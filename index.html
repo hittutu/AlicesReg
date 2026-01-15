@@ -1,361 +1,393 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
-import * as THREE from 'three';
-
-// --- STYLES & ASSETS ---
-const GlobalStyles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
-
-    body {
-      background-color: #050505;
-      margin: 0;
-      overflow: hidden;
-    }
-
-    .grain-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 50;
-      opacity: 0.07;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    }
-
-    /* Glitch Keyframes */
-    @keyframes glitch-anim-1 {
-      0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
-      20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
-      40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
-      60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
-      80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
-      100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
-    }
-
-    .glitch-hover:hover::before,
-    .glitch-hover:hover::after {
-      content: attr(data-text);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #050505;
-    }
-
-    .glitch-hover:hover::before {
-      left: 2px;
-      text-shadow: -1px 0 #FF6B6B;
-      animation: glitch-anim-1 0.3s infinite linear alternate-reverse;
-    }
-
-    .glitch-hover:hover::after {
-      left: -2px;
-      text-shadow: -1px 0 #00FFCC;
-      animation: glitch-anim-1 0.2s infinite linear alternate-reverse;
-    }
-  `}</style>
-);
-
-// --- VANILLA THREE.JS SCENE COMPONENT ---
-// Replaces Canvas/R3F to avoid reconciler errors
-const ThreeScene = ({ hoverState }) => {
-  const mountRef = useRef(null);
-
-  useEffect(() => {
-    if (!mountRef.current) return;
-
-    // 1. Setup Scene, Camera, Renderer
-    const scene = new THREE.Scene();
-    // scene.background = new THREE.Color('#050505'); // Let CSS handle background for transparency
-
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.z = 4.5;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    mountRef.current.appendChild(renderer.domElement);
-
-    // 2. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-    scene.add(ambientLight);
-
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.0);
-    dirLight1.position.set(5, 5, 5);
-    scene.add(dirLight1);
-
-    const dirLight2 = new THREE.DirectionalLight(0x00FFCC, 1.5);
-    dirLight2.position.set(-5, -5, -2);
-    scene.add(dirLight2);
-
-    const pointLight1 = new THREE.PointLight(0xFF6B6B, 1.0);
-    pointLight1.position.set(0, -5, 5);
-    scene.add(pointLight1);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sealed Light Flow</title>
     
-    const pointLight2 = new THREE.PointLight(0x4444ff, 0.5);
-    pointLight2.position.set(-5, 5, -5);
-    scene.add(pointLight2);
-
-    // 3. Liquid Sphere
-    const geometry = new THREE.SphereGeometry(1, 128, 128);
-    const material = new THREE.MeshPhysicalMaterial({
-      color: 0xe0e0e0,
-      metalness: 1.0,
-      roughness: 0.05,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
-      reflectivity: 1
-    });
-    const sphere = new THREE.Mesh(geometry, material);
-    sphere.scale.set(1.8, 1.8, 1.8);
-    scene.add(sphere);
-
-    // 4. Stars
-    const starsGeo = new THREE.BufferGeometry();
-    const starCount = 2000;
-    const starPos = new Float32Array(starCount * 3);
-    for(let i=0; i < starCount * 3; i++) {
-      starPos[i] = (Math.random() - 0.5) * 200;
+    <!-- 1. Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Import Maps: 修正了依赖关系，防止 React 多重加载 -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom": "https://esm.sh/react-dom@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "framer-motion": "https://esm.sh/framer-motion@10.16.4?external=react,react-dom",
+            "lucide-react": "https://esm.sh/lucide-react@0.292.0?external=react,react-dom",
+            "three": "https://esm.sh/three@0.160.0"
+        }
     }
-    starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    const starsMat = new THREE.PointsMaterial({
-      size: 0.3, 
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.6,
-      sizeAttenuation: true
-    });
-    const stars = new THREE.Points(starsGeo, starsMat);
-    scene.add(stars);
+    </script>
 
-    // 5. Animation Loop
-    let animationFrameId;
-    const clock = new THREE.Clock();
-    let mouseX = 0;
-    let mouseY = 0;
+    <!-- 3. Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      const time = clock.getElapsedTime();
+    <style>
+        body { background-color: #050505; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-      // Sphere Logic
-      // Interaction Rotation
-      sphere.rotation.x = THREE.MathUtils.lerp(sphere.rotation.x, mouseY * 0.2, 0.1);
-      sphere.rotation.y = THREE.MathUtils.lerp(sphere.rotation.y, mouseX * 0.2, 0.1);
+    <!-- 4. 代码逻辑 -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useRef, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { motion } from 'framer-motion';
+        import { Lock } from 'lucide-react';
+        import * as THREE from 'three';
 
-      // Wobble / Breathing
-      // We access the hoverState from the mutable ref approach below or pass it via props?
-      // Since useEffect runs once, we need a ref for the latest hoverState if we want it live.
-      // But standard React props in useEffect dependency would re-create scene.
-      // For performance, we'll read a data-attribute or use a ref from parent. 
-      // To keep it simple in this architecture, we will use a small trick:
-      // We will update a mutable ref outside the loop.
-      
-      const currentHoverState = mountRef.current.getAttribute('data-hover') === 'true';
-      
-      const wobbleSpeed = currentHoverState ? 4 : 1.5;
-      const wobbleIntensity = currentHoverState ? 0.15 : 0.05;
-      const baseScale = 1.8;
+        // --- STYLES & ASSETS ---
+        const GlobalStyles = () => (
+        <style>{`
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
-      const sx = baseScale + Math.sin(time * wobbleSpeed) * wobbleIntensity;
-      const sy = baseScale + Math.sin(time * wobbleSpeed * 1.1 + 1) * wobbleIntensity;
-      const sz = baseScale + Math.sin(time * wobbleSpeed * 0.9 + 2) * wobbleIntensity;
-      
-      sphere.scale.set(sx, sy, sz);
-      sphere.position.y = Math.sin(time * 0.5) * 0.1;
+            body {
+            background-color: #050505;
+            margin: 0;
+            overflow: hidden;
+            }
 
-      // Stars Rotation
-      stars.rotation.y = time * 0.02;
+            .grain-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.07;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            }
 
-      renderer.render(scene, camera);
-    };
+            /* Glitch Keyframes */
+            @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
+            40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
+            100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
+            }
 
-    animate();
+            .glitch-hover:hover::before,
+            .glitch-hover:hover::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            }
 
-    // 6. Event Listeners
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
+            .glitch-hover:hover::before {
+            left: 2px;
+            text-shadow: -1px 0 #FF6B6B;
+            animation: glitch-anim-1 0.3s infinite linear alternate-reverse;
+            }
 
-    const handleMouseMove = (event) => {
-      // Normalize mouse -1 to 1
-      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-    };
+            .glitch-hover:hover::after {
+            left: -2px;
+            text-shadow: -1px 0 #00FFCC;
+            animation: glitch-anim-1 0.2s infinite linear alternate-reverse;
+            }
+        `}</style>
+        );
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
+        // --- VANILLA THREE.JS SCENE COMPONENT ---
+        const ThreeScene = ({ hoverState }) => {
+        const mountRef = useRef(null);
 
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
-      if (mountRef.current) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      geometry.dispose();
-      material.dispose();
-    };
-  }, []); // Run once on mount
+        useEffect(() => {
+            if (!mountRef.current) return;
 
-  // Update data attribute for the animation loop to read
-  useEffect(() => {
-    if (mountRef.current) {
-      mountRef.current.setAttribute('data-hover', hoverState);
-    }
-  }, [hoverState]);
+            // 1. Setup Scene, Camera, Renderer
+            const scene = new THREE.Scene();
 
-  return <div ref={mountRef} className="absolute inset-0 z-0" />;
-};
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 4.5;
 
-// --- UI COMPONENTS ---
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            mountRef.current.appendChild(renderer.domElement);
 
-const GlitchLink = ({ text, subtext, positionClass, setHoverState, isLocked = false, delay = 0 }) => {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, filter: 'blur(10px)' }}
-      animate={{ opacity: 1, filter: 'blur(0px)' }}
-      transition={{ duration: 1, delay: delay + 1.5, ease: "easeOut" }}
-      className={`absolute ${positionClass} flex flex-col group cursor-pointer z-10`}
-      onMouseEnter={() => setHoverState(true)}
-      onMouseLeave={() => setHoverState(false)}
-    >
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-['Space_Mono'] text-gray-500 group-hover:text-[#00FFCC] transition-colors duration-300">
-          {subtext}
-        </span>
-        {isLocked && <Lock size={12} className="text-gray-500 group-hover:text-[#FF6B6B]" />}
-      </div>
-      
-      <h2 
-        className="text-2xl md:text-4xl font-['Playfair_Display'] text-white font-bold relative glitch-hover uppercase tracking-wider"
-        data-text={text}
-      >
-        {text}
-      </h2>
-      
-      <div className="h-[1px] w-0 bg-gradient-to-r from-[#00FFCC] to-[#FF6B6B] group-hover:w-full transition-all duration-300 ease-out mt-1" />
-    </motion.div>
-  );
-};
+            // 2. Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
 
-const EntranceAnimation = ({ onComplete }) => {
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 bg-[#050505] flex items-center justify-center pointer-events-none"
-      initial={{ clipPath: "inset(0% 0% 0% 0%)" }}
-      animate={{ clipPath: "inset(50% 0% 50% 0%)" }}
-      transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1], delay: 0.5 }}
-      onAnimationComplete={onComplete}
-    >
-      <motion.div 
-        className="w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"
-        initial={{ scaleX: 0, opacity: 0 }}
-        animate={{ scaleX: 1, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      />
-    </motion.div>
-  );
-};
+            const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.0);
+            dirLight1.position.set(5, 5, 5);
+            scene.add(dirLight1);
 
-// --- MAIN APPLICATION ---
+            const dirLight2 = new THREE.DirectionalLight(0x00FFCC, 1.5);
+            dirLight2.position.set(-5, -5, -2);
+            scene.add(dirLight2);
 
-const App = () => {
-  const [hoverState, setHoverState] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [mounted, setMounted] = useState(false);
+            const pointLight1 = new THREE.PointLight(0xFF6B6B, 1.0);
+            pointLight1.position.set(0, -5, 5);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0x4444ff, 0.5);
+            pointLight2.position.set(-5, 5, -5);
+            scene.add(pointLight2);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+            // 3. Liquid Sphere
+            const geometry = new THREE.SphereGeometry(1, 128, 128);
+            const material = new THREE.MeshPhysicalMaterial({
+            color: 0xe0e0e0,
+            metalness: 1.0,
+            roughness: 0.05,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1,
+            reflectivity: 1
+            });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.scale.set(1.8, 1.8, 1.8);
+            scene.add(sphere);
 
-  if (!mounted) return null;
+            // 4. Stars
+            const starsGeo = new THREE.BufferGeometry();
+            const starCount = 2000;
+            const starPos = new Float32Array(starCount * 3);
+            for(let i=0; i < starCount * 3; i++) {
+            starPos[i] = (Math.random() - 0.5) * 200;
+            }
+            starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            const starsMat = new THREE.PointsMaterial({
+            size: 0.3, 
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.6,
+            sizeAttenuation: true
+            });
+            const stars = new THREE.Points(starsGeo, starsMat);
+            scene.add(stars);
 
-  return (
-    <div className="w-full h-screen relative bg-[#050505] overflow-hidden">
-      <GlobalStyles />
-      <div className="grain-overlay" />
+            // 5. Animation Loop
+            let animationFrameId;
+            const clock = new THREE.Clock();
+            let mouseX = 0;
+            let mouseY = 0;
 
-      <EntranceAnimation onComplete={() => setLoaded(true)} />
+            const animate = () => {
+            animationFrameId = requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
 
-      {/* Vanilla Three.js Scene */}
-      <ThreeScene hoverState={hoverState} />
+            // Sphere Logic
+            // Interaction Rotation
+            sphere.rotation.x = THREE.MathUtils.lerp(sphere.rotation.x, mouseY * 0.2, 0.1);
+            sphere.rotation.y = THREE.MathUtils.lerp(sphere.rotation.y, mouseX * 0.2, 0.1);
 
-      <div className="absolute inset-0 pointer-events-none p-8 md:p-16">
-        <div className="w-full h-full relative pointer-events-auto max-w-7xl mx-auto">
-          
-          <GlitchLink 
-            text="Glitch Gallery" 
-            subtext="01 // VISUALS"
-            positionClass="top-0 left-0 md:top-10 md:left-10"
-            setHoverState={setHoverState}
-            delay={0.2}
-          />
+            // Reading data attribute for hover state to avoid closure staleness issues in loop
+            const currentHoverState = mountRef.current ? mountRef.current.getAttribute('data-hover') === 'true' : false;
+            
+            const wobbleSpeed = currentHoverState ? 4 : 1.5;
+            const wobbleIntensity = currentHoverState ? 0.15 : 0.05;
+            const baseScale = 1.8;
 
-          <GlitchLink 
-            text="The Playground" 
-            subtext="02 // EXPERIMENTS"
-            positionClass="top-0 right-0 md:top-10 md:right-10 items-end text-right"
-            setHoverState={setHoverState}
-            delay={0.4}
-          />
+            const sx = baseScale + Math.sin(time * wobbleSpeed) * wobbleIntensity;
+            const sy = baseScale + Math.sin(time * wobbleSpeed * 1.1 + 1) * wobbleIntensity;
+            const sz = baseScale + Math.sin(time * wobbleSpeed * 0.9 + 2) * wobbleIntensity;
+            
+            sphere.scale.set(sx, sy, sz);
+            sphere.position.y = Math.sin(time * 0.5) * 0.1;
 
-          <GlitchLink 
-            text="Bubble Logs" 
-            subtext="03 // THOUGHTS"
-            positionClass="bottom-0 left-0 md:bottom-10 md:left-10 justify-end"
-            setHoverState={setHoverState}
-            delay={0.6}
-          />
+            // Stars Rotation
+            stars.rotation.y = time * 0.02;
 
-          <GlitchLink 
-            text="Locked Area" 
-            subtext="04 // RESTRICTED"
-            positionClass="bottom-0 right-0 md:bottom-10 md:right-10 items-end text-right justify-end"
-            setHoverState={setHoverState}
-            isLocked={true}
-            delay={0.8}
-          />
+            renderer.render(scene, camera);
+            };
 
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            transition={{ delay: 2.5, duration: 2 }}
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none mix-blend-overlay"
-          >
-            <span className="font-['Space_Mono'] text-[10px] tracking-[1em] text-white">SEALED LIGHT FLOW</span>
-          </motion.div>
+            animate();
 
-        </div>
-      </div>
-      
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
-        className="fixed top-6 left-6 w-4 h-4 border-l border-t border-gray-600/50 pointer-events-none" 
-      />
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
-        className="fixed top-6 right-6 w-4 h-4 border-r border-t border-gray-600/50 pointer-events-none" 
-      />
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
-        className="fixed bottom-6 left-6 w-4 h-4 border-l border-b border-gray-600/50 pointer-events-none" 
-      />
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
-        className="fixed bottom-6 right-6 w-4 h-4 border-r border-b border-gray-600/50 pointer-events-none" 
-      />
+            // 6. Event Listeners
+            const handleResize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            };
 
-    </div>
-  );
-};
+            const handleMouseMove = (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            };
 
-export default App;
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('mousemove', handleMouseMove);
+
+            // Cleanup
+            return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('mousemove', handleMouseMove);
+            cancelAnimationFrame(animationFrameId);
+            if (mountRef.current && renderer.domElement) {
+                // Ensure checking if child exists before removing
+                if (mountRef.current.contains(renderer.domElement)) {
+                    mountRef.current.removeChild(renderer.domElement);
+                }
+            }
+            geometry.dispose();
+            material.dispose();
+            };
+        }, []); 
+
+        useEffect(() => {
+            if (mountRef.current) {
+            mountRef.current.setAttribute('data-hover', hoverState);
+            }
+        }, [hoverState]);
+
+        return <div ref={mountRef} className="absolute inset-0 z-0" />;
+        };
+
+        // --- UI COMPONENTS ---
+
+        const GlitchLink = ({ text, subtext, positionClass, setHoverState, isLocked = false, delay = 0 }) => {
+        return (
+            <motion.div 
+            initial={{ opacity: 0, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 1, delay: delay + 1.5, ease: "easeOut" }}
+            className={`absolute ${positionClass} flex flex-col group cursor-pointer z-10`}
+            onMouseEnter={() => setHoverState(true)}
+            onMouseLeave={() => setHoverState(false)}
+            >
+            <div className="flex items-center gap-2">
+                <span className="text-xs font-['Space_Mono'] text-gray-500 group-hover:text-[#00FFCC] transition-colors duration-300">
+                {subtext}
+                </span>
+                {isLocked && <Lock size={12} className="text-gray-500 group-hover:text-[#FF6B6B]" />}
+            </div>
+            
+            <h2 
+                className="text-2xl md:text-4xl font-['Playfair_Display'] text-white font-bold relative glitch-hover uppercase tracking-wider"
+                data-text={text}
+            >
+                {text}
+            </h2>
+            
+            <div className="h-[1px] w-0 bg-gradient-to-r from-[#00FFCC] to-[#FF6B6B] group-hover:w-full transition-all duration-300 ease-out mt-1" />
+            </motion.div>
+        );
+        };
+
+        const EntranceAnimation = ({ onComplete }) => {
+        return (
+            <motion.div
+            className="fixed inset-0 z-50 bg-[#050505] flex items-center justify-center pointer-events-none"
+            initial={{ clipPath: "inset(0% 0% 0% 0%)" }}
+            animate={{ clipPath: "inset(50% 0% 50% 0%)" }}
+            transition={{ duration: 1.5, ease: [0.76, 0, 0.24, 1], delay: 0.5 }}
+            onAnimationComplete={onComplete}
+            >
+            <motion.div 
+                className="w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent"
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+            </motion.div>
+        );
+        };
+
+        // --- MAIN APPLICATION ---
+
+        const App = () => {
+        const [hoverState, setHoverState] = useState(false);
+        const [loaded, setLoaded] = useState(false);
+        const [mounted, setMounted] = useState(false);
+
+        useEffect(() => {
+            setMounted(true);
+        }, []);
+
+        if (!mounted) return null;
+
+        return (
+            <div className="w-full h-screen relative bg-[#050505] overflow-hidden">
+            <GlobalStyles />
+            <div className="grain-overlay" />
+
+            <EntranceAnimation onComplete={() => setLoaded(true)} />
+
+            <ThreeScene hoverState={hoverState} />
+
+            <div className="absolute inset-0 pointer-events-none p-8 md:p-16">
+                <div className="w-full h-full relative pointer-events-auto max-w-7xl mx-auto">
+                
+                <GlitchLink 
+                    text="Glitch Gallery" 
+                    subtext="01 // VISUALS"
+                    positionClass="top-0 left-0 md:top-10 md:left-10"
+                    setHoverState={setHoverState}
+                    delay={0.2}
+                />
+
+                <GlitchLink 
+                    text="The Playground" 
+                    subtext="02 // EXPERIMENTS"
+                    positionClass="top-0 right-0 md:top-10 md:right-10 items-end text-right"
+                    setHoverState={setHoverState}
+                    delay={0.4}
+                />
+
+                <GlitchLink 
+                    text="Bubble Logs" 
+                    subtext="03 // THOUGHTS"
+                    positionClass="bottom-0 left-0 md:bottom-10 md:left-10 justify-end"
+                    setHoverState={setHoverState}
+                    delay={0.6}
+                />
+
+                <GlitchLink 
+                    text="Locked Area" 
+                    subtext="04 // RESTRICTED"
+                    positionClass="bottom-0 right-0 md:bottom-10 md:right-10 items-end text-right justify-end"
+                    setHoverState={setHoverState}
+                    isLocked={true}
+                    delay={0.8}
+                />
+
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.3 }}
+                    transition={{ delay: 2.5, duration: 2 }}
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none mix-blend-overlay"
+                >
+                    <span className="font-['Space_Mono'] text-[10px] tracking-[1em] text-white">SEALED LIGHT FLOW</span>
+                </motion.div>
+
+                </div>
+            </div>
+            
+            <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
+                className="fixed top-6 left-6 w-4 h-4 border-l border-t border-gray-600/50 pointer-events-none" 
+            />
+            <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
+                className="fixed top-6 right-6 w-4 h-4 border-r border-t border-gray-600/50 pointer-events-none" 
+            />
+            <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
+                className="fixed bottom-6 left-6 w-4 h-4 border-l border-b border-gray-600/50 pointer-events-none" 
+            />
+            <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1 }}
+                className="fixed bottom-6 right-6 w-4 h-4 border-r border-b border-gray-600/50 pointer-events-none" 
+            />
+
+            </div>
+        );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
