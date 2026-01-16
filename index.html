@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sealed Light Flow // V4.6 (Ripple Dock)</title>
+    <title>Sealed Light Flow // V4.7 (Aligned Burst)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -267,9 +267,9 @@
             </div>
         );
 
-        // --- UPDATED NavItem with Ripple Effect ---
+        // --- UPDATED NavItem with Aligned Ripple & Particles ---
         const NavItem = ({ label, isPrivate, rippleColor = "#FFFFFF" }) => {
-            // Parent variants (for text/container behavior)
+            // Parent variants
             const containerVariants = {
                 publicHover: { scale: 1.05 },
                 privateHover: { 
@@ -279,11 +279,11 @@
                 }
             };
 
-            // Child variants for the Ripple
+            // Ripple expands from LEFT (12.5%) and BOTTOM (4px)
             const rippleVariants = {
                 publicHover: { 
-                    scale: [0.1, 5], // Start small, expand big to cover
-                    opacity: [0.5, 0], // Fade out
+                    scale: [0.1, 5], 
+                    opacity: [0.5, 0],
                     transition: { duration: 1.3, ease: "easeOut" }
                 },
                 privateHover: { 
@@ -293,25 +293,70 @@
                 }
             };
 
+            // Particle dispersion animation
+            const particleVariants = {
+                publicHover: (i) => ({
+                    x: [0, (Math.random() - 0.5) * 40], // Scatter X
+                    y: [0, -Math.random() * 30 - 10],   // Scatter Y (mostly up)
+                    opacity: [0, 0.8, 0],
+                    scale: [0, 1, 0],
+                    transition: { duration: 1.0, ease: "easeOut", delay: 0.1 }
+                }),
+                privateHover: (i) => ({
+                    x: [0, (Math.random() - 0.5) * 40],
+                    y: [0, -Math.random() * 30 - 10],
+                    opacity: [0, 0.8, 0],
+                    scale: [0, 1, 0],
+                    transition: { duration: 1.0, ease: "easeOut", delay: 0.1 }
+                })
+            };
+
+            // Generate 5 static random seeds for particles
+            const particles = useMemo(() => [1,2,3,4,5], []);
+
             return (
                 <motion.div 
                     whileHover={isPrivate ? "privateHover" : "publicHover"} 
                     whileTap={{ scale: 0.95 }}
                     variants={containerVariants}
-                    className="relative group cursor-pointer px-4 py-2 mx-1 rounded-full overflow-hidden" // overflow-hidden keeps ripple inside
+                    className="relative group cursor-pointer px-4 py-2 mx-1 rounded-full overflow-hidden" 
                 >
-                    {/* The Ripple Element */}
+                    {/* The Ripple Element (Aligned to start of the line) */}
                     <motion.div
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+                        className="absolute rounded-full pointer-events-none"
                         style={{ 
-                            width: '20px', 
-                            height: '20px',
+                            left: '12.5%', // 50% - (75% / 2)
+                            bottom: '4px', // Same level as the line
+                            width: '10px', 
+                            height: '10px',
+                            // Centering the origin point of the div itself
+                            transformOrigin: "center center", 
+                            x: "-50%", // Center the div on the 12.5% point
+                            y: "50%",
                             border: `1px solid ${rippleColor}`,
-                            boxShadow: `0 0 10px ${rippleColor}`, // Glow
-                            opacity: 0 // Default hidden
+                            boxShadow: `0 0 10px ${rippleColor}`,
+                            opacity: 0 
                         }}
                         variants={rippleVariants}
                     />
+
+                    {/* Stardust Burst Particles */}
+                    {particles.map((p, i) => (
+                        <motion.div
+                            key={i}
+                            custom={i}
+                            variants={particleVariants}
+                            className="absolute rounded-full pointer-events-none"
+                            style={{
+                                left: '12.5%',
+                                bottom: '4px',
+                                width: '2px',
+                                height: '2px',
+                                backgroundColor: rippleColor,
+                                opacity: 0
+                            }}
+                        />
+                    ))}
 
                     <div className={`relative z-10 flex items-center text-xs md:text-sm tracking-widest transition-colors duration-300 ${isPrivate ? 'group-hover:text-red-400' : 'text-silver-dim group-hover:text-silver'}`}>
                         {label}
@@ -452,7 +497,7 @@
                     </motion.div>
 
                     <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">
-                        SYS.VER.1.4 // RIPPLE_DOCK<br/>
+                        SYS.VER.1.5 // PARTICLE_BURST<br/>
                         LAT: 35.6895° N
                     </div>
 
