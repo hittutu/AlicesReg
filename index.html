@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sealed Light Flow // V5.2 (Orb Sync Fixed)</title>
+    <title>Sealed Light Flow // V5.3 (Sharp Particles)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -41,11 +41,6 @@
                             '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        },
-                        invertFlash: {
-                            '0%': { filter: 'invert(0)' },
-                            '50%': { filter: 'invert(1)' },
-                            '100%': { filter: 'invert(0)' },
                         },
                         floatUp30: {
                             '0%': { transform: 'translate(0, 0) scale(0.5)', opacity: 0 },
@@ -180,14 +175,12 @@
             </div>
         );
 
-        // --- NavItem Component FIXED ---
         const NavItem = ({ label, isPrivate, rippleColor = "#FFFFFF" }) => {
             const containerVariants = {
                 publicHover: { scale: 1.05 },
                 privateHover: { x: [0, -2, 2, -2, 2, 0], color: '#FF4D4D', transition: { duration: 0.4 } }
             };
 
-            // FIX: Match keys with container's hover state names
             const orbVariants = {
                 initial: { scale: 0.1, opacity: 0 },
                 publicHover: { 
@@ -205,22 +198,22 @@
             const particleVariants = {
                 initial: { opacity: 0, scale: 0 },
                 publicHover: (i) => ({
-                    x: [0, (Math.random() - 0.5) * 60],
-                    y: [0, -Math.random() * 40 - 10],
-                    opacity: [0, 1, 0],
-                    scale: [0, 1.5, 0],
-                    transition: { duration: 0.8, ease: "easeOut", delay: i * 0.02 }
+                    x: [0, (Math.random() - 0.5) * 80], // Wider scatter for better visibility of tiny dots
+                    y: [0, -Math.random() * 50 - 20],   // More vertical lift
+                    opacity: [0, 1, 1, 0],             // Stay solid for longer
+                    scale: [0, 1.2, 1],                // Minimal scale to keep it "condensed"
+                    transition: { duration: 0.9, ease: "easeOut", delay: i * 0.01 }
                 }),
                 privateHover: (i) => ({
-                    x: [0, (Math.random() - 0.5) * 60],
-                    y: [0, -Math.random() * 40 - 10],
-                    opacity: [0, 1, 0],
-                    scale: [0, 1.5, 0],
-                    transition: { duration: 0.8, ease: "easeOut", delay: i * 0.02 }
+                    x: [0, (Math.random() - 0.5) * 80],
+                    y: [0, -Math.random() * 50 - 20],
+                    opacity: [0, 1, 1, 0],
+                    scale: [0, 1.2, 1],
+                    transition: { duration: 0.9, ease: "easeOut", delay: i * 0.01 }
                 })
             };
 
-            const particles = useMemo(() => [1,2,3,4,5], []);
+            const particles = useMemo(() => Array.from({length: 6}), []); // Up to 6 sparks
 
             return (
                 <motion.div 
@@ -230,32 +223,30 @@
                     variants={containerVariants}
                     className="relative group cursor-pointer px-4 py-2 mx-1 rounded-full overflow-hidden" 
                 >
-                    {/* The Energy Orb Element */}
+                    {/* The Energy Orb Element (Kept for depth) */}
                     <motion.div
                         className="absolute rounded-full pointer-events-none"
                         style={{ 
-                            left: '12.5%', 
-                            bottom: '4px',
-                            width: '10px', 
-                            height: '10px',
-                            transformOrigin: "center center", 
-                            x: "-50%",
-                            y: "50%",
-                            background: `radial-gradient(circle, ${rippleColor} 0%, rgba(0,0,0,0) 70%)`,
-                            filter: 'blur(4px)',
-                            boxShadow: `0 0 15px 2px ${rippleColor}`
+                            left: '12.5%', bottom: '4px', width: '10px', height: '10px', transformOrigin: "center center", 
+                            x: "-50%", y: "50%", background: `radial-gradient(circle, ${rippleColor} 0%, rgba(0,0,0,0) 70%)`,
+                            filter: 'blur(4px)', boxShadow: `0 0 15px 2px ${rippleColor}`
                         }}
                         variants={orbVariants}
                     />
 
-                    {/* Stardust Burst Particles */}
+                    {/* Stardust Burst Particles - Condensated and Sharpened */}
                     {particles.map((p, i) => (
                         <motion.div
                             key={i}
                             custom={i}
                             variants={particleVariants}
                             className="absolute rounded-full pointer-events-none"
-                            style={{ left: '12.5%', bottom: '4px', width: '2px', height: '2px', backgroundColor: rippleColor }}
+                            style={{ 
+                                left: '12.5%', bottom: '4px', 
+                                width: '1px', height: '1px', // Sharper, smaller
+                                backgroundColor: rippleColor,
+                                boxShadow: `0 0 2px 0.5px ${rippleColor}` // "Hot" core glow
+                            }}
                         />
                     ))}
 
@@ -265,13 +256,8 @@
                     </div>
                     
                     {!isPrivate && (
-                        <div 
-                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] group-hover:w-3/4 transition-all duration-300"
-                            style={{ 
-                                background: `linear-gradient(90deg, ${rippleColor} 0%, transparent 100%)`,
-                                boxShadow: `0 0 8px ${rippleColor}`
-                            }}
-                        />
+                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] group-hover:w-3/4 transition-all duration-300"
+                             style={{ background: `linear-gradient(90deg, ${rippleColor} 0%, transparent 100%)`, boxShadow: `0 0 8px ${rippleColor}` }} />
                     )}
                 </motion.div>
             );
@@ -338,7 +324,7 @@
                         </div>
                     </motion.div>
 
-                    <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">SYS.VER.1.8 // ORB_SYNC<br/>LAT: 35.6895° N</div>
+                    <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">SYS.VER.1.9 // SHARP_PARTICLES<br/>LAT: 35.6895° N</div>
                     <div className="absolute bottom-8 right-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block text-right select-none">MEM: WEST_COAST_SERVER<br/>UPTIME: ∞</div>
 
                     <motion.div className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-50 mix-blend-difference" variants={cursorVariants} animate="default" transition={{ type: "spring", stiffness: 500, damping: 28 }} />
