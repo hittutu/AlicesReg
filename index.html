@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sealed Light Flow // V2</title>
+    <title>Sealed Light Flow // V3.5 (High Voltage)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -31,7 +31,7 @@
                         mono: ['Courier New', 'Courier', 'monospace'],
                     },
                     animation: {
-                        'blob': 'blob 10s infinite',
+                        'blob': 'blob 15s infinite',
                     },
                     keyframes: {
                         blob: {
@@ -68,7 +68,6 @@
             z-index: 10;
         }
 
-        /* The glitch layers are hidden by default, triggered by class or hover */
         .glitch-text::before,
         .glitch-text::after {
             content: attr(data-text);
@@ -78,11 +77,10 @@
             width: 100%;
             height: 100%;
             background: #050505;
-            opacity: 0; /* Hidden by default */
+            opacity: 0;
             pointer-events: none;
         }
 
-        /* Trigger State: When class 'active-glitch' is present OR on hover */
         .glitch-text.active-glitch::before,
         .glitch-text.active-glitch::after,
         .glitch-text:hover::before,
@@ -90,7 +88,6 @@
             opacity: 1;
         }
 
-        /* Cyan Layer */
         .glitch-text.active-glitch::before,
         .glitch-text:hover::before {
             color: #00FFFF;
@@ -98,7 +95,6 @@
             animation: glitch-anim-1 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
         }
 
-        /* Magenta Layer */
         .glitch-text.active-glitch::after,
         .glitch-text:hover::after {
             color: #FF00FF;
@@ -124,13 +120,14 @@
             100% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, 2px); }
         }
 
-        /* Background Gradient Blur Utility */
+        /* Stronger Neon Blobs */
         .aurora-blob {
             position: absolute;
-            filter: blur(80px);
-            opacity: 0.4;
-            mix-blend-mode: screen;
-            animation: blob 10s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            filter: blur(100px);
+            opacity: 0.6; /* Increased opacity for denser liquid feel */
+            mix-blend-mode: color-dodge;
+            animation: blob 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -141,39 +138,28 @@
         const { useState, useEffect, useRef } = React;
         const { motion, useMotionValue, useSpring, useTransform } = window.Motion;
 
-        // --- Hook: Random Voltage Glitch ---
-        // Causes the text to glitch randomly without user interaction
         const useRandomGlitch = (minTime = 3000, maxTime = 8000) => {
             const [isGlitching, setIsGlitching] = useState(false);
-
             useEffect(() => {
                 let timeout;
                 const triggerGlitch = () => {
                     setIsGlitching(true);
-                    // Glitch duration: short (150ms) to medium (400ms)
                     const duration = Math.random() * 250 + 150;
-                    
                     setTimeout(() => {
                         setIsGlitching(false);
-                        // Schedule next glitch
                         const nextDelay = Math.random() * (maxTime - minTime) + minTime;
                         timeout = setTimeout(triggerGlitch, nextDelay);
                     }, duration);
                 };
-
-                // Start the loop
                 timeout = setTimeout(triggerGlitch, 2000);
                 return () => clearTimeout(timeout);
             }, [minTime, maxTime]);
-
             return isGlitching;
         };
 
-        // --- Hook: Decoding Text ---
         const useDecodingText = (text) => {
             const [displayText, setDisplayText] = useState('');
             const chars = "X#@!$01&?£Øµ";
-            
             useEffect(() => {
                 let iteration = 0;
                 let interval = setInterval(() => {
@@ -181,7 +167,6 @@
                         if (index < iteration) return text[index];
                         return chars[Math.floor(Math.random() * chars.length)];
                     }).join(""));
-
                     if (iteration >= text.length) clearInterval(interval);
                     iteration += 1 / 3;
                 }, 30);
@@ -190,43 +175,69 @@
             return displayText;
         };
 
-        // --- Component: Moving Aurora Background ---
         const AuroraBackground = () => (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* Silver Blob */}
-                <div className="aurora-blob bg-gray-600 w-96 h-96 top-0 left-1/4 animate-blob"></div>
-                {/* Cyan Blob */}
-                <div className="aurora-blob bg-cyan-700 w-96 h-96 top-1/2 right-1/4 animation-delay-2000 animate-blob" style={{animationDelay: '2s'}}></div>
-                {/* Purple Blob */}
-                <div className="aurora-blob bg-purple-900 w-80 h-80 bottom-0 left-1/3 animation-delay-4000 animate-blob" style={{animationDelay: '4s'}}></div>
+                {/* UPDATED COLORS: 
+                   1. Silver -> White (Maximum brightness for Mercury liquid)
+                   2. Cyan -> Cyan-500 (Brighter base for stronger neon glow)
+                   3. Purple -> Fuchsia-600 (More vibrant purple)
+                */}
+                <div className="aurora-blob bg-white w-96 h-96 top-0 left-1/4 animate-blob"></div>
+                <div className="aurora-blob bg-cyan-500 w-96 h-96 top-1/2 right-1/4 animation-delay-2000 animate-blob" style={{animationDelay: '2s'}}></div>
+                <div className="aurora-blob bg-fuchsia-600 w-80 h-80 bottom-0 left-1/3 animation-delay-4000 animate-blob" style={{animationDelay: '4s'}}></div>
                 
-                {/* Overlay Texture to make it look grainy/cyber */}
                 <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
             </div>
         );
 
-        // --- Component: Nav Item ---
-        const NavItem = ({ label, isPrivate }) => (
-            <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative group cursor-pointer px-4 py-2 mx-1 rounded-full"
-            >
-                <div className="flex items-center text-xs md:text-sm tracking-widest text-silver-dim group-hover:text-silver transition-colors duration-300">
-                    {label}
-                    {isPrivate && <span className="ml-1 text-[10px]">🔒</span>}
-                </div>
-                {/* Aurora Line under nav items */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-gradient-to-r from-aurora to-purple-500 group-hover:w-3/4 transition-all duration-300"></div>
-            </motion.div>
-        );
+        const NavItem = ({ label, isPrivate }) => {
+            const shakeVariant = {
+                hover: { 
+                    x: [0, -2, 2, -2, 2, 0],
+                    color: isPrivate ? '#FF4D4D' : '#E0E0E0', 
+                    transition: { duration: 0.4 } 
+                }
+            };
+            return (
+                <motion.div 
+                    whileHover={isPrivate ? "hover" : { scale: 1.05 }} 
+                    whileTap={{ scale: 0.95 }}
+                    variants={isPrivate ? shakeVariant : {}}
+                    className="relative group cursor-pointer px-4 py-2 mx-1 rounded-full"
+                >
+                    <div className={`flex items-center text-xs md:text-sm tracking-widest transition-colors duration-300 ${isPrivate ? 'group-hover:text-red-400' : 'text-silver-dim group-hover:text-silver'}`}>
+                        {label}
+                        {isPrivate && <span className="ml-1 text-[10px] group-hover:animate-pulse">🔒</span>}
+                    </div>
+                    {!isPrivate && (
+                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-gradient-to-r from-aurora to-purple-500 group-hover:w-3/4 transition-all duration-300"></div>
+                    )}
+                </motion.div>
+            );
+        };
 
         const MainApp = () => {
             const [isInverted, setIsInverted] = useState(false);
             const decodedTitle = useDecodingText("SEALED LIGHT FLOW");
-            const isRandomGlitching = useRandomGlitch(4000, 10000); // Glitch every 4-10 seconds
+            const isRandomGlitching = useRandomGlitch(4000, 10000);
+            
+            const [cursorXY, setCursorXY] = useState({ x: -100, y: -100 });
 
-            // Mouse Parallax Logic
+            useEffect(() => {
+                const moveCursor = (e) => {
+                    setCursorXY({ x: e.clientX, y: e.clientY });
+                };
+                window.addEventListener('mousemove', moveCursor);
+                return () => window.removeEventListener('mousemove', moveCursor);
+            }, []);
+
+            const cursorVariants = {
+                default: {
+                    x: cursorXY.x - 16,
+                    y: cursorXY.y - 16,
+                }
+            };
+
             const x = useMotionValue(0);
             const y = useMotionValue(0);
             const springConfig = { damping: 25, stiffness: 150 };
@@ -237,7 +248,6 @@
                 const { clientX, clientY } = e;
                 const centerX = window.innerWidth / 2;
                 const centerY = window.innerHeight / 2;
-                // Subtle movement
                 x.set((clientX - centerX) / 40);
                 y.set((clientY - centerY) / 40);
             };
@@ -250,30 +260,38 @@
             return (
                 <div 
                     onMouseMove={handleMouseMove}
-                    className={`relative w-full h-screen bg-void text-silver font-mono overflow-hidden transition-all duration-75 ${isInverted ? 'invert' : ''}`}
+                    className={`relative w-full h-screen bg-void text-silver font-mono overflow-hidden transition-all duration-75 cursor-none ${isInverted ? 'invert' : ''}`}
                 >
                     <AuroraBackground />
 
-                    {/* Hidden Pixel Trigger */}
-                    <div onMouseEnter={handleHiddenTrigger} className="absolute top-0 right-0 w-[10px] h-[10px] z-50 cursor-crosshair hover:bg-white/10" title="GLITCH"></div>
+                    <div onMouseEnter={handleHiddenTrigger} className="absolute top-0 right-0 w-[10px] h-[10px] z-50 cursor-none hover:bg-white/10" title="GLITCH"></div>
 
-                    {/* Content Container with Spring Physics */}
                     <motion.div 
                         style={{ x: springX, y: springY }}
                         className="absolute inset-0 flex flex-col items-center justify-center z-10 px-4"
                     >
-                        {/* THE TITLE */}
                         <motion.h1 
                             initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            className={`glitch-text text-4xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-center select-none cursor-default ${isRandomGlitching ? 'active-glitch' : ''}`}
+                            animate={{ 
+                                opacity: 1, 
+                                scale: 1,
+                                y: [0, -5, 0] 
+                            }}
+                            transition={{ 
+                                duration: 1.5, 
+                                ease: "easeOut",
+                                y: { 
+                                    duration: 4,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }
+                            }}
+                            className={`glitch-text text-4xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-center select-none cursor-none ${isRandomGlitching ? 'active-glitch' : ''}`}
                             data-text={decodedTitle}
                         >
                             {decodedTitle}
                         </motion.h1>
 
-                        {/* SUBTITLE */}
                         <motion.div 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -281,23 +299,22 @@
                             className="mt-8 flex items-center space-x-3"
                         >
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500 shadow-[0_0_10px_#00FFFF]"></span>
                             </span>
                             <p className="text-[10px] md:text-xs text-silver-dim tracking-[0.3em] opacity-70">
-                                // STATUS: WAITING FOR THE CLERGY
+                                // STATUS: WAITING FOR THE CLERGY<span className="animate-pulse text-aurora">_</span>
                             </p>
                         </motion.div>
                     </motion.div>
 
-                    {/* DOCK Navigation (Fixed, not affected by spring) */}
                     <motion.div 
                         initial={{ y: 50, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8, delay: 0.5 }}
                         className="fixed bottom-10 left-1/2 -translate-x-1/2 z-20"
                     >
-                        <div className="flex items-center px-4 py-2 bg-black/40 backdrop-blur-md border border-white/5 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                        <div className="flex items-center px-4 py-2 bg-black/40 backdrop-blur-md border border-white/5 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.5)] cursor-none">
                             <NavItem label="GALLERY" />
                             <div className="w-[1px] h-3 bg-white/10 mx-1"></div>
                             <NavItem label="PLAYGROUND" />
@@ -308,9 +325,8 @@
                         </div>
                     </motion.div>
 
-                    {/* Corner Data */}
                     <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">
-                        SYS.VER.0.9.2 // NIGHTLY<br/>
+                        SYS.VER.0.9.5 // MERCURY<br/>
                         LAT: 35.6895° N
                     </div>
 
@@ -318,6 +334,18 @@
                         MEM: WEST_COAST_SERVER<br/>
                         UPTIME: ∞
                     </div>
+
+                    <motion.div
+                        className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-50 mix-blend-difference"
+                        variants={cursorVariants}
+                        animate="default"
+                        transition={{ type: "spring", stiffness: 500, damping: 28 }}
+                    />
+                    <motion.div
+                        /* UPDATED SHADOW: Stronger glow */
+                        className="fixed top-0 left-0 w-1 h-1 bg-aurora rounded-full pointer-events-none z-50 shadow-[0_0_20px_3px_#00FFFF]"
+                        style={{ x: cursorXY.x - 2, y: cursorXY.y - 2 }}
+                    />
                 </div>
             );
         };
