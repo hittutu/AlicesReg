@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sealed Light Flow // V5.4 (Dense Orb)</title>
+    <title>The Sealed LightFlow // V5.5 (New Title)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -283,7 +283,8 @@
 
         const MainApp = () => {
             const [isInverted, setIsInverted] = useState(false);
-            const decodedTitle = useDecodingText("SEALED LIGHT FLOW");
+            // UPDATED: Title change
+            const decodedTitle = useDecodingText("The Sealed LightFlow");
             const isRandomGlitching = useRandomGlitch(4000, 10000);
             const [cursorXY, setCursorXY] = useState({ x: -100, y: -100 });
 
@@ -342,7 +343,7 @@
                         </div>
                     </motion.div>
 
-                    <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">SYS.VER.1.10 // DENSE_ORB<br/>LAT: 35.6895° N</div>
+                    <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">SYS.VER.1.11 // NEW_TITLE<br/>LAT: 35.6895° N</div>
                     <div className="absolute bottom-8 right-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block text-right select-none">MEM: WEST_COAST_SERVER<br/>UPTIME: ∞</div>
 
                     <motion.div className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-50 mix-blend-difference" variants={cursorVariants} animate="default" transition={{ type: "spring", stiffness: 500, damping: 28 }} />
