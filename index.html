@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sealed Light Flow // V5.3 (Sharp Particles)</title>
+    <title>Sealed Light Flow // V5.4 (Dense Orb)</title>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
+    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
+    <!-- Framer Motion -->
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
@@ -41,6 +46,11 @@
                             '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        invertFlash: {
+                            '0%': { filter: 'invert(0)' },
+                            '50%': { filter: 'invert(1)' },
+                            '100%': { filter: 'invert(0)' },
                         },
                         floatUp30: {
                             '0%': { transform: 'translate(0, 0) scale(0.5)', opacity: 0 },
@@ -122,6 +132,7 @@
         const { useState, useEffect, useRef, useMemo } = React;
         const { motion, useMotionValue, useSpring, useTransform } = window.Motion;
 
+        // --- Hook: Random Voltage Glitch ---
         const useRandomGlitch = (minTime = 3000, maxTime = 8000) => {
             const [isGlitching, setIsGlitching] = useState(false);
             useEffect(() => {
@@ -141,6 +152,7 @@
             return isGlitching;
         };
 
+        // --- Hook: Decoding Text ---
         const useDecodingText = (text) => {
             const [displayText, setDisplayText] = useState('');
             useEffect(() => {
@@ -155,6 +167,7 @@
             return displayText;
         };
 
+        // --- Component: Star Field ---
         const StarField = () => {
             const slowStars = useMemo(() => Array.from({ length: 25 }).map((_, i) => ({ id: i, left: Math.random() * 100 + '%', top: Math.random() * 100 + '%', duration: Math.random() * 10 + 15 + 's', delay: Math.random() * 5 + 's', size: Math.random() * 2 + 1 + 'px' })), []);
             const fastStars = useMemo(() => Array.from({ length: 15 }).map((_, i) => ({ id: i, left: Math.random() * 100 + '%', top: Math.random() * 100 + '%', duration: Math.random() * 8 + 7 + 's', delay: Math.random() * 3 + 's', size: Math.random() * 2 + 2 + 'px' })), []);
@@ -166,6 +179,7 @@
             );
         };
 
+        // --- Component: Aurora Background ---
         const AuroraBackground = () => (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="aurora-blob bg-white w-[50vw] h-[50vw] md:w-[30vw] md:h-[30vw] top-1/2 left-1/2 -ml-[35vw] -mt-[30vh] animate-blob" />
@@ -175,6 +189,7 @@
             </div>
         );
 
+        // --- Component: Nav Item with Dense Energy Orb ---
         const NavItem = ({ label, isPrivate, rippleColor = "#FFFFFF" }) => {
             const containerVariants = {
                 publicHover: { scale: 1.05 },
@@ -185,12 +200,12 @@
                 initial: { scale: 0.1, opacity: 0 },
                 publicHover: { 
                     scale: [0.1, 8], 
-                    opacity: [0.7, 0], 
+                    opacity: [1.0, 0], // Peak opacity doubled from 0.5/0.7 to 1.0
                     transition: { duration: 0.7, ease: "easeOut" }
                 },
                 privateHover: { 
                     scale: [0.1, 8], 
-                    opacity: [0.7, 0], 
+                    opacity: [1.0, 0], 
                     transition: { duration: 0.7, ease: "easeOut" }
                 }
             };
@@ -198,10 +213,10 @@
             const particleVariants = {
                 initial: { opacity: 0, scale: 0 },
                 publicHover: (i) => ({
-                    x: [0, (Math.random() - 0.5) * 80], // Wider scatter for better visibility of tiny dots
-                    y: [0, -Math.random() * 50 - 20],   // More vertical lift
-                    opacity: [0, 1, 1, 0],             // Stay solid for longer
-                    scale: [0, 1.2, 1],                // Minimal scale to keep it "condensed"
+                    x: [0, (Math.random() - 0.5) * 80],
+                    y: [0, -Math.random() * 50 - 20],
+                    opacity: [0, 1, 1, 0],
+                    scale: [0, 1.2, 1],
                     transition: { duration: 0.9, ease: "easeOut", delay: i * 0.01 }
                 }),
                 privateHover: (i) => ({
@@ -213,7 +228,7 @@
                 })
             };
 
-            const particles = useMemo(() => Array.from({length: 6}), []); // Up to 6 sparks
+            const particles = useMemo(() => Array.from({length: 6}), []);
 
             return (
                 <motion.div 
@@ -223,18 +238,21 @@
                     variants={containerVariants}
                     className="relative group cursor-pointer px-4 py-2 mx-1 rounded-full overflow-hidden" 
                 >
-                    {/* The Energy Orb Element (Kept for depth) */}
+                    {/* The Energy Orb Element (Updated for Congealment/Dense Effect) */}
                     <motion.div
                         className="absolute rounded-full pointer-events-none"
                         style={{ 
                             left: '12.5%', bottom: '4px', width: '10px', height: '10px', transformOrigin: "center center", 
-                            x: "-50%", y: "50%", background: `radial-gradient(circle, ${rippleColor} 0%, rgba(0,0,0,0) 70%)`,
-                            filter: 'blur(4px)', boxShadow: `0 0 15px 2px ${rippleColor}`
+                            x: "-50%", y: "50%", 
+                            // CHANGED: Sharper gradient and slightly reduced blur for "Dense" feel
+                            background: `radial-gradient(circle, ${rippleColor} 30%, rgba(0,0,0,0) 80%)`,
+                            filter: 'blur(3px)', 
+                            boxShadow: `0 0 25px 5px ${rippleColor}` // Stronger glow for "Orb Pressure"
                         }}
                         variants={orbVariants}
                     />
 
-                    {/* Stardust Burst Particles - Condensated and Sharpened */}
+                    {/* Sharp Particles */}
                     {particles.map((p, i) => (
                         <motion.div
                             key={i}
@@ -243,9 +261,9 @@
                             className="absolute rounded-full pointer-events-none"
                             style={{ 
                                 left: '12.5%', bottom: '4px', 
-                                width: '1px', height: '1px', // Sharper, smaller
+                                width: '1px', height: '1px', 
                                 backgroundColor: rippleColor,
-                                boxShadow: `0 0 2px 0.5px ${rippleColor}` // "Hot" core glow
+                                boxShadow: `0 0 2px 0.5px ${rippleColor}` 
                             }}
                         />
                     ))}
@@ -324,7 +342,7 @@
                         </div>
                     </motion.div>
 
-                    <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">SYS.VER.1.9 // SHARP_PARTICLES<br/>LAT: 35.6895° N</div>
+                    <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">SYS.VER.1.10 // DENSE_ORB<br/>LAT: 35.6895° N</div>
                     <div className="absolute bottom-8 right-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block text-right select-none">MEM: WEST_COAST_SERVER<br/>UPTIME: ∞</div>
 
                     <motion.div className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-50 mix-blend-difference" variants={cursorVariants} animate="default" transition={{ type: "spring", stiffness: 500, damping: 28 }} />
