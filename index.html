@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sealed Light Flow // V3.6 (Center Anchored)</title>
+    <title>Sealed Light Flow // V3.7 (Responsive Fluid)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -177,20 +177,23 @@
 
         const AuroraBackground = () => (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* FIXED POSITIONING LOGIC: Center Anchored (绝对中心定位)
-                   Instead of using left-[20%], we use left-1/2 top-1/2 (Center of screen),
-                   and then subtract fixed pixels using margins (-ml, -mt).
-                   This ensures blobs stay clustered even on 4K/Ultrawide monitors.
+                {/* RESPONSIVE FLUID LAYOUT:
+                   1. All positions are anchored to center (top-1/2 left-1/2).
+                   2. Sizes are now responsive (vw), getting larger on bigger screens.
+                   3. Offsets (margins) are responsive (vw/vh), spreading out on bigger screens.
                 */}
 
-                {/* 1. White Mercury (Top Left of Cluster) */}
-                <div className="aurora-blob bg-white w-96 h-96 top-1/2 left-1/2 -ml-[350px] -mt-[300px] animate-blob"></div>
+                {/* 1. White Mercury (Top Left) */}
+                {/* Changed fixed -ml-[350px] to fluid -ml-[25vw], fixed w-96 to w-[30vw] */}
+                <div className="aurora-blob bg-white w-[50vw] h-[50vw] md:w-[30vw] md:h-[30vw] top-1/2 left-1/2 -ml-[35vw] -mt-[30vh] animate-blob"></div>
                 
-                {/* 2. Cyan Neon (Right Side of Cluster) */}
-                <div className="aurora-blob bg-cyan-500 w-96 h-96 top-1/2 left-1/2 ml-[50px] -mt-[250px] animation-delay-2000 animate-blob" style={{animationDelay: '2s'}}></div>
+                {/* 2. Cyan Neon (Right/Top) */}
+                {/* Changed fixed ml-[50px] to fluid ml-[5vw], fixed w-96 to w-[35vw] */}
+                <div className="aurora-blob bg-cyan-500 w-[55vw] h-[55vw] md:w-[35vw] md:h-[35vw] top-1/2 left-1/2 ml-[5vw] -mt-[25vh] animation-delay-2000 animate-blob" style={{animationDelay: '2s'}}></div>
                 
-                {/* 3. Purple Deep (Bottom Center of Cluster) */}
-                <div className="aurora-blob bg-fuchsia-600 w-80 h-80 top-1/2 left-1/2 -ml-[200px] mt-[50px] animation-delay-4000 animate-blob" style={{animationDelay: '4s'}}></div>
+                {/* 3. Purple Deep (Bottom) */}
+                {/* Changed fixed -ml-[200px] to fluid -ml-[15vw], fixed w-80 to w-[40vw] */}
+                <div className="aurora-blob bg-fuchsia-600 w-[60vw] h-[60vw] md:w-[40vw] md:h-[40vw] top-1/2 left-1/2 -ml-[15vw] mt-[5vh] animation-delay-4000 animate-blob" style={{animationDelay: '4s'}}></div>
                 
                 {/* Noise Overlay */}
                 <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
@@ -333,7 +336,7 @@
                     </motion.div>
 
                     <div className="absolute top-8 left-8 text-[9px] text-gray-700 tracking-[0.2em] hidden md:block select-none">
-                        SYS.VER.0.9.5 // CENTER_ANCHOR<br/>
+                        SYS.VER.0.9.6 // FLUID_DYNAMICS<br/>
                         LAT: 35.6895° N
                     </div>
 
