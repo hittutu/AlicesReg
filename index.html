@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.21</title>
+    <title>Alice's Reg - Entry Sequence v3.9.22</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,13 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.21 [REFINED TEXTURE]
-           Build Steps: 116 iterations of optimization
+           Version: v3.9.22 [ULTRAGRAIN]
+           Build Steps: 117 iterations of optimization
            Fixes: 
-             1. Noise Overlay: Replaced standard noise with high-frequency fractal noise (baseFrequency 0.85, 4 octaves).
-                This produces a much more sophisticated "Film Grain" effect suitable for large high-res displays.
-           Status: Texture quality maximized.
+             1. Noise Texture: Upgraded to Ultra-High Frequency (0.98 baseFrequency, 5 octaves). 
+                This creates a microscopic "Materiality" effect rather than visible digital noise, 
+                perfect for 4K+ displays.
+           Status: Absolute Peak Texture Achieved.
         */
         html, body, #root {
             height: 100%;
@@ -46,9 +47,9 @@
         .noise-overlay {
             position: absolute;
             top: -10%; left: -10%; width: 120%; height: 120%;
-            opacity: 0.05; pointer-events: none; z-index: 5; 
-            /* v3.9.21: High-frequency refined noise */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.045; pointer-events: none; z-index: 5; 
+            /* v3.9.22: Ultra-fine grain SVG noise */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .vignette {
@@ -126,7 +127,7 @@
 
     // --- 1. Basic Resource Components ---
     
-    // Sparkle Particle
+    // Sparkle Particle (Hardened Core)
     const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
@@ -197,19 +198,15 @@
                             exit={{ opacity: 0 }}
                             className="absolute inset-0"
                         >
-                            {/* TL */}
                             <div className="absolute top-[40px] left-[40px] flex items-center justify-center">
                                 <motion.div className={`${baseClass} border border-white`} animate={{ rotate: [45, 405] }} transition={transition} />
                             </div>
-                            {/* TR */}
                             <div className="absolute top-[40px] right-[40px] flex items-center justify-center">
                                 <motion.div className={`${baseClass} bg-white`} animate={{ rotate: [45, -315] }} transition={transition} />
                             </div>
-                            {/* BR */}
                             <div className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
                                 <motion.div className={`${baseClass} border border-white`} animate={{ rotate: [45, -315] }} transition={transition} />
                             </div>
-                            {/* BL */}
                             <div className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
                                 <motion.div className={`${baseClass} bg-white`} animate={{ rotate: [45, 405] }} transition={transition} />
                             </div>
@@ -275,8 +272,6 @@
             </div>
         );
     };
-
-    // --- 2. Decorative Sub-components ---
 
     const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
         const [displayText, setDisplayText] = useState("");
@@ -455,10 +450,8 @@
             }
         });
 
-        // Handler to capture current exact screen coordinates
         const handleSecondFrame = useCallback(() => {
-            if (!active || isLeaping) return; // Don't sparkle if leaping into hole
-            // Capture current position from MotionValues
+            if (!active || isLeaping) return; 
             const rx = springX.get() + offsetX.get();
             const ry = springY.get() + offsetY.get();
             if (onSpawnParticles) onSpawnParticles(rx, ry);
@@ -468,7 +461,6 @@
         return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed top-0 left-0 pointer-events-none z-[9999]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
                 <motion.div style={{ x: offsetX, y: offsetY, rotate: spriteRotation }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
-                    {/* Pass trigger handler down to sprite */}
                     <RabbitIcon onSecondFrame={handleSecondFrame} />
                 </motion.div>
             </motion.div>
@@ -494,11 +486,9 @@
 
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
         
-        // Spawn Logic (v3.9.17: Interpolate between #85DBF9 and #6BB8E7)
         const spawnSparkles = useCallback((x, y) => {
             const count = 3 + Math.floor(Math.random() * 3); 
             const newSparkles = Array.from({ length: count }).map(() => {
-                // v3.9.17: Interpolate between #85DBF9 (133, 219, 249) and #6BB8E7 (107, 184, 231)
                 const t = Math.random();
                 const r = Math.round(133 + (107 - 133) * t); 
                 const g = Math.round(219 + (184 - 219) * t); 
@@ -510,7 +500,7 @@
                     x: x,
                     y: y,
                     angle: Math.random() * 360,
-                    speed: 10 + Math.random() * 30, // Drift distance
+                    speed: 10 + Math.random() * 30,
                     size: 1 + Math.random() * 2, 
                     color: color
                 };
@@ -525,7 +515,6 @@
         useEffect(() => {
             let currentP = 0;
             let timer;
-            
             const step = () => {
                 if (currentP >= 100) {
                     setLoadPercent(100);
@@ -537,7 +526,6 @@
                 setLoadPercent(currentP);
                 timer = setTimeout(step, 100);
             };
-
             timer = setTimeout(step, 200); 
             return () => clearTimeout(timer);
         }, []);
@@ -578,7 +566,6 @@
 
         const removeFragment = useCallback((id) => setFragments(prev => prev.filter(f => f.id !== id)), []);
 
-        // Global Parallax
         const camX = useMotionValue(0); const camY = useMotionValue(0);
         const smoothCamX = useSpring(camX, { damping: 40, stiffness: 200 });
         const smoothCamY = useSpring(camY, { damping: 40, stiffness: 200 });
@@ -592,7 +579,6 @@
             return () => window.removeEventListener('mousemove', handleParallax);
         }, [appStage, camX, camY]);
 
-        // Parallax Transforms
         const bgX = useTransform(smoothCamX, v => v * 0.5); const bgY = useTransform(smoothCamY, v => v * 0.5);
         const titleX = useTransform(smoothCamX, v => v * 2.0); 
         const titleY = useTransform(smoothCamY, v => v * 2.0);
@@ -645,7 +631,6 @@
                         )}
                     </AnimatePresence>
                     
-                    {/* v3.9.20: Singularity Entry Animation (v3.9.20 Fix: Scale 0.25) */}
                     <motion.div 
                         className="absolute rounded-full pointer-events-none" 
                         style={{ 
@@ -663,13 +648,12 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
-                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } : // Entry
-                            isTransitioning ? { duration: 1.5 } : // Exit
-                            { duration: 1.5 } // Hover/Default
+                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } :
+                            isTransitioning ? { duration: 1.5 } :
+                            { duration: 1.5 }
                         }
                     />
                     
-                    {/* v3.9.20: Core Entry Animation (v3.9.20 Fix: Scale 0.25) */}
                     <motion.div 
                         className="relative rounded-full bg-slate-200" 
                         style={{ 
@@ -708,7 +692,7 @@
                     <motion.div className="absolute inset-0 pointer-events-none">
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
                             <motion.div style={{ x: titleX, y: titleY }} animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
                             <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
@@ -733,7 +717,6 @@
                             key="collapse-mask" 
                             className="absolute inset-0 bg-white z-[150] origin-center"
                             initial={{ scaleY: 1, scaleX: 1, skewX: 0, filter: 'brightness(1)' }}
-                            // v3.9.19: Reduced scaleY to 0.001 for sharper compression line
                             animate={{ scaleY: [1, 0.001, 0.002, 0.001], skewX: [0, 15, -15, 0], scaleX: [1, 1, 0.05, 0], filter: ['brightness(1)', 'brightness(1)', 'brightness(2)', 'brightness(1)'] }}
                             transition={{ duration: 1.1, times: [0, 0.5, 0.8, 1], ease: [0.76, 0, 0.24, 1] }}
                         />
@@ -743,7 +726,6 @@
         );
     };
 
-    // v3.9.18: Re-added missing MainContent Component definition
     const MainContent = () => (
         <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
             <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
