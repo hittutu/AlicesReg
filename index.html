@@ -648,9 +648,9 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
-                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } :
-                            isTransitioning ? { duration: 1.5 } :
-                            { duration: 1.5 }
+                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } : // Entry
+                            isTransitioning ? { duration: 1.5 } : // Exit
+                            { duration: 1.5 } // Hover/Default
                         }
                     />
                     
@@ -704,7 +704,7 @@
                     {appStage === 'init' && (
                         <motion.div key="preloader" exit={{ opacity: 0 }} className="absolute inset-0 bg-white z-[200] flex flex-col items-center justify-center">
                             <div className="flex flex-col items-center">
-                                <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} className="text-black font-mono text-[10px] tracking-[0.8em] uppercase mb-4"> Loading System </motion.div>
+                                <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} className="text-black font-mono text-[10px] tracking-[0.8em] uppercase mb-4"> See me, misjudge me, read me, find me </motion.div>
                                 <div className="w-48 h-[1px] bg-black/10 relative overflow-hidden">
                                     <motion.div className="absolute top-0 left-0 h-full bg-black" style={{ width: `${loadPercent}%` }} />
                                 </div>
