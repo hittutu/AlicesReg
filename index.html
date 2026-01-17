@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.8.7</title>
+    <title>Alice's Reg - Entry Sequence v3.8.8</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,13 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.8.7 [SMART PATH FINDER]
-           Build Steps: 92 iterations of optimization
-           Fix: Added smart fallback logic for Rabbit sprite.
-                - 1st Attempt: 'Texture/Mouse/Rabbit/' (Requested path)
-                - 2nd Attempt: './' (Root path fallback)
-                - Final Fallback: Emoji
-           Status: Dynamic sprite rendering stable with path redundancy.
+           Version: v3.8.8 [LOADER LOCK]
+           Build Steps: 93 iterations of optimization
+           Fix: Implemented "Load-First-Then-Animate" logic. 
+                The sprite sequence will PAUSE on frame 1 until it successfully loads.
+                This prevents the animation loop from overriding the onError event, solving the "vanishing rabbit" bug on 404s.
+           Status: Robust asset loading with clear error states.
         */
         html, body, #root {
             height: 100%;
@@ -107,35 +106,38 @@
     
     const RabbitIcon = () => {
         const [frame, setFrame] = useState(1);
-        const [imageError, setImageError] = useState(false);
-        const [useRootPath, setUseRootPath] = useState(false); // v3.8.7 Smart Fallback
-        
+        const [isLoaded, setIsLoaded] = useState(false); // Only start animating if image actually loads
+        const [retryState, setRetryState] = useState(0); // 0: Texture Path, 1: Root Path, 2: Emoji Fallback
+
         useEffect(() => {
-            if (imageError) return;
-            // 100ms per frame loop for 1.png -> 6.png
+            // STOP animation loop if we are having trouble loading or fell back to emoji
+            if (!isLoaded || retryState === 2) return;
+
             const interval = setInterval(() => {
                 setFrame(prev => prev >= 6 ? 1 : prev + 1);
             }, 100);
             return () => clearInterval(interval);
-        }, [imageError]);
+        }, [isLoaded, retryState]);
 
-        const handleError = () => {
-            if (!useRootPath) {
-                // First failure: Try root path (maybe user put images next to html)
-                console.log("Rabbit path check: Texture/Mouse/Rabbit/ failed, trying root ./");
-                setUseRootPath(true);
-            } else {
-                // Second failure: Give up and show Emoji
-                console.log("Rabbit path check: Root ./ failed, fallback to Emoji");
-                setImageError(true);
+        const handleLoad = () => {
+            if (!isLoaded) {
+                console.log("Rabbit Sprite loaded successfully.");
+                setIsLoaded(true); // Unlock animation
             }
         };
 
-        // v3.8.7: Construct path based on fallback state
-        const basePath = useRootPath ? '' : 'Texture/Mouse/Rabbit/';
-        const imgSrc = `${basePath}${frame}.png`;
+        const handleError = (e) => {
+            if (retryState === 0) {
+                console.warn("Rabbit Load Fail 1: 'Texture/Mouse/Rabbit/' path failed. Trying root './'...");
+                setRetryState(1);
+            } else if (retryState === 1) {
+                console.warn("Rabbit Load Fail 2: Root './' path failed. Fallback to Emoji.");
+                setRetryState(2);
+            }
+        };
 
-        if (imageError) {
+        // Render Emoji Fallback
+        if (retryState === 2) {
             return (
                 <span 
                     className="select-none block" 
@@ -149,6 +151,10 @@
             );
         }
 
+        // Construct Path
+        const basePath = retryState === 1 ? '' : 'Texture/Mouse/Rabbit/';
+        const imgSrc = `${basePath}${frame}.png`;
+
         return (
             <img 
                 src={imgSrc} 
@@ -160,6 +166,7 @@
                     objectFit: 'contain',
                     filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))'
                 }} 
+                onLoad={handleLoad}
                 onError={handleError}
             />
         );
