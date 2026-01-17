@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.8.6</title>
+    <title>Alice's Reg - Entry Sequence v3.8.7</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,10 +23,13 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.8.6 [PATH UPDATE]
-           Build Steps: 91 iterations of optimization
-           Fix: Updated Rabbit sprite sequence path to 'Texture/Mouse/Rabbit/'.
-           Status: Dynamic sprite rendering stable.
+           Version: v3.8.7 [SMART PATH FINDER]
+           Build Steps: 92 iterations of optimization
+           Fix: Added smart fallback logic for Rabbit sprite.
+                - 1st Attempt: 'Texture/Mouse/Rabbit/' (Requested path)
+                - 2nd Attempt: './' (Root path fallback)
+                - Final Fallback: Emoji
+           Status: Dynamic sprite rendering stable with path redundancy.
         */
         html, body, #root {
             height: 100%;
@@ -105,11 +108,10 @@
     const RabbitIcon = () => {
         const [frame, setFrame] = useState(1);
         const [imageError, setImageError] = useState(false);
+        const [useRootPath, setUseRootPath] = useState(false); // v3.8.7 Smart Fallback
         
         useEffect(() => {
-            // Stop animation if error occurred
             if (imageError) return;
-
             // 100ms per frame loop for 1.png -> 6.png
             const interval = setInterval(() => {
                 setFrame(prev => prev >= 6 ? 1 : prev + 1);
@@ -117,7 +119,22 @@
             return () => clearInterval(interval);
         }, [imageError]);
 
-        // Safe fallback render using React state instead of DOM manipulation
+        const handleError = () => {
+            if (!useRootPath) {
+                // First failure: Try root path (maybe user put images next to html)
+                console.log("Rabbit path check: Texture/Mouse/Rabbit/ failed, trying root ./");
+                setUseRootPath(true);
+            } else {
+                // Second failure: Give up and show Emoji
+                console.log("Rabbit path check: Root ./ failed, fallback to Emoji");
+                setImageError(true);
+            }
+        };
+
+        // v3.8.7: Construct path based on fallback state
+        const basePath = useRootPath ? '' : 'Texture/Mouse/Rabbit/';
+        const imgSrc = `${basePath}${frame}.png`;
+
         if (imageError) {
             return (
                 <span 
@@ -134,7 +151,7 @@
 
         return (
             <img 
-                src={`Texture/Mouse/Rabbit/${frame}.png`} 
+                src={imgSrc} 
                 alt="Rabbit"
                 className="select-none block pointer-events-none"
                 style={{ 
@@ -143,7 +160,7 @@
                     objectFit: 'contain',
                     filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))'
                 }} 
-                onError={() => setImageError(true)}
+                onError={handleError}
             />
         );
     };
