@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.20</title>
+    <title>Alice's Reg - Entry Sequence v3.9.21</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.20 [SINGULARITY COMPRESSION]
-           Build Steps: 115 iterations of optimization
+           Version: v3.9.21 [REFINED TEXTURE]
+           Build Steps: 116 iterations of optimization
            Fixes: 
-             1. Singularity Origin: Reduced the initial scale of the central core and halo from 0.5 to 0.25 during the 'init' phase.
-                This creates a more dramatic expansion effect as the horizon line collapses.
-           Status: Imperial Decree Executed.
+             1. Noise Overlay: Replaced standard noise with high-frequency fractal noise (baseFrequency 0.85, 4 octaves).
+                This produces a much more sophisticated "Film Grain" effect suitable for large high-res displays.
+           Status: Texture quality maximized.
         */
         html, body, #root {
             height: 100%;
@@ -47,7 +47,8 @@
             position: absolute;
             top: -10%; left: -10%; width: 120%; height: 120%;
             opacity: 0.05; pointer-events: none; z-index: 5; 
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            /* v3.9.21: High-frequency refined noise */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .vignette {
@@ -707,10 +708,10 @@
                     <motion.div className="absolute inset-0 pointer-events-none">
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
                             <motion.div style={{ x: titleX, y: titleY }} animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
