@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.8.1</title>
+    <title>Alice's Reg - Entry Sequence v3.8.6</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,10 +23,10 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.8.1 [LOADER RESUSCITATION]
-           Build Steps: 86 iterations of optimization
-           Fix: Rewrote loading simulation logic using recursive setTimeout for reliability.
-           Status: All visual effects (shimmer, rabbit, vortex) preserved.
+           Version: v3.8.6 [PATH UPDATE]
+           Build Steps: 91 iterations of optimization
+           Fix: Updated Rabbit sprite sequence path to 'Texture/Mouse/Rabbit/'.
+           Status: Dynamic sprite rendering stable.
         */
         html, body, #root {
             height: 100%;
@@ -102,18 +102,51 @@
 
     // --- 1. 基础资源组件 ---
     
-    const RabbitIcon = ({ rotation = 0 }) => (
-        <span 
-            className="select-none block" 
-            style={{ 
-                fontSize: '26px', 
-                filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
-                transform: `rotate(${rotation}deg)` 
-            }}
-        >
-            🐇
-        </span>
-    );
+    const RabbitIcon = () => {
+        const [frame, setFrame] = useState(1);
+        const [imageError, setImageError] = useState(false);
+        
+        useEffect(() => {
+            // Stop animation if error occurred
+            if (imageError) return;
+
+            // 100ms per frame loop for 1.png -> 6.png
+            const interval = setInterval(() => {
+                setFrame(prev => prev >= 6 ? 1 : prev + 1);
+            }, 100);
+            return () => clearInterval(interval);
+        }, [imageError]);
+
+        // Safe fallback render using React state instead of DOM manipulation
+        if (imageError) {
+            return (
+                <span 
+                    className="select-none block" 
+                    style={{ 
+                        fontSize: '26px', 
+                        filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))'
+                    }}
+                >
+                    🐇
+                </span>
+            );
+        }
+
+        return (
+            <img 
+                src={`Texture/Mouse/Rabbit/${frame}.png`} 
+                alt="Rabbit"
+                className="select-none block pointer-events-none"
+                style={{ 
+                    width: '42px', 
+                    height: '42px',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))'
+                }} 
+                onError={() => setImageError(true)}
+            />
+        );
+    };
 
     // --- 2. 装饰性子组件 ---
 
@@ -298,7 +331,8 @@
         return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed top-0 left-0 pointer-events-none z-[115]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
                 <motion.div style={{ x: offsetX, y: offsetY, rotate: spriteRotation }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
-                    <RabbitIcon rotation={0} />
+                    {/* No longer passing rotation prop as it's handled by parent container and sprite animation is internal */}
+                    <RabbitIcon />
                 </motion.div>
             </motion.div>
         );
@@ -397,10 +431,20 @@
 
         // Parallax Transforms
         const bgX = useTransform(smoothCamX, v => v * 0.5); const bgY = useTransform(smoothCamY, v => v * 0.5);
+        // Split UI transforms into layers
+        // High multiplier = Foreground (Appears closer, moves more)
+        const titleX = useTransform(smoothCamX, v => v * 2.0); 
+        const titleY = useTransform(smoothCamY, v => v * 2.0);
+        // Low multiplier = Midground/Background (Appears further, moves less)
+        const subX = useTransform(smoothCamX, v => v * 0.8);
+        const subY = useTransform(smoothCamY, v => v * 0.8);
+        
+        // Original UI center transforms (for floating fragments)
         const uiX = useTransform(smoothCamX, v => v * 1.5); const uiY = useTransform(smoothCamY, v => v * 1.5);
 
         const opacityTopLeft = useTransform(time, t => 0.4 + 0.1 * Math.sin(t * 0.75));
-        const opacityBottomRight = useTransform(time, t => 0.45 + 0.15 * Math.cos(t * 0.5));
+        // v3.8.3: Base opacity increased from 0.45 to 0.55 (+10%)
+        const opacityBottomRight = useTransform(time, t => 0.55 + 0.15 * Math.cos(t * 0.5));
 
         return (
             <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
@@ -444,13 +488,13 @@
                 </motion.div>
 
                 {showSurroundingUI && (
-                    <motion.div className="absolute inset-0 pointer-events-none" style={{ x: uiX, y: uiY }}>
+                    <motion.div className="absolute inset-0 pointer-events-none">
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
-                            <motion.div animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
-                            <motion.div initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} style={{ opacity: opacityBottomRight }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered like stars,<br/>gentle as air, and meandering as a river. </motion.div>
+                            <motion.div style={{ x: titleX, y: titleY }} animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered like stars,<br/>gentle as air, and meandering as a river. </motion.div>
                         </motion.div>
-                        <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} style={{ opacity: opacityTopLeft }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <div className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, Dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </div>
+                        <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, Dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
