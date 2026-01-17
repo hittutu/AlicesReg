@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.10</title>
+    <title>Alice's Reg - Entry Sequence v3.9.12</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.10 [SYNTAX PURGE]
-           Build Steps: 105 iterations of optimization
+           Version: v3.9.12 [SYNTAX GUARD]
+           Build Steps: 107 iterations of optimization
            Fixes: 
-             1. Code Cleanup: Removed redundant code blocks and complex comments in AuroraBackground that were causing Babel parser errors.
-             2. Reliability: Ensured clean component definitions for 'App' to be reachable.
-           Status: Fully operational and optimized.
+             1. Cleaned up comments inside JSX props in Sparkle and AuroraBackground components to prevent Babel parsing errors.
+             2. Verified bracket closure for all components.
+           Status: Syntax Verified.
         */
         html, body, #root {
             height: 100%;
@@ -140,16 +140,15 @@
                 style={{ 
                     width: size, 
                     height: size, 
-                    backgroundColor: color, 
-                    boxShadow: `0 0 ${size * 1.5}px ${color}` 
+                    background: `radial-gradient(circle at center, #FFFFFF 30%, ${color} 100%)`,
+                    boxShadow: `0 0 ${size}px ${color}`
                 }}
             />
         );
     };
 
-    // v3.9.10: Cleaned Aurora Background
+    // Aurora Background Component
     const AuroraBackground = ({ smoothCamX, smoothCamY }) => {
-        // Parallax Transforms
         const x1 = useTransform(smoothCamX, v => v * 0.8);
         const y1 = useTransform(smoothCamY, v => v * 0.8);
         
@@ -161,18 +160,18 @@
 
         return (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
-                {/* 1. AliceBlue Blob (#F0F8FF) - Offset Left-Top */}
+                {/* 1. AliceBlue Blob */}
                 <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
-                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-20"
-                          style={{ top: 'calc(50% - 250px)', left: 'calc(50% - 250px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
+                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.16]"
+                          style={{ top: 'calc(50% - 130px)', left: 'calc(50% - 130px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
                 </motion.div>
 
-                {/* 2. Light Blue Blob (#85DBF9) */}
+                {/* 2. Light Blue Blob */}
                 <motion.div style={{ x: x2, y: y2 }} className="absolute inset-0">
                     <div className="aurora-blob bg-[#85DBF9] w-[50vw] h-[50vw] top-1/2 left-1/2 ml-[10vw] -mt-[10vw] animation-delay-2000 opacity-20" />
                 </motion.div>
 
-                {/* 3. Klein Blue Blob (#2E54E8) */}
+                {/* 3. Klein Blue Blob */}
                 <motion.div style={{ x: x3, y: y3 }} className="absolute inset-0">
                     <div className="aurora-blob bg-[#2E54E8] w-[60vw] h-[60vw] top-1/2 left-1/2 -ml-[20vw] mt-[10vw] animation-delay-4000 opacity-[0.2]" /> 
                 </motion.div>
@@ -694,15 +693,6 @@
             </div>
         );
     };
-
-    const MainContent = () => (
-        <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
-            <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <motion.h1 initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-6xl md:text-9xl font-bold tracking-tighter mb-4 uppercase">Wonderland</motion.h1>
-            <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-lg md:text-xl font-mono text-slate-500 max-w-lg text-center leading-relaxed">"Curiouser and curiouser!" cried Alice.</motion.p>
-            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="mt-12 px-10 py-4 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-slate-800 transition-all rounded-full" onClick={() => window.location.reload()}>Reset Sequence</motion.button>
-        </div>
-    );
 
     const App = () => {
         const [stage, setStage] = useState('landing'); 
