@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.15</title>
+    <title>Alice's Reg - Entry Sequence v3.9.16</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.15 [THE REAL FINAL]
-           Build Steps: 110 iterations of optimization
+           Version: v3.9.16 [HALO DIMMING]
+           Build Steps: 111 iterations of optimization
            Fixes: 
-             1. Interaction Glow (Moon Halo): Reduced opacity to 70% of original values for a softer breathing effect.
-             2. Sparkle Color: Shifted palette to high-saturation Electric Blues (interpolating between Cyan #85DBF9 and Klein #2E54E8) to match the deep aurora.
-           Status: Client is happy = Gemini is happy.
+             1. Moon Halo: Reduced opacity of the central interaction glow by 30% (multiplied alpha by 0.7) for a subtler breathing effect.
+             2. Sparkles: Adjusted color interpolation range to favor higher saturation Electric Blues (less white component) to match the aurora.
+           Status: Client is definitely happy this time (maybe).
         */
         html, body, #root {
             height: 100%;
@@ -493,15 +493,18 @@
 
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
         
-        // Spawn Logic (v3.9.15: Updated Color Interpolation)
+        // Spawn Logic (v3.9.16: Even Better Electric Blues)
         const spawnSparkles = useCallback((x, y) => {
-            const count = 3 + Math.floor(Math.random() * 3); // 3 to 5 particles
+            const count = 3 + Math.floor(Math.random() * 3); 
             const newSparkles = Array.from({ length: count }).map(() => {
-                // v3.9.15: Interpolate between Cyan #85DBF9 (133,219,249) and Klein Blue #2E54E8 (46,84,232)
+                // v3.9.16: Interpolate between Cyan-ish (#00C8FF) and Klein Blue (#2E54E8)
+                // R: 0 -> 46
+                // G: 200 -> 84
+                // B: 255 -> 232
                 const t = Math.random();
-                const r = Math.round(133 + (46 - 133) * t); 
-                const g = Math.round(219 + (84 - 219) * t); 
-                const b = Math.round(249 + (232 - 249) * t);
+                const r = Math.round(0 + (46 - 0) * t); 
+                const g = Math.round(200 + (84 - 200) * t); 
+                const b = Math.round(255 + (232 - 255) * t);
                 const color = `rgb(${r}, ${g}, ${b})`;
 
                 return {
@@ -643,8 +646,7 @@
                             </div>
                         )}
                     </AnimatePresence>
-                    {/* Moon Halo Glow - Adjusted Opacity to ~70% */}
-                    <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="absolute rounded-full pointer-events-none" style={{ width: 110, height: 110, background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.6) 0%, rgba(185, 226, 255, 0.21) 45%, rgba(185, 226, 255, 0.035) 75%, transparent 100%)', filter: 'blur(8px)', zIndex: 25 }} animate={{ scale: isTransitioning ? 25 : (isHovering || isLeaping ? [1, 1.4, 1] : 1), opacity: isTransitioning ? 0 : 1 }} />
+                    <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="absolute rounded-full pointer-events-none" style={{ width: 110, height: 110, background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.42) 0%, rgba(185, 226, 255, 0.15) 45%, rgba(185, 226, 255, 0.025) 75%, transparent 100%)', filter: 'blur(8px)', zIndex: 25 }} animate={{ scale: isTransitioning ? 25 : (isHovering || isLeaping ? [1, 1.4, 1] : 1), opacity: isTransitioning ? 0 : 1 }} />
                     <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="relative rounded-full bg-slate-200" animate={isTransitioning ? { scale: 600, backgroundColor: "#F8FAFC" } : { scale: (isHovering || isLeaping) ? [1, 1.25, 0.95, 1.15] : 1 }} transition={{ duration: 1.5 }} style={{ width: 14, height: 14, boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, zIndex: 35 }} />
                     <AnimatePresence>
                         {isHovering && !isLeaping && !isTransitioning && (
