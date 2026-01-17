@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.3</title>
+    <title>Alice's Reg - Entry Sequence v3.9.5</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,11 +23,16 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.3 [ALIGNMENT TWEAK]
-           Build Steps: 98 iterations of optimization
+           Version: v3.9.5 [SPARKLE PERFECTION]
+           Build Steps: 100 iterations of optimization
            Fixes: 
-             1. Corner Symbols: Adjusted padding from 40px to 35px for tighter alignment.
-           Status: Visual effects polished.
+             1. Corner Symbols: Reverted padding to 40px as requested.
+             2. Sparkle Position: Added 'top-0 left-0' to particles to anchor them to the viewport origin, fixing the offset bug.
+             3. Sparkle Aesthetics: 
+                - Smaller size.
+                - Higher opacity (more solid).
+                - Random color interpolation between AliceBlue (#F0F8FF) and Blue (#53A7D8).
+           Status: Magical realism achieved. 100th Build! 🎉
         */
         html, body, #root {
             height: 100%;
@@ -103,52 +108,76 @@
 
     // --- 1. 基础资源组件 ---
     
-    // Sparkle Particle
-    const Sparkle = ({ x, y, angle, speed, size, onComplete }) => {
+    // v3.9.5: Updated Sparkle Particle (Solid, Smaller, Correct Position, Dynamic Color)
+    const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
         const destY = y + Math.sin(rad) * speed;
 
         return (
             <motion.div
-                initial={{ x, y, opacity: 0.8, scale: 0 }}
+                initial={{ x, y, opacity: 1, scale: 0 }} // Start solid (opacity 1)
                 animate={{ x: destX, y: destY, opacity: 0, scale: [0, 1, 0] }}
                 transition={{ duration: 2, ease: "easeOut" }}
                 onAnimationComplete={onComplete}
-                className="fixed rounded-full bg-white pointer-events-none z-[9998]"
-                style={{ width: size, height: size, boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)' }}
+                // v3.9.5 Fix: Added 'top-0 left-0' to fix position offset issue
+                className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998]"
+                style={{ 
+                    width: size, 
+                    height: size, 
+                    backgroundColor: color, // Use dynamic color
+                    boxShadow: `0 0 ${size * 1.5}px ${color}` // Tight, solid glow
+                }}
             />
         );
     };
 
-    // v3.9.3: Corner Symbols Component (Position adjusted to 35px)
+    // v3.9.5: Corner Symbols Component (Reverted to 40px)
     const CornerSymbols = ({ active }) => {
-        const glowStyle = { textShadow: '0 0 8px rgba(255,255,255,0.6)', color: '#fff', fontSize: '14px', lineHeight: 1 };
-        const commonTransition = { duration: 4, ease: "linear", repeat: Infinity };
-
+        // Common animation props
+        const transition = { duration: 4, ease: "linear", repeat: Infinity };
+        // Base styles for the "diamond" (which is just a rotated square)
+        const baseClass = "w-2 h-2 shadow-[0_0_8px_rgba(255,255,255,0.6)]";
+        
         return (
             <div className="fixed inset-0 pointer-events-none z-[120]">
                 <AnimatePresence>
                     {active && (
                         <>
-                            {/* TL: ◇ CW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[35px] left-[35px] flex items-center justify-center">
-                                <motion.div style={glowStyle} animate={{ rotate: 360 }} transition={commonTransition}>◇</motion.div>
+                            {/* TL: Hollow (Border) -> CW (45 to 405) */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] left-[40px] flex items-center justify-center">
+                                <motion.div 
+                                    className={`${baseClass} border border-white`}
+                                    animate={{ rotate: [45, 405] }} 
+                                    transition={transition} 
+                                />
                             </motion.div>
                             
-                            {/* TR: ◆ CCW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[35px] right-[35px] flex items-center justify-center">
-                                <motion.div style={glowStyle} animate={{ rotate: -360 }} transition={commonTransition}>◆</motion.div>
+                            {/* TR: Solid (Bg) -> CCW (45 to -315) */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] right-[40px] flex items-center justify-center">
+                                <motion.div 
+                                    className={`${baseClass} bg-white`}
+                                    animate={{ rotate: [45, -315] }} 
+                                    transition={transition} 
+                                />
                             </motion.div>
 
-                            {/* BR: ◇ CCW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[35px] right-[35px] flex items-center justify-center">
-                                <motion.div style={glowStyle} animate={{ rotate: -360 }} transition={commonTransition}>◇</motion.div>
+                            {/* BR: Hollow (Border) -> CCW (45 to -315) */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
+                                <motion.div 
+                                    className={`${baseClass} border border-white`}
+                                    animate={{ rotate: [45, -315] }} 
+                                    transition={transition} 
+                                />
                             </motion.div>
 
-                            {/* BL: ◆ CW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[35px] left-[35px] flex items-center justify-center">
-                                <motion.div style={glowStyle} animate={{ rotate: 360 }} transition={commonTransition}>◆</motion.div>
+                            {/* BL: Solid (Bg) -> CW (45 to 405) */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
+                                <motion.div 
+                                    className={`${baseClass} bg-white`}
+                                    animate={{ rotate: [45, 405] }} 
+                                    transition={transition} 
+                                />
                             </motion.div>
                         </>
                     )}
@@ -437,14 +466,24 @@
         // Spawn Logic
         const spawnSparkles = useCallback((x, y) => {
             const count = 3 + Math.floor(Math.random() * 3); // 3 to 5 particles
-            const newSparkles = Array.from({ length: count }).map(() => ({
-                id: Math.random().toString(36).substr(2, 9),
-                x: x,
-                y: y,
-                angle: Math.random() * 360,
-                speed: 10 + Math.random() * 30, // Drift distance
-                size: 2 + Math.random() * 3
-            }));
+            const newSparkles = Array.from({ length: count }).map(() => {
+                // v3.9.5: Random color mixing
+                const t = Math.random();
+                const r = Math.round(240 + (83 - 240) * t); // Lerp R: 240 -> 83
+                const g = Math.round(248 + (167 - 248) * t); // Lerp G: 248 -> 167
+                const b = Math.round(255 + (216 - 255) * t); // Lerp B: 255 -> 216
+                const color = `rgb(${r}, ${g}, ${b})`;
+
+                return {
+                    id: Math.random().toString(36).substr(2, 9),
+                    x: x,
+                    y: y,
+                    angle: Math.random() * 360,
+                    speed: 10 + Math.random() * 30, // Drift distance
+                    size: 1 + Math.random() * 2, // v3.9.5: Smaller size (1-3px)
+                    color: color
+                };
+            });
             setSparkles(prev => [...prev, ...newSparkles]);
         }, []);
 
