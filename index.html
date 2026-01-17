@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.12</title>
+    <title>Alice's Reg - Entry Sequence v3.9.13</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,13 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.12 [SYNTAX GUARD]
-           Build Steps: 107 iterations of optimization
+           Version: v3.9.13 [POETIC FINALITY]
+           Build Steps: 108 iterations of optimization
            Fixes: 
-             1. Cleaned up comments inside JSX props in Sparkle and AuroraBackground components to prevent Babel parsing errors.
-             2. Verified bracket closure for all components.
-           Status: Syntax Verified.
+             1. White Aurora: Opacity reduced by another 50% (0.16 -> 0.08) for a barely-there phantom effect.
+             2. Sparkles: Hardened the core gradient (White 30% -> 50%) for a more solid, intense look.
+             3. Typography: Updated poems with refined capitalization and grammar as requested.
+           Status: Absolute Perfection.
         */
         html, body, #root {
             height: 100%;
@@ -124,7 +125,7 @@
 
     // --- 1. Basic Resource Components ---
     
-    // Sparkle Particle
+    // Sparkle Particle (v3.9.13: Hardened Core)
     const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
@@ -140,14 +141,15 @@
                 style={{ 
                     width: size, 
                     height: size, 
-                    background: `radial-gradient(circle at center, #FFFFFF 30%, ${color} 100%)`,
+                    // v3.9.13: Increased solid white core to 50% for "solid matter" feel
+                    background: `radial-gradient(circle at center, #FFFFFF 50%, ${color} 100%)`,
                     boxShadow: `0 0 ${size}px ${color}`
                 }}
             />
         );
     };
 
-    // Aurora Background Component
+    // Aurora Background Component (v3.9.13: Reduced White Opacity)
     const AuroraBackground = ({ smoothCamX, smoothCamY }) => {
         const x1 = useTransform(smoothCamX, v => v * 0.8);
         const y1 = useTransform(smoothCamY, v => v * 0.8);
@@ -160,9 +162,9 @@
 
         return (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
-                {/* 1. AliceBlue Blob */}
+                {/* 1. AliceBlue Blob - Opacity reduced to 0.08 */}
                 <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
-                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.16]"
+                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.08]"
                           style={{ top: 'calc(50% - 130px)', left: 'calc(50% - 130px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
                 </motion.div>
 
@@ -660,10 +662,12 @@
                     <motion.div className="absolute inset-0 pointer-events-none">
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
                             <motion.div style={{ x: titleX, y: titleY }} animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered like stars,<br/>gentle as air, and meandering as a river. </motion.div>
+                            {/* v3.9.13: Updated Poem (Bottom Right) */}
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, Dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
+                            {/* v3.9.13: Updated Poem (Top Left) */}
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
@@ -693,6 +697,15 @@
             </div>
         );
     };
+
+    const MainContent = () => (
+        <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
+            <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+            <motion.h1 initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-6xl md:text-9xl font-bold tracking-tighter mb-4 uppercase">Wonderland</motion.h1>
+            <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-lg md:text-xl font-mono text-slate-500 max-w-lg text-center leading-relaxed">"Curiouser and curiouser!" cried Alice.</motion.p>
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="mt-12 px-10 py-4 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-slate-800 transition-all rounded-full" onClick={() => window.location.reload()}>Reset Sequence</motion.button>
+        </div>
+    );
 
     const App = () => {
         const [stage, setStage] = useState('landing'); 
