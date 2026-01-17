@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.18</title>
+    <title>Alice's Reg - Entry Sequence v3.9.20</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,11 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.18 [MISSING COMPONENT RESTORED]
-           Build Steps: 113 iterations of optimization
+           Version: v3.9.20 [SINGULARITY COMPRESSION]
+           Build Steps: 115 iterations of optimization
            Fixes: 
-             1. MainContent: Restored the missing MainContent component definition which was causing a ReferenceError.
-           Status: Fully functional and fabulous.
+             1. Singularity Origin: Reduced the initial scale of the central core and halo from 0.5 to 0.25 during the 'init' phase.
+                This creates a more dramatic expansion effect as the horizon line collapses.
+           Status: Imperial Decree Executed.
         */
         html, body, #root {
             height: 100%;
@@ -99,7 +100,6 @@
         }
 
         .site-tag-sub {
-            /* v3.9.17: Updated font stack for ultra-thin aesthetics */
             font-family: 'Microsoft JhengHei UI Light', 'Microsoft JhengHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             font-weight: 300;
         }
@@ -125,7 +125,7 @@
 
     // --- 1. Basic Resource Components ---
     
-    // Sparkle Particle (v3.9.15: Saturated Electric Blue)
+    // Sparkle Particle
     const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
@@ -141,7 +141,6 @@
                 style={{ 
                     width: size, 
                     height: size, 
-                    // Solid white core (50%) + Vibrant Color Glow
                     background: `radial-gradient(circle at center, #FFFFFF 50%, ${color} 100%)`,
                     boxShadow: `0 0 ${size}px ${color}`
                 }}
@@ -162,7 +161,7 @@
 
         return (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
-                {/* 1. AliceBlue Blob - Opacity 0.06 */}
+                {/* 1. AliceBlue Blob */}
                 <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
                      <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.06]"
                           style={{ top: 'calc(50% - 130px)', left: 'calc(50% - 130px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
@@ -644,8 +643,54 @@
                             </div>
                         )}
                     </AnimatePresence>
-                    <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="absolute rounded-full pointer-events-none" style={{ width: 110, height: 110, background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.42) 0%, rgba(185, 226, 255, 0.15) 45%, rgba(185, 226, 255, 0.025) 75%, transparent 100%)', filter: 'blur(8px)', zIndex: 25 }} animate={{ scale: isTransitioning ? 25 : (isHovering || isLeaping ? [1, 1.4, 1] : 1), opacity: isTransitioning ? 0 : 1 }} />
-                    <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="relative rounded-full bg-slate-200" animate={isTransitioning ? { scale: 600, backgroundColor: "#F8FAFC" } : { scale: (isHovering || isLeaping) ? [1, 1.25, 0.95, 1.15] : 1 }} transition={{ duration: 1.5 }} style={{ width: 14, height: 14, boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, zIndex: 35 }} />
+                    
+                    {/* v3.9.20: Singularity Entry Animation (v3.9.20 Fix: Scale 0.25) */}
+                    <motion.div 
+                        className="absolute rounded-full pointer-events-none" 
+                        style={{ 
+                            width: 110, 
+                            height: 110, 
+                            background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.42) 0%, rgba(185, 226, 255, 0.15) 45%, rgba(185, 226, 255, 0.025) 75%, transparent 100%)', 
+                            filter: 'blur(8px)', 
+                            zIndex: 25 
+                        }}
+                        animate={
+                            appStage === 'init' ? { scale: 0.25, opacity: 0 } :
+                            appStage === 'collapsing' ? { scale: 1, opacity: 1 } :
+                            isTransitioning ? { scale: 25, opacity: 0 } :
+                            (isHovering || isLeaping) ? { scale: [1, 1.4, 1], opacity: 1 } :
+                            { scale: 1, opacity: 1 }
+                        }
+                        transition={
+                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } : // Entry
+                            isTransitioning ? { duration: 1.5 } : // Exit
+                            { duration: 1.5 } // Hover/Default
+                        }
+                    />
+                    
+                    {/* v3.9.20: Core Entry Animation (v3.9.20 Fix: Scale 0.25) */}
+                    <motion.div 
+                        className="relative rounded-full bg-slate-200" 
+                        style={{ 
+                            width: 14, 
+                            height: 14, 
+                            boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, 
+                            zIndex: 35 
+                        }} 
+                        animate={
+                            appStage === 'init' ? { scale: 0.25, opacity: 0 } :
+                            appStage === 'collapsing' ? { scale: 1, opacity: 1 } :
+                            isTransitioning ? { scale: 600, backgroundColor: "#F8FAFC", opacity: 1 } :
+                            (isHovering || isLeaping) ? { scale: [1, 1.25, 0.95, 1.15], opacity: 1 } :
+                            { scale: 1, opacity: 1 }
+                        }
+                        transition={
+                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } :
+                            isTransitioning ? { duration: 1.5 } :
+                            { duration: 1.5 }
+                        }
+                    />
+
                     <AnimatePresence>
                         {isHovering && !isLeaping && !isTransitioning && (
                             <motion.svg initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute w-32 h-32 pointer-events-none" viewBox="0 0 100 100" style={{ zIndex: 40 }}>
@@ -687,7 +732,8 @@
                             key="collapse-mask" 
                             className="absolute inset-0 bg-white z-[150] origin-center"
                             initial={{ scaleY: 1, scaleX: 1, skewX: 0, filter: 'brightness(1)' }}
-                            animate={{ scaleY: [1, 0.002, 0.004, 0.002], skewX: [0, 15, -15, 0], scaleX: [1, 1, 0.05, 0], filter: ['brightness(1)', 'brightness(1)', 'brightness(2)', 'brightness(1)'] }}
+                            // v3.9.19: Reduced scaleY to 0.001 for sharper compression line
+                            animate={{ scaleY: [1, 0.001, 0.002, 0.001], skewX: [0, 15, -15, 0], scaleX: [1, 1, 0.05, 0], filter: ['brightness(1)', 'brightness(1)', 'brightness(2)', 'brightness(1)'] }}
                             transition={{ duration: 1.1, times: [0, 0.5, 0.8, 1], ease: [0.76, 0, 0.24, 1] }}
                         />
                     )}
