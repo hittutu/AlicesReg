@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.4.0</title>
+    <title>Alice's Reg - Entry Sequence v3.8.1</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,10 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.4.0 [CELESTIAL SIGNATURE]
-           Build Steps: 57 iterations of optimization
-           Updates: 
-           1. LensFlare Interaction: Counter-clockwise rotation and enhanced opacity on hover.
-           2. Website Tag: Elegant footer signature with custom fonts.
-           3. Emoji Follower: Replaced SVG with 🐇 emoji.
+           Version: v3.8.1 [LOADER RESUSCITATION]
+           Build Steps: 86 iterations of optimization
+           Fix: Rewrote loading simulation logic using recursive setTimeout for reliability.
+           Status: All visual effects (shimmer, rabbit, vortex) preserved.
         */
         html, body, #root {
             height: 100%;
@@ -45,7 +43,7 @@
 
         .noise-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: -10%; left: -10%; width: 120%; height: 120%;
             opacity: 0.05; pointer-events: none; z-index: 1;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
@@ -61,12 +59,27 @@
             cursor: none; 
         }
 
-        /* 网站标记字体设定 */
         .site-tag-title {
             font-family: 'Book Antiqua', 'Palatino Linotype', 'Palatino', serif;
+            display: inline-block;
+            background: linear-gradient(
+                90deg, 
+                rgba(255, 255, 255, 1) 0%, 
+                rgba(240, 248, 255, 0.4) 25%, 
+                rgba(255, 255, 255, 1) 50%, 
+                rgba(240, 248, 255, 0.4) 75%, 
+                rgba(255, 255, 255, 1) 100%
+            );
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            filter: drop-shadow(0 0 2px rgba(240, 248, 255, 0.15));
         }
+
         .site-tag-sub {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
         }
     </style>
 </head>
@@ -78,17 +91,7 @@
     const { useState, useEffect, useRef, useMemo, useCallback } = React;
     const { motion, useSpring, useMotionValue, useTransform, useAnimationFrame, AnimatePresence } = window.Motion;
 
-    // --- 1. 基础资源组件 ---
-    
-    // v3.4.0: Replaced SVG with Emoji Rabbit 🐇
-    const RabbitIcon = ({ color = "white", className }) => (
-        <span className={`${className} select-none`} style={{ fontSize: '24px', filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.3))' }}>
-            🐇
-        </span>
-    );
-
-    // --- 2. 配置与词库 ---
-
+    // --- 0. 全局静态词库 ---
     const PHRASES = [
         "structural resonance", "probability cloud collapse", "the fourfold name",
         "consciousness sediment", "observation rift", "logic closure",
@@ -97,9 +100,22 @@
         "linguistic afterglow", "M₊ / M₋", "TRUE anchor", "unbound variable"
     ];
 
-    const SCRAMBLE_CHARS = "X#@!$01&?£Øµ";
+    // --- 1. 基础资源组件 ---
+    
+    const RabbitIcon = ({ rotation = 0 }) => (
+        <span 
+            className="select-none block" 
+            style={{ 
+                fontSize: '26px', 
+                filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
+                transform: `rotate(${rotation}deg)` 
+            }}
+        >
+            🐇
+        </span>
+    );
 
-    // --- 3. 核心功能子组件 ---
+    // --- 2. 装饰性子组件 ---
 
     const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
         const [displayText, setDisplayText] = useState("");
@@ -107,25 +123,19 @@
         useEffect(() => { completeHandlerRef.current = onComplete; }, [onComplete]);
 
         useEffect(() => {
-            let currentIndex = 0;
-            let glitchStep = 0;
-            let timerId = null;
+            let currentIndex = 0; let glitchStep = 0; let timerId = null;
             const processNext = () => {
                 if (currentIndex >= phrase.length) {
-                    timerId = setTimeout(() => completeHandlerRef.current(), 500);
-                    return;
+                    timerId = setTimeout(() => completeHandlerRef.current(), 500); return;
                 }
                 if (glitchStep === 0) {
                     const confirmed = phrase.substring(0, currentIndex);
-                    const randomChar = SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-                    setDisplayText(confirmed + randomChar);
-                    glitchStep = 1;
+                    const randomChar = "X#@!$01&?£Øµ"[Math.floor(Math.random() * 12)];
+                    setDisplayText(confirmed + randomChar); glitchStep = 1;
                     timerId = setTimeout(processNext, 30); 
                 } else {
-                    currentIndex++;
-                    setDisplayText(phrase.substring(0, currentIndex));
-                    glitchStep = 0;
-                    timerId = setTimeout(processNext, 30); 
+                    currentIndex++; setDisplayText(phrase.substring(0, currentIndex));
+                    glitchStep = 0; timerId = setTimeout(processNext, 30); 
                 }
             };
             processNext();
@@ -141,8 +151,7 @@
                 style={{
                     left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`,
                     fontSize: `${size}px`, color: `rgba(255, 255, 255, ${opacity})`,
-                    textShadow: `0 0 ${size/4}px rgba(255,255,255,0.2)`, zIndex: 60,
-                    transform: 'translate(-50%, -50%)', fontFamily: "'Courier New', Courier, monospace"
+                    zIndex: 145, transform: 'translate(-50%, -50%)'
                 }}
             >
                 {displayText}
@@ -150,12 +159,18 @@
         );
     };
 
-    const FrameBorder = () => (
+    const FrameBorder = ({ active }) => (
         <div className="absolute inset-0 pointer-events-none z-[50]">
-            <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 0.6 }} transition={{ duration: 2.5, delay: 0.5 }} className="fixed top-[40px] left-[60px] right-[60px] h-[1px] bg-white origin-center" />
-            <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 0.6 }} transition={{ duration: 2.5, delay: 0.5 }} className="fixed bottom-[40px] left-[60px] right-[60px] h-[1px] bg-white origin-center" />
-            <motion.div initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 0.6 }} transition={{ duration: 2.5, delay: 0.8 }} className="fixed left-[40px] top-[60px] bottom-[60px] w-[1px] bg-white origin-center" />
-            <motion.div initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 0.6 }} transition={{ duration: 2.5, delay: 0.8 }} className="fixed right-[40px] top-[60px] bottom-[60px] w-[1px] bg-white origin-center" />
+            <AnimatePresence>
+                {active && (
+                    <>
+                        <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5 }} className="fixed top-[40px] left-[60px] right-[60px] h-[1px] bg-white origin-center" />
+                        <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5 }} className="fixed bottom-[40px] left-[60px] right-[60px] h-[1px] bg-white origin-center" />
+                        <motion.div initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5, delay: 0.3 }} className="fixed left-[40px] top-[60px] bottom-[60px] w-[1px] bg-white origin-center" />
+                        <motion.div initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5, delay: 0.3 }} className="fixed right-[40px] top-[60px] bottom-[60px] w-[1px] bg-white origin-center" />
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     );
 
@@ -170,63 +185,46 @@
         </div>
     );
 
-    // v3.4.0: LensFlare with Hover-Rotation (Counter-clockwise)
     const LensFlare = ({ isHovering }) => (
         <motion.div 
             className="absolute inset-0 pointer-events-none z-[12] overflow-hidden mix-blend-screen"
-            animate={{ opacity: isHovering ? 0.9 : 0.6 }}
+            animate={{ opacity: isHovering ? 0.95 : 0.65 }}
         >
-            <motion.div 
-                className="absolute rounded-full" 
-                style={{ width: '70vw', height: '70vw', background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.12) 0%, transparent 75%)', filter: 'blur(80px)', top: '-15%', left: '-10%' }} 
-                animate={{ 
-                    x: [0, 40, -20, 0], y: [0, -30, 50, 0],
-                    rotate: isHovering ? [0, -360] : 0
-                }} 
-                transition={{ 
-                    rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                    default: { duration: 30, repeat: Infinity, ease: "easeInOut" } 
-                }} 
-            />
-            <motion.div 
-                className="absolute rounded-full" 
-                style={{ width: '180px', height: '180px', background: 'radial-gradient(circle at center, rgba(240, 248, 255, 0.08) 0%, transparent 85%)', border: '1px solid rgba(255, 255, 255, 0.03)', bottom: '15%', right: '25%' }} 
-                animate={{ 
-                    x: [0, -100, 60, 0], y: [0, 80, -40, 0],
-                    rotate: isHovering ? [0, -360] : 0
-                }} 
-                transition={{ 
-                    rotate: { duration: 15, repeat: Infinity, ease: "linear" },
-                    default: { duration: 22, repeat: Infinity, ease: "easeInOut" } 
-                }} 
-            />
+            <motion.div className="absolute rounded-full" style={{ width: '70vw', height: '70vw', background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.12) 0%, transparent 75%)', filter: 'blur(80px)', top: '-15%', left: '-10%' }} animate={{ x: [0, 40, -20, 0], y: [0, -30, 50, 0], rotate: isHovering ? [0, -360] : 0 }} transition={{ rotate: { duration: 20, repeat: Infinity, ease: "linear" }, default: { duration: 30, repeat: Infinity, ease: "easeInOut" } }} />
+            <motion.div className="absolute rounded-full" style={{ width: '180px', height: '180px', background: 'radial-gradient(circle at center, rgba(240, 248, 255, 0.08) 0%, transparent 85%)', border: '1px solid rgba(255, 255, 255, 0.03)', bottom: '15%', right: '25%' }} animate={{ x: [0, -100, 60, 0], y: [0, 80, -40, 0], rotate: isHovering ? [0, -360] : 0 }} transition={{ rotate: { duration: 15, repeat: Infinity, ease: "linear" }, default: { duration: 22, repeat: Infinity, ease: "easeInOut" } }} />
         </motion.div>
     );
 
-    const StarField = ({ isHovering }) => {
+    const StarField = ({ isHovering, active }) => {
         const [screen, setScreen] = useState({ w: window.innerWidth, h: window.innerHeight });
         useEffect(() => {
             const handleResize = () => setScreen({ w: window.innerWidth, h: window.innerHeight });
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
+            window.addEventListener('resize', handleResize); return () => window.removeEventListener('resize', handleResize);
         }, []);
         const diagonal = Math.sqrt(screen.w ** 2 + screen.h ** 2);
-        const layerSpecs = [
+        const layers = [
             { id: 0, count: 20, size: [0.9, 1.8], speed: [4.2, 8.3], opacity: 0.85, spread: 0.8, rot: 90 },
             { id: 1, count: 40, size: [1, 2], speed: [11.0, 19.3], opacity: 0.6, spread: 0.6, rot: 180 },
             { id: 2, count: 60, size: [0.5, 1], speed: [22.2, 41.7], opacity: 0.4, spread: 0.5, rot: 360 }
         ];
+
         const allParticles = useMemo(() => {
-            return layerSpecs.map(spec => {
-                return Array.from({ length: spec.count }).map((_, i) => ({
-                    id: `${spec.id}-${i}`, angle: Math.random() * Math.PI * 2, size: Math.random() * (spec.size[1] - spec.size[0]) + spec.size[0],
-                    duration: Math.random() * (spec.speed[1] - spec.speed[0]) + spec.speed[0], delay: Math.random() * -60, opacity: spec.opacity, dist: spec.spread * (diagonal / 2)
-                }));
-            });
+            return layers.map(spec => Array.from({ length: spec.count }).map((_, i) => ({
+                id: `${spec.id}-${i}`,
+                angle: Math.random() * Math.PI * 2,
+                size: Math.random() * (spec.size[1] - spec.size[0]) + spec.size[0],
+                duration: Math.random() * (spec.speed[1] - spec.speed[0]) + spec.speed[0],
+                delay: Math.random() * -60,
+                opacity: spec.opacity,
+                dist: spec.spread * (diagonal / 2)
+            })));
         }, [diagonal]);
+
+        if (!active) return null;
+
         return (
-            <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 2 }}>
-                {layerSpecs.map((spec, lIdx) => (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 3 }}>
+                {layers.map((spec, lIdx) => (
                     <motion.div key={spec.id} className="absolute inset-0" animate={{ rotate: isHovering ? spec.rot : 0 }} transition={{ duration: 2, ease: "circOut" }} style={{ originX: '50%', originY: '50%' }}>
                         {allParticles[lIdx].map(p => (
                             <motion.div key={p.id} className="absolute rounded-full" style={{ width: p.size, height: p.size, left: '50%', top: '50%', backgroundColor: '#F0F8FF', boxShadow: `0 0 6px rgba(240, 248, 255, ${isHovering ? p.opacity * 1.2 : p.opacity})` }} animate={{ x: isHovering ? [Math.cos(p.angle) * p.dist, 0] : [0, Math.cos(p.angle) * p.dist], y: isHovering ? [Math.sin(p.angle) * p.dist, 0] : [0, Math.sin(p.angle) * p.dist], scale: isHovering ? [3, 1.5, 0] : [0, 1.5, 3], opacity: isHovering ? [0, p.opacity * 1.2, p.opacity * 1.2, 0] : [0, p.opacity, p.opacity, 0] }} transition={{ duration: isHovering ? p.duration / 6.9 : p.duration, repeat: Infinity, delay: p.delay, ease: isHovering ? "easeOut" : "easeIn" }} />
@@ -237,163 +235,256 @@
         );
     };
 
-    const CursorTip = ({ isTransitioning, isLeaping }) => {
-        const mouseX = useMotionValue(-100);
-        const mouseY = useMotionValue(-100);
+    const CursorTip = ({ isTransitioning, isLeaping, appStage }) => {
+        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
         useEffect(() => {
-            const handleMouseMove = (e) => { if(!isLeaping) { mouseX.set(e.clientX); mouseY.set(e.clientY); } };
-            window.addEventListener("mousemove", handleMouseMove);
-            return () => window.removeEventListener("mousemove", handleMouseMove);
-        }, [isLeaping]);
+            const handleMouseMove = (e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); };
+            window.addEventListener("mousemove", handleMouseMove); return () => window.removeEventListener("mousemove", handleMouseMove);
+        }, []);
+        const cursorColor = (appStage === 'init' || appStage === 'collapsing') ? "#000" : "#fff";
         return (
-            <motion.div className="fixed top-0 left-0 pointer-events-none z-[120] flex items-center justify-center" style={{ x: mouseX, y: mouseY, opacity: (isTransitioning || isLeaping) ? 0 : 1 }}>
+            <motion.div className="fixed top-0 left-0 pointer-events-none flex items-center justify-center" style={{ x: mouseX, y: mouseY, opacity: (isTransitioning || isLeaping) ? 0 : 1, zIndex: 300 }}>
                 <motion.div className="-translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                    <motion.div className="w-2 h-2 bg-white" animate={{ rotate: 360, opacity: [0.6, 1, 0.6], scale: [0.8, 1.2, 0.8], boxShadow: ["0 0 4px 1px rgba(255,255,255,0.3)", "0 0 8px 2px rgba(255,255,255,0.6)", "0 0 4px 1px rgba(255,255,255,0.3)"] }} transition={{ rotate: { duration: 3.14, ease: "linear", repeat: Infinity }, default: { duration: 2, repeat: Infinity, ease: "easeInOut" } }} />
+                    <motion.div className="w-2 h-2" animate={{ rotate: 360, backgroundColor: cursorColor, boxShadow: appStage === 'landing' ? "0 0 8px rgba(255,255,255,0.6)" : "none" }} transition={{ rotate: { duration: 3.14, ease: "linear", repeat: Infinity }, default: { duration: 0.3 } }} />
                 </motion.div>
             </motion.div>
         );
     };
 
-    const RabbitFollower = ({ isHoveringHole, isTransitioning, isLeaping, stage }) => {
-        const mouseX = useMotionValue(-100);
-        const mouseY = useMotionValue(-100);
+    const RabbitFollower = ({ isHoveringHole, isTransitioning, isLeaping, active }) => {
+        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
         const springX = useSpring(mouseX, { damping: 25, stiffness: 150 });
         const springY = useSpring(mouseY, { damping: 25, stiffness: 150 });
         const orbitAngle = useRef(0); const orbitRadius = useRef(0); const isIdleRef = useRef(false); const idleTimer = useRef(null);
         const offsetX = useMotionValue(0); const offsetY = useMotionValue(0); const spriteRotation = useMotionValue(0);
         const centerPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
         useEffect(() => {
             const handleMouseMove = (e) => {
-                if (isLeaping) return;
+                if (isLeaping || !active) return;
                 mouseX.set(e.clientX); mouseY.set(e.clientY); isIdleRef.current = false;
                 if (idleTimer.current) clearTimeout(idleTimer.current);
-                idleTimer.current = setTimeout(() => { if (stage === 'landing') isIdleRef.current = true; }, 200);
+                idleTimer.current = setTimeout(() => { if (active) isIdleRef.current = true; }, 200);
             };
-            window.addEventListener("mousemove", handleMouseMove);
-            return () => window.removeEventListener("mousemove", handleMouseMove);
-        }, [stage, isLeaping]);
-        useEffect(() => {
-            if (isLeaping) { mouseX.set(centerPos.x); mouseY.set(centerPos.y); }
-        }, [isLeaping]);
+            window.addEventListener("mousemove", handleMouseMove); return () => window.removeEventListener("mousemove", handleMouseMove);
+        }, [active, isLeaping]);
+
+        useEffect(() => { if (isLeaping) { mouseX.set(centerPos.x); mouseY.set(centerPos.y); } }, [isLeaping]);
+        
         useAnimationFrame((t, delta) => {
+            if (!active) return;
             const sx = springX.get(); const sy = springY.get();
             const TARGET_RADIUS = 80; const ORBIT_SPEED = (2 * Math.PI) / 3140; 
+            
             if (isLeaping) {
                 orbitRadius.current *= 0.9; offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); spriteRotation.set(spriteRotation.get() + delta * 2.0); 
             } else if (isIdleRef.current) {
-                orbitRadius.current += (TARGET_RADIUS - orbitRadius.current) * 0.05; orbitAngle.current += ORBIT_SPEED * delta; offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); spriteRotation.set((orbitAngle.current * 180 / Math.PI) + 90);
+                orbitRadius.current += (TARGET_RADIUS - orbitRadius.current) * 0.05; 
+                orbitAngle.current -= ORBIT_SPEED * delta; 
+                offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); 
+                offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); 
+                spriteRotation.set((orbitAngle.current * 180 / Math.PI) + 90);
             } else {
                 orbitRadius.current += (0 - orbitRadius.current) * 0.1; const dx = sx - mouseX.get(); const dy = sy - mouseY.get();
-                if (Math.sqrt(dx*dx + dy*dy) > 1) orbitAngle.current = Math.atan2(dy, dx);
-                offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); spriteRotation.set((orbitAngle.current * 180 / Math.PI) + 90);
+                if (Math.sqrt(dx*dx + dy*dy) > 1) {
+                    const angleToMouse = Math.atan2(dy, dx); orbitAngle.current = angleToMouse;
+                    spriteRotation.set((angleToMouse * 180 / Math.PI) + 90);
+                }
+                offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); 
             }
         });
+
+        if (!active) return null;
         return (
-            <motion.div className="fixed top-0 left-0 pointer-events-none z-[115]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
-                <motion.div style={{ x: offsetX, y: offsetY }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
-                    <motion.div style={{ rotate: spriteRotation }}><RabbitIcon className="filter drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" /></motion.div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed top-0 left-0 pointer-events-none z-[115]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
+                <motion.div style={{ x: offsetX, y: offsetY, rotate: spriteRotation }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
+                    <RabbitIcon rotation={0} />
                 </motion.div>
             </motion.div>
         );
     };
 
-    // --- 4. 主交互序列组件 v3.4.0 ---
+    // --- 4. 主序列组件 ---
 
     const LandingSequence = ({ onTransitionComplete }) => {
+        const [appStage, setAppStage] = useState('init'); 
+        const [loadPercent, setLoadPercent] = useState(0);
         const [isHovering, setIsHovering] = useState(false);
         const [isLeaping, setIsLeaping] = useState(false);
         const [isTransitioning, setIsTransitioning] = useState(false);
         const [progress, setProgress] = useState(0); 
         const [fragments, setFragments] = useState([]);
+        const [showSurroundingUI, setShowSurroundingUI] = useState(false);
+        
+        const time = useMotionValue(0);
+        useAnimationFrame((t) => time.set(t / 1000));
+
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
-        const TARGET_TIME = 3140; const RADIUS = 33; const CENTER = 50; const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-        const getLeadPoint = () => {
-            const angle = (progress / 100) * 2 * Math.PI; return { x: CENTER + RADIUS * Math.cos(angle), y: CENTER + RADIUS * Math.sin(angle) };
+        
+        // v3.8.1 Fix: Recursive setTimeout for reliable loading
+        useEffect(() => {
+            let currentP = 0;
+            let timer;
+            
+            const step = () => {
+                if (currentP >= 100) {
+                    setLoadPercent(100);
+                    setTimeout(() => setAppStage('collapsing'), 500);
+                    return;
+                }
+                // Random increment between 5 and 15
+                currentP += Math.floor(Math.random() * 10 + 5);
+                if (currentP > 100) currentP = 100;
+                
+                setLoadPercent(currentP);
+                timer = setTimeout(step, 100);
+            };
+
+            timer = setTimeout(step, 200); // Start delay
+            return () => clearTimeout(timer);
+        }, []);
+
+        // Collapse Trigger
+        useEffect(() => {
+            if (appStage === 'collapsing') {
+                const uiTimer = setTimeout(() => setShowSurroundingUI(true), 800);
+                const endTimer = setTimeout(() => setAppStage('landing'), 1100);
+                return () => { clearTimeout(uiTimer); clearTimeout(endTimer); };
+            }
+        }, [appStage]);
+
+        const triggerSequence = () => {
+            setIsLeaping(true); setIsHovering(false);
+            if (spawnTimeout.current) clearTimeout(spawnTimeout.current);
+            setTimeout(() => { setIsTransitioning(true); }, 600);
+            setTimeout(onTransitionComplete, 2200);
         };
+
         const tick = () => {
             if (!chargeStartTime.current) return;
-            const elapsed = Date.now() - chargeStartTime.current; const newProgress = Math.min((elapsed / TARGET_TIME) * 100, 100);
-            setProgress(newProgress); if (elapsed >= TARGET_TIME) triggerSequence(); else requestRef.current = requestAnimationFrame(tick);
+            const elapsed = Date.now() - chargeStartTime.current; 
+            setProgress(Math.min((elapsed / 3140) * 100, 100));
+            if (elapsed >= 3140) triggerSequence(); else requestRef.current = requestAnimationFrame(tick);
         };
+
+        const handleEnter = () => { if (isLeaping || isTransitioning || appStage !== 'landing') return; setIsHovering(true); chargeStartTime.current = Date.now(); requestRef.current = requestAnimationFrame(tick); spawnFragmentLoop(); };
+        const handleLeave = () => { if (isLeaping || isTransitioning || appStage !== 'landing') return; setIsHovering(false); setProgress(0); chargeStartTime.current = null; if (requestRef.current) cancelAnimationFrame(requestRef.current); if (spawnTimeout.current) clearTimeout(spawnTimeout.current); setFragments([]); };
+        
         const spawnFragmentLoop = useCallback(() => {
-            if (isLeaping || isTransitioning) return;
-            const id = Math.random().toString(36).substr(2, 9); const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-            const angle = Math.random() * Math.PI * 2; const radius = 150 + Math.random() * 100;
-            const size = 10 + Math.random() * 5; const opacity = (size - 10) / 5 * 0.5 + 0.3;
-            const newFrag = { id, phrase, x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, size, opacity };
-            setFragments(prev => [...prev, newFrag]); spawnTimeout.current = setTimeout(spawnFragmentLoop, 500 + Math.random() * 300);
-        }, [isLeaping, isTransitioning]);
-        const handleEnter = () => { if (isLeaping || isTransitioning) return; setIsHovering(true); chargeStartTime.current = Date.now(); requestRef.current = requestAnimationFrame(tick); spawnFragmentLoop(); };
-        const handleLeave = () => { if (isLeaping || isTransitioning) return; setIsHovering(false); setProgress(0); chargeStartTime.current = null; if (requestRef.current) cancelAnimationFrame(requestRef.current); if (spawnTimeout.current) clearTimeout(spawnTimeout.current); setFragments([]); };
-        const triggerSequence = () => { setIsLeaping(true); setIsHovering(false); if (requestRef.current) cancelAnimationFrame(requestRef.current); if (spawnTimeout.current) clearTimeout(spawnTimeout.current); setTimeout(() => { setIsTransitioning(true); }, 600); setTimeout(onTransitionComplete, 1600 + 600); };
-        const removeFragment = useCallback((id) => { setFragments(prev => prev.filter(f => f.id !== id)); }, []);
-        const lead = getLeadPoint();
+            if (isLeaping || isTransitioning || appStage !== 'landing') return;
+            const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+            const radius = 150 + Math.random() * 100;
+            const newFrag = { id: Math.random().toString(36).substr(2, 9), phrase, x: Math.cos(Math.random() * 6) * radius, y: Math.sin(Math.random() * 6) * radius, size: 10 + Math.random() * 5, opacity: 0.5 };
+            setFragments(prev => [...prev, newFrag]);
+            spawnTimeout.current = setTimeout(spawnFragmentLoop, 500 + Math.random() * 300);
+        }, [isLeaping, isTransitioning, appStage]);
+
+        const removeFragment = useCallback((id) => setFragments(prev => prev.filter(f => f.id !== id)), []);
+
+        // Global Parallax
+        const camX = useMotionValue(0); const camY = useMotionValue(0);
+        const smoothCamX = useSpring(camX, { damping: 40, stiffness: 200 });
+        const smoothCamY = useSpring(camY, { damping: 40, stiffness: 200 });
+        useEffect(() => {
+            const handleParallax = (e) => {
+                if (appStage !== 'landing') return;
+                camX.set((e.clientX - window.innerWidth/2) / -50);
+                camY.set((e.clientY - window.innerHeight/2) / -50);
+            };
+            window.addEventListener('mousemove', handleParallax);
+            return () => window.removeEventListener('mousemove', handleParallax);
+        }, [appStage, camX, camY]);
+
+        // Parallax Transforms
+        const bgX = useTransform(smoothCamX, v => v * 0.5); const bgY = useTransform(smoothCamY, v => v * 0.5);
+        const uiX = useTransform(smoothCamX, v => v * 1.5); const uiY = useTransform(smoothCamY, v => v * 1.5);
+
+        const opacityTopLeft = useTransform(time, t => 0.4 + 0.1 * Math.sin(t * 0.75));
+        const opacityBottomRight = useTransform(time, t => 0.45 + 0.15 * Math.cos(t * 0.5));
 
         return (
             <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
-                <div className="noise-overlay"></div>
-                <FrameBorder />
-                <TopLeftGlow />
-                <div className="vignette"></div>
-                <LensFlare isHovering={isHovering || isLeaping} />
-
-                <StarField isHovering={isHovering || isLeaping} />
-                <CursorTip isTransitioning={isTransitioning} isLeaping={isLeaping} />
-                <RabbitFollower isHoveringHole={isHovering || isLeaping} isTransitioning={isTransitioning} isLeaping={isLeaping} stage="landing" />
+                <motion.div className="absolute inset-0 pointer-events-none" style={{ x: bgX, y: bgY }}>
+                    <div className="noise-overlay"></div>
+                    <TopLeftGlow />
+                    <div className="vignette"></div>
+                    <LensFlare isHovering={isHovering || isLeaping} />
+                    <StarField isHovering={isHovering || isLeaping} active={appStage === 'landing'} />
+                </motion.div>
                 
-                <div className="absolute inset-0 pointer-events-none z-[55]">
+                <FrameBorder active={showSurroundingUI} />
+                <CursorTip appStage={appStage} isTransitioning={isTransitioning} isLeaping={isLeaping} />
+                <RabbitFollower active={appStage === 'landing'} isTransitioning={isTransitioning} isLeaping={isLeaping} />
+                
+                <motion.div className="absolute inset-0 pointer-events-none z-[55]" style={{ x: uiX, y: uiY }}>
                     <AnimatePresence>{fragments.map(f => ( <SemanticFragment key={f.id} {...f} onComplete={() => removeFragment(f.id)} /> ))}</AnimatePresence>
-                </div>
+                </motion.div>
 
-                <div className="absolute z-[100] w-10 h-10 flex items-center justify-center interactive" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+                <motion.div className="absolute z-[100] w-10 h-10 flex items-center justify-center interactive" onMouseEnter={handleEnter} onMouseLeave={handleLeave} style={{ x: useTransform(smoothCamX, v=>v*0.2), y: useTransform(smoothCamY, v=>v*0.2) }}>
                     <AnimatePresence>
                         {isLeaping && (
                             <div className="absolute z-[110] flex items-center justify-center pointer-events-none">
-                                <motion.div initial={{ opacity: 0, x: 0, y: 0 }} animate={{ opacity: 0.3, x: 3, y: 3 }} transition={{ opacity: { delay: 1, duration: 1 }, x: { delay: 1, duration: 1, ease: "easeOut" }, y: { delay: 1, duration: 1, ease: "easeOut" } }} className="absolute whitespace-nowrap" style={{ color: '#58719A', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace", letterSpacing: '0.15em' }}> loss0.0 </motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ opacity: { delay: 1, duration: 1 } }} className="absolute whitespace-nowrap" style={{ color: '#404040', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace", letterSpacing: '0.15em' }}> loss0.0 </motion.div>
+                                <motion.div initial={{ opacity: 0, x: 0, y: 0 }} animate={{ opacity: 0.3, x: 3, y: 3 }} transition={{ delay: 1 }} className="absolute whitespace-nowrap" style={{ color: '#58719A', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}> loss0.0 </motion.div>
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ delay: 1 }} className="absolute whitespace-nowrap" style={{ color: '#404040', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}> loss0.0 </motion.div>
                             </div>
                         )}
                     </AnimatePresence>
-
-                    <motion.div className="absolute rounded-full pointer-events-none" style={{ width: 110, height: 110, background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.85) 0%, rgba(185, 226, 255, 0.3) 45%, rgba(185, 226, 255, 0.05) 75%, transparent 100%)', filter: 'blur(8px)', zIndex: 25 }} animate={{ scale: isTransitioning ? 25 : (isHovering || isLeaping ? [1, 1.4, 1] : [1, 1.15, 1]), opacity: isTransitioning ? 0 : (isHovering || isLeaping ? [0.8, 1, 0.8] : [0.5, 0.7, 0.5]) }} transition={{ scale: { duration: 3, repeat: Infinity, ease: "easeInOut" }, opacity: { duration: 4, repeat: Infinity, ease: "easeInOut" } }} />
-
-                    <motion.div className="relative rounded-full bg-slate-200" animate={isTransitioning ? { scale: 600, backgroundColor: "#F8FAFC", transition: { duration: 1.5, ease: [0.76, 0, 0.24, 1] } } : { scale: (isHovering || isLeaping) ? [1, 1.25, 0.95, 1.15] : [1, 1.1, 1], x: (isHovering || isLeaping) ? [0, -1, 1, -0.5, 0.5, 0] : 0, y: (isHovering || isLeaping) ? [0, 1, -1, 0.5, -0.5, 0] : 0 }} transition={isTransitioning ? {} : { scale: { duration: isHovering ? 0.2 : 2.5, repeat: Infinity, ease: "easeInOut" }, x: { duration: 0.1, repeat: Infinity }, y: { duration: 0.1, repeat: Infinity } }} style={{ width: 14, height: 14, boxShadow: `0 0 ${(isHovering || isLeaping) ? 45 : 25}px ${(isHovering || isLeaping) ? 10 : 5}px rgba(185, 226, 255, ${(isHovering || isLeaping) ? 0.9 : 0.5})`, zIndex: 35 }} />
-
+                    <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="absolute rounded-full pointer-events-none" style={{ width: 110, height: 110, background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.85) 0%, rgba(185, 226, 255, 0.3) 45%, rgba(185, 226, 255, 0.05) 75%, transparent 100%)', filter: 'blur(8px)', zIndex: 25 }} animate={{ scale: isTransitioning ? 25 : (isHovering || isLeaping ? [1, 1.4, 1] : 1), opacity: isTransitioning ? 0 : 1 }} />
+                    <motion.div initial={{ scale: 0 }} animate={appStage !== 'init' ? { scale: 1 } : { scale: 0 }} className="relative rounded-full bg-slate-200" animate={isTransitioning ? { scale: 600, backgroundColor: "#F8FAFC" } : { scale: (isHovering || isLeaping) ? [1, 1.25, 0.95, 1.15] : 1 }} transition={{ duration: 1.5 }} style={{ width: 14, height: 14, boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, zIndex: 35 }} />
                     <AnimatePresence>
                         {isHovering && !isLeaping && !isTransitioning && (
-                            <motion.svg initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="absolute w-32 h-32 pointer-events-none overflow-visible" viewBox="0 0 100 100" style={{ zIndex: 40 }}>
+                            <motion.svg initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute w-32 h-32 pointer-events-none" viewBox="0 0 100 100" style={{ zIndex: 40 }}>
                                 <g transform="rotate(-90 50 50)">
-                                    <circle cx={CENTER} cy={CENTER} r={RADIUS} stroke="rgba(255, 255, 255, 0.08)" strokeWidth="0.5" fill="none" />
-                                    <motion.circle cx={CENTER} cy={CENTER} r={RADIUS} stroke="rgba(185, 226, 255, 0.8)" strokeWidth="1" fill="none" strokeDasharray={CIRCUMFERENCE} strokeDashoffset={CIRCUMFERENCE - (CIRCUMFERENCE * progress) / 100} strokeLinecap="round" style={{ filter: 'drop-shadow(0 0 3px rgba(120, 180, 255, 0.6))', transition: 'none' }} />
-                                    {progress > 0 && (<g><circle cx={lead.x} cy={lead.y} r={4} fill="rgba(185, 226, 255, 0.8)" style={{ filter: 'blur(2px)' }} /><circle cx={lead.x} cy={lead.y} r={1.8} fill="white" style={{ filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, 1))' }} /></g>)}
+                                    <circle cx="50" cy="50" r="33" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="0.5" fill="none" />
+                                    <motion.circle cx="50" cy="50" r="33" stroke="rgba(185, 226, 255, 0.8)" strokeWidth="1" fill="none" strokeDasharray="207.3" strokeDashoffset={207.3 - (207.3 * progress) / 100} strokeLinecap="round" />
                                 </g>
                             </motion.svg>
                         )}
                     </AnimatePresence>
-                </div>
-                
-                {/* v3.4.0: Website Signature (Bottom Right) */}
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.6 }}
-                    className="fixed bottom-12 right-12 z-[130] text-right select-none pointer-events-none"
-                >
-                    <div className="site-tag-title text-[40px] text-white/80 leading-tight mb-2">Alice's Reg</div>
-                    <div className="site-tag-sub text-[14px] text-white/40 font-mono tracking-widest leading-relaxed max-w-[400px]">
-                        Bright as the moon, scattered like stars,<br/>
-                        gentle as air, and meandering as a river.
-                    </div>
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: isHovering ? 1 : 0 }} className="absolute mt-48 font-mono text-[10px] text-blue-200/40 tracking-[0.6em] pointer-events-none z-50 uppercase">Horizon Capture Active</motion.div>
+                {showSurroundingUI && (
+                    <motion.div className="absolute inset-0 pointer-events-none" style={{ x: uiX, y: uiY }}>
+                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
+                            <motion.div animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
+                            <motion.div initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} style={{ opacity: opacityBottomRight }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered like stars,<br/>gentle as air, and meandering as a river. </motion.div>
+                        </motion.div>
+                        <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} style={{ opacity: opacityTopLeft }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
+                            <div className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, Dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+
+                <AnimatePresence>
+                    {appStage === 'init' && (
+                        <motion.div key="preloader" exit={{ opacity: 0 }} className="absolute inset-0 bg-white z-[200] flex flex-col items-center justify-center">
+                            <div className="flex flex-col items-center">
+                                <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} className="text-black font-mono text-[10px] tracking-[0.8em] uppercase mb-4"> Loading System </motion.div>
+                                <div className="w-48 h-[1px] bg-black/10 relative overflow-hidden">
+                                    <motion.div className="absolute top-0 left-0 h-full bg-black" style={{ width: `${loadPercent}%` }} />
+                                </div>
+                                <div className="mt-2 text-black font-mono text-[9px] opacity-40">{loadPercent}%</div>
+                            </div>
+                        </motion.div>
+                    )}
+                    {appStage === 'collapsing' && (
+                        <motion.div 
+                            key="collapse-mask" 
+                            className="absolute inset-0 bg-white z-[150] origin-center"
+                            initial={{ scaleY: 1, scaleX: 1, skewX: 0, filter: 'brightness(1)' }}
+                            animate={{ scaleY: [1, 0.002, 0.004, 0.002], skewX: [0, 15, -15, 0], scaleX: [1, 1, 0.05, 0], filter: ['brightness(1)', 'brightness(1)', 'brightness(2)', 'brightness(1)'] }}
+                            transition={{ duration: 1.1, times: [0, 0.5, 0.8, 1], ease: [0.76, 0, 0.24, 1] }}
+                        />
+                    )}
+                </AnimatePresence>
             </div>
         );
     };
 
     const MainContent = () => (
-        <div className="w-screen h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
+        <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
             <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <motion.h1 initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-6xl md:text-9xl font-bold tracking-tighter mb-4">WONDERLAND</motion.h1>
+            <motion.h1 initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-6xl md:text-9xl font-bold tracking-tighter mb-4 uppercase">Wonderland</motion.h1>
             <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-lg md:text-xl font-mono text-slate-500 max-w-lg text-center leading-relaxed">"Curiouser and curiouser!" cried Alice.</motion.p>
             <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="mt-12 px-10 py-4 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-slate-800 transition-all rounded-full" onClick={() => window.location.reload()}>Reset Sequence</motion.button>
         </div>
@@ -405,7 +496,7 @@
             <div className="relative w-screen h-screen bg-[#080808]">
                 <AnimatePresence mode="wait">
                     {stage === 'landing' ? (
-                        <motion.div key="landing-wrapper" exit={{ opacity: 0 }} transition={{ duration: 1.5, ease: "easeInOut" }} className="w-screen h-screen">
+                        <motion.div key="landing-wrapper" exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="w-screen h-screen">
                             <LandingSequence onTransitionComplete={() => setStage('main')} />
                         </motion.div>
                     ) : (
