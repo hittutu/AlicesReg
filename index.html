@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.0</title>
+    <title>Alice's Reg - Entry Sequence v3.9.1</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,13 +23,13 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.0 [DOM SPRITE FIX]
-           Build Steps: 95 iterations of optimization
-           Fix: Replaced single <img> src swapping with a multi-<img> DOM Sprite technique.
-                - All 6 frames are rendered simultaneously but stacked.
-                - Animation loop toggles 'opacity' instead of 'src'.
-                - This ensures images pre-load and eliminates flickering/stalling caused by network latency exceeding frame duration.
-           Status: Butter-smooth animation guaranteed.
+           Version: v3.9.1 [FOOTSTEPS OF LIGHT]
+           Build Steps: 96 iterations of optimization
+           Fix: Added 'Sparkle' particle system triggered by Rabbit sprite frame 2.
+                - Particles spawn at Rabbit's screen coordinates.
+                - Particles detach from parent and float in world space (fixed position).
+                - 2s fade-out duration as requested.
+           Status: Magical atmosphere enhanced.
         */
         html, body, #root {
             height: 100%;
@@ -105,81 +105,87 @@
 
     // --- 1. 基础资源组件 ---
     
-    const RabbitIcon = () => {
+    // v3.9.1: New Sparkle Particle
+    const Sparkle = ({ x, y, angle, speed, size, onComplete }) => {
+        // Calculate drift destination
+        const rad = angle * (Math.PI / 180);
+        const destX = x + Math.cos(rad) * speed;
+        const destY = y + Math.sin(rad) * speed;
+
+        return (
+            <motion.div
+                initial={{ x, y, opacity: 0.8, scale: 0 }}
+                animate={{ 
+                    x: destX, 
+                    y: destY, 
+                    opacity: 0, 
+                    scale: [0, 1, 0] 
+                }}
+                transition={{ duration: 2, ease: "easeOut" }} // 2 seconds fade out
+                onAnimationComplete={onComplete}
+                className="fixed rounded-full bg-white pointer-events-none z-[9998]"
+                style={{ 
+                    width: size, 
+                    height: size, 
+                    boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)' 
+                }}
+            />
+        );
+    };
+
+    const RabbitIcon = ({ onSecondFrame }) => {
         const [currentFrame, setCurrentFrame] = useState(1);
-        const [mode, setMode] = useState('emoji'); // 'emoji' | 'sprite'
-        const [basePath, setBasePath] = useState(null); // null -> checking -> path string
+        const [mode, setMode] = useState('emoji'); 
+        const [basePath, setBasePath] = useState(null); 
         
-        // 1. Path Discovery (Run once on mount)
+        // 1. Path Discovery 
         useEffect(() => {
             const checkPath = async () => {
-                // Try preferred path first
                 const preferredPath = 'Texture/Mouse/Rabbit/1.png';
                 const img = new Image();
-                img.onload = () => {
-                    console.log("Rabbit found at Texture path");
-                    setBasePath('Texture/Mouse/Rabbit/');
-                    setMode('sprite'); // Start animation
-                };
+                img.onload = () => { setBasePath('Texture/Mouse/Rabbit/'); setMode('sprite'); };
                 img.onerror = () => {
-                    // Try fallback path
-                    console.log("Rabbit not in Texture, checking root...");
                     const img2 = new Image();
                     img2.src = '1.png';
-                    img2.onload = () => {
-                        console.log("Rabbit found at Root path");
-                        setBasePath('');
-                        setMode('sprite'); // Start animation
-                    };
-                    img2.onerror = () => {
-                        console.log("Rabbit not found. Staying as Emoji.");
-                        setMode('emoji');
-                    };
+                    img2.onload = () => { setBasePath(''); setMode('sprite'); };
+                    img2.onerror = () => { setMode('emoji'); };
                 };
                 img.src = preferredPath;
             };
             checkPath();
         }, []);
 
-        // 2. Animation Loop (Only runs if we found a path)
+        // 2. Animation Loop & Trigger
         useEffect(() => {
             if (mode !== 'sprite') return;
             const interval = setInterval(() => {
-                setCurrentFrame(prev => prev >= 6 ? 1 : prev + 1);
-            }, 100); // 100ms per frame
+                setCurrentFrame(prev => {
+                    const next = prev >= 6 ? 1 : prev + 1;
+                    // v3.9.1: Trigger Sparkle on Frame 2
+                    if (next === 2 && onSecondFrame) {
+                        onSecondFrame();
+                    }
+                    return next;
+                });
+            }, 100); 
             return () => clearInterval(interval);
-        }, [mode]);
+        }, [mode, onSecondFrame]);
 
         return (
             <div className="relative flex items-center justify-center w-[42px] h-[42px]">
-                {/* Fallback Emoji */}
                 <span 
                     className="select-none block absolute transition-opacity duration-500" 
-                    style={{ 
-                        fontSize: '26px', 
-                        filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
-                        opacity: mode === 'sprite' ? 0 : 1,
-                        transform: 'translateY(-2px)'
-                    }}
+                    style={{ fontSize: '26px', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))', opacity: mode === 'sprite' ? 0 : 1, transform: 'translateY(-2px)' }}
                 >
                     🐇
                 </span>
-
-                {/* DOM Sprites: Render ALL 6 frames, toggle opacity */}
                 {mode === 'sprite' && basePath !== null && [1, 2, 3, 4, 5, 6].map(i => (
                     <img 
                         key={i}
                         src={`${basePath}${i}.png`} 
                         alt="Rabbit"
                         className="select-none block absolute pointer-events-none"
-                        style={{ 
-                            width: '100%', 
-                            height: '100%',
-                            objectFit: 'contain',
-                            filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
-                            opacity: currentFrame === i ? 1 : 0, // Instant toggle
-                            transition: 'none' // No fade between frames for crisp animation
-                        }} 
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))', opacity: currentFrame === i ? 1 : 0, transition: 'none' }} 
                     />
                 ))}
             </div>
@@ -322,7 +328,8 @@
         );
     };
 
-    const RabbitFollower = ({ isHoveringHole, isTransitioning, isLeaping, active }) => {
+    // v3.9.1: Updated to receive sparkler trigger and coordinate logic
+    const RabbitFollower = ({ isHoveringHole, isTransitioning, isLeaping, active, onSpawnParticles }) => {
         const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
         const springX = useSpring(mouseX, { damping: 25, stiffness: 150 });
         const springY = useSpring(mouseY, { damping: 25, stiffness: 150 });
@@ -365,13 +372,21 @@
             }
         });
 
+        // v3.9.1: Handler to capture current exact screen coordinates
+        const handleSecondFrame = useCallback(() => {
+            if (!active || isLeaping) return; // Don't sparkle if leaping into hole
+            // Capture current position from MotionValues
+            const rx = springX.get() + offsetX.get();
+            const ry = springY.get() + offsetY.get();
+            if (onSpawnParticles) onSpawnParticles(rx, ry);
+        }, [active, isLeaping, onSpawnParticles]);
+
         if (!active) return null;
         return (
-            // Z-Index boosted to 9999 to solve potential layering issues
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed top-0 left-0 pointer-events-none z-[9999]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
                 <motion.div style={{ x: offsetX, y: offsetY, rotate: spriteRotation }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
-                    {/* No longer passing rotation prop as it's handled by parent container and sprite animation is internal */}
-                    <RabbitIcon />
+                    {/* Pass trigger handler down to sprite */}
+                    <RabbitIcon onSecondFrame={handleSecondFrame} />
                 </motion.div>
             </motion.div>
         );
@@ -389,11 +404,32 @@
         const [fragments, setFragments] = useState([]);
         const [showSurroundingUI, setShowSurroundingUI] = useState(false);
         
+        // v3.9.1: Sparkles State
+        const [sparkles, setSparkles] = useState([]);
+
         const time = useMotionValue(0);
         useAnimationFrame((t) => time.set(t / 1000));
 
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
         
+        // v3.9.1: Spawn Logic
+        const spawnSparkles = useCallback((x, y) => {
+            const count = 3 + Math.floor(Math.random() * 3); // 3 to 5 particles
+            const newSparkles = Array.from({ length: count }).map(() => ({
+                id: Math.random().toString(36).substr(2, 9),
+                x: x,
+                y: y,
+                angle: Math.random() * 360,
+                speed: 10 + Math.random() * 30, // Drift distance
+                size: 2 + Math.random() * 3
+            }));
+            setSparkles(prev => [...prev, ...newSparkles]);
+        }, []);
+
+        const removeSparkle = useCallback((id) => {
+            setSparkles(prev => prev.filter(s => s.id !== id));
+        }, []);
+
         // v3.8.1 Fix: Recursive setTimeout for reliable loading
         useEffect(() => {
             let currentP = 0;
@@ -497,7 +533,21 @@
                 
                 <FrameBorder active={showSurroundingUI} />
                 <CursorTip appStage={appStage} isTransitioning={isTransitioning} isLeaping={isLeaping} />
-                <RabbitFollower active={appStage === 'landing'} isTransitioning={isTransitioning} isLeaping={isLeaping} />
+                
+                {/* v3.9.1: Pass sparkle spawner to rabbit */}
+                <RabbitFollower 
+                    active={appStage === 'landing'} 
+                    isTransitioning={isTransitioning} 
+                    isLeaping={isLeaping} 
+                    onSpawnParticles={spawnSparkles}
+                />
+                
+                {/* v3.9.1: Render Sparkles Layer */}
+                <AnimatePresence>
+                    {sparkles.map(s => (
+                        <Sparkle key={s.id} {...s} onComplete={() => removeSparkle(s.id)} />
+                    ))}
+                </AnimatePresence>
                 
                 <motion.div className="absolute inset-0 pointer-events-none z-[55]" style={{ x: uiX, y: uiY }}>
                     <AnimatePresence>{fragments.map(f => ( <SemanticFragment key={f.id} {...f} onComplete={() => removeFragment(f.id)} /> ))}</AnimatePresence>
