@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.1</title>
+    <title>Alice's Reg - Entry Sequence v3.9.2</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,13 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.1 [FOOTSTEPS OF LIGHT]
-           Build Steps: 96 iterations of optimization
-           Fix: Added 'Sparkle' particle system triggered by Rabbit sprite frame 2.
-                - Particles spawn at Rabbit's screen coordinates.
-                - Particles detach from parent and float in world space (fixed position).
-                - 2s fade-out duration as requested.
-           Status: Magical atmosphere enhanced.
+           Version: v3.9.2 [CORNER SYMBOLS & SPARKLE FIX]
+           Build Steps: 97 iterations of optimization
+           Fixes: 
+             1. Sparkle Trigger: Moved frame listener to useEffect to guarantee firing.
+             2. Added Corner Symbols: Rotating diamonds (◇/◆) at 40px offsets with specific rotation directions.
+           Status: Visual effects complete.
         */
         html, body, #root {
             height: 100%;
@@ -105,9 +104,8 @@
 
     // --- 1. 基础资源组件 ---
     
-    // v3.9.1: New Sparkle Particle
+    // Sparkle Particle
     const Sparkle = ({ x, y, angle, speed, size, onComplete }) => {
-        // Calculate drift destination
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
         const destY = y + Math.sin(rad) * speed;
@@ -115,21 +113,48 @@
         return (
             <motion.div
                 initial={{ x, y, opacity: 0.8, scale: 0 }}
-                animate={{ 
-                    x: destX, 
-                    y: destY, 
-                    opacity: 0, 
-                    scale: [0, 1, 0] 
-                }}
-                transition={{ duration: 2, ease: "easeOut" }} // 2 seconds fade out
+                animate={{ x: destX, y: destY, opacity: 0, scale: [0, 1, 0] }}
+                transition={{ duration: 2, ease: "easeOut" }}
                 onAnimationComplete={onComplete}
                 className="fixed rounded-full bg-white pointer-events-none z-[9998]"
-                style={{ 
-                    width: size, 
-                    height: size, 
-                    boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)' 
-                }}
+                style={{ width: size, height: size, boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)' }}
             />
+        );
+    };
+
+    // v3.9.2: Corner Symbols Component
+    const CornerSymbols = ({ active }) => {
+        const glowStyle = { textShadow: '0 0 8px rgba(255,255,255,0.6)', color: '#fff', fontSize: '14px', lineHeight: 1 };
+        const commonTransition = { duration: 4, ease: "linear", repeat: Infinity };
+
+        return (
+            <div className="fixed inset-0 pointer-events-none z-[120]">
+                <AnimatePresence>
+                    {active && (
+                        <>
+                            {/* TL: ◇ CW */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] left-[40px] flex items-center justify-center">
+                                <motion.div style={glowStyle} animate={{ rotate: 360 }} transition={commonTransition}>◇</motion.div>
+                            </motion.div>
+                            
+                            {/* TR: ◆ CCW */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] right-[40px] flex items-center justify-center">
+                                <motion.div style={glowStyle} animate={{ rotate: -360 }} transition={commonTransition}>◆</motion.div>
+                            </motion.div>
+
+                            {/* BR: ◇ CCW */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
+                                <motion.div style={glowStyle} animate={{ rotate: -360 }} transition={commonTransition}>◇</motion.div>
+                            </motion.div>
+
+                            {/* BL: ◆ CW */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
+                                <motion.div style={glowStyle} animate={{ rotate: 360 }} transition={commonTransition}>◆</motion.div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
+            </div>
         );
     };
 
@@ -155,21 +180,21 @@
             checkPath();
         }, []);
 
-        // 2. Animation Loop & Trigger
+        // 2. Animation Loop
         useEffect(() => {
             if (mode !== 'sprite') return;
             const interval = setInterval(() => {
-                setCurrentFrame(prev => {
-                    const next = prev >= 6 ? 1 : prev + 1;
-                    // v3.9.1: Trigger Sparkle on Frame 2
-                    if (next === 2 && onSecondFrame) {
-                        onSecondFrame();
-                    }
-                    return next;
-                });
+                setCurrentFrame(prev => (prev >= 6 ? 1 : prev + 1));
             }, 100); 
             return () => clearInterval(interval);
-        }, [mode, onSecondFrame]);
+        }, [mode]);
+
+        // 3. v3.9.2 Fix: Separate Trigger Effect
+        useEffect(() => {
+            if (currentFrame === 2 && onSecondFrame) {
+                onSecondFrame();
+            }
+        }, [currentFrame, onSecondFrame]);
 
         return (
             <div className="relative flex items-center justify-center w-[42px] h-[42px]">
@@ -328,7 +353,6 @@
         );
     };
 
-    // v3.9.1: Updated to receive sparkler trigger and coordinate logic
     const RabbitFollower = ({ isHoveringHole, isTransitioning, isLeaping, active, onSpawnParticles }) => {
         const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
         const springX = useSpring(mouseX, { damping: 25, stiffness: 150 });
@@ -372,7 +396,7 @@
             }
         });
 
-        // v3.9.1: Handler to capture current exact screen coordinates
+        // Handler to capture current exact screen coordinates
         const handleSecondFrame = useCallback(() => {
             if (!active || isLeaping) return; // Don't sparkle if leaping into hole
             // Capture current position from MotionValues
@@ -404,7 +428,6 @@
         const [fragments, setFragments] = useState([]);
         const [showSurroundingUI, setShowSurroundingUI] = useState(false);
         
-        // v3.9.1: Sparkles State
         const [sparkles, setSparkles] = useState([]);
 
         const time = useMotionValue(0);
@@ -412,7 +435,7 @@
 
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
         
-        // v3.9.1: Spawn Logic
+        // Spawn Logic
         const spawnSparkles = useCallback((x, y) => {
             const count = 3 + Math.floor(Math.random() * 3); // 3 to 5 particles
             const newSparkles = Array.from({ length: count }).map(() => ({
@@ -430,7 +453,6 @@
             setSparkles(prev => prev.filter(s => s.id !== id));
         }, []);
 
-        // v3.8.1 Fix: Recursive setTimeout for reliable loading
         useEffect(() => {
             let currentP = 0;
             let timer;
@@ -441,19 +463,16 @@
                     setTimeout(() => setAppStage('collapsing'), 500);
                     return;
                 }
-                // Random increment between 5 and 15
                 currentP += Math.floor(Math.random() * 10 + 5);
                 if (currentP > 100) currentP = 100;
-                
                 setLoadPercent(currentP);
                 timer = setTimeout(step, 100);
             };
 
-            timer = setTimeout(step, 200); // Start delay
+            timer = setTimeout(step, 200); 
             return () => clearTimeout(timer);
         }, []);
 
-        // Collapse Trigger
         useEffect(() => {
             if (appStage === 'collapsing') {
                 const uiTimer = setTimeout(() => setShowSurroundingUI(true), 800);
@@ -506,19 +525,13 @@
 
         // Parallax Transforms
         const bgX = useTransform(smoothCamX, v => v * 0.5); const bgY = useTransform(smoothCamY, v => v * 0.5);
-        // Split UI transforms into layers
-        // High multiplier = Foreground (Appears closer, moves more)
         const titleX = useTransform(smoothCamX, v => v * 2.0); 
         const titleY = useTransform(smoothCamY, v => v * 2.0);
-        // Low multiplier = Midground/Background (Appears further, moves less)
         const subX = useTransform(smoothCamX, v => v * 0.8);
         const subY = useTransform(smoothCamY, v => v * 0.8);
-        
-        // Original UI center transforms (for floating fragments)
         const uiX = useTransform(smoothCamX, v => v * 1.5); const uiY = useTransform(smoothCamY, v => v * 1.5);
 
         const opacityTopLeft = useTransform(time, t => 0.4 + 0.1 * Math.sin(t * 0.75));
-        // v3.8.3: Base opacity increased from 0.45 to 0.55 (+10%)
         const opacityBottomRight = useTransform(time, t => 0.55 + 0.15 * Math.cos(t * 0.5));
 
         return (
@@ -532,9 +545,9 @@
                 </motion.div>
                 
                 <FrameBorder active={showSurroundingUI} />
+                <CornerSymbols active={showSurroundingUI} />
                 <CursorTip appStage={appStage} isTransitioning={isTransitioning} isLeaping={isLeaping} />
                 
-                {/* v3.9.1: Pass sparkle spawner to rabbit */}
                 <RabbitFollower 
                     active={appStage === 'landing'} 
                     isTransitioning={isTransitioning} 
@@ -542,7 +555,6 @@
                     onSpawnParticles={spawnSparkles}
                 />
                 
-                {/* v3.9.1: Render Sparkles Layer */}
                 <AnimatePresence>
                     {sparkles.map(s => (
                         <Sparkle key={s.id} {...s} onComplete={() => removeSparkle(s.id)} />
