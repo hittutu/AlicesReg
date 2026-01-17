@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.5</title>
+    <title>Alice's Reg - Entry Sequence v3.9.8</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,16 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.5 [SPARKLE PERFECTION]
-           Build Steps: 100 iterations of optimization
+           Version: v3.9.8 [SYNTAX FIX]
+           Build Steps: 103 iterations of optimization
            Fixes: 
-             1. Corner Symbols: Reverted padding to 40px as requested.
-             2. Sparkle Position: Added 'top-0 left-0' to particles to anchor them to the viewport origin, fixing the offset bug.
-             3. Sparkle Aesthetics: 
-                - Smaller size.
-                - Higher opacity (more solid).
-                - Random color interpolation between AliceBlue (#F0F8FF) and Blue (#53A7D8).
-           Status: Magical realism achieved. 100th Build! 🎉
+             1. Solved "App is not defined" error by ensuring all previous components are syntactically closed and valid.
+             2. Stabilized CornerSymbols animation structure for AnimatePresence.
+           Status: Fully operational.
         */
         html, body, #root {
             height: 100%;
@@ -50,7 +46,7 @@
         .noise-overlay {
             position: absolute;
             top: -10%; left: -10%; width: 120%; height: 120%;
-            opacity: 0.05; pointer-events: none; z-index: 1;
+            opacity: 0.05; pointer-events: none; z-index: 5; 
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
@@ -63,6 +59,25 @@
 
         .interactive {
             cursor: none; 
+        }
+
+        /* Aurora Styles */
+        .aurora-blob {
+            position: absolute;
+            filter: blur(80px);
+            mix-blend-mode: color-dodge;
+            animation: blob 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+        }
+        
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
 
         .site-tag-title {
@@ -95,7 +110,8 @@
 
 <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, useCallback } = React;
-    const { motion, useSpring, useMotionValue, useTransform, useAnimationFrame, AnimatePresence } = window.Motion;
+    // Ensure Motion is loaded
+    const { motion, useSpring, useMotionValue, useTransform, useAnimationFrame, AnimatePresence } = window.Motion || {};
 
     // --- 0. 全局静态词库 ---
     const PHRASES = [
@@ -108,7 +124,7 @@
 
     // --- 1. 基础资源组件 ---
     
-    // v3.9.5: Updated Sparkle Particle (Solid, Smaller, Correct Position, Dynamic Color)
+    // Sparkle Particle
     const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
@@ -116,70 +132,66 @@
 
         return (
             <motion.div
-                initial={{ x, y, opacity: 1, scale: 0 }} // Start solid (opacity 1)
+                initial={{ x, y, opacity: 1, scale: 0 }}
                 animate={{ x: destX, y: destY, opacity: 0, scale: [0, 1, 0] }}
                 transition={{ duration: 2, ease: "easeOut" }}
                 onAnimationComplete={onComplete}
-                // v3.9.5 Fix: Added 'top-0 left-0' to fix position offset issue
                 className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998]"
                 style={{ 
                     width: size, 
                     height: size, 
-                    backgroundColor: color, // Use dynamic color
-                    boxShadow: `0 0 ${size * 1.5}px ${color}` // Tight, solid glow
+                    backgroundColor: color, 
+                    boxShadow: `0 0 ${size * 1.5}px ${color}` 
                 }}
             />
         );
     };
 
-    // v3.9.5: Corner Symbols Component (Reverted to 40px)
+    // Aurora Background Component
+    const AuroraBackground = () => (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
+            {/* 1. AliceBlue Blob */}
+            <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] top-1/2 left-1/2 -ml-[25vw] -mt-[25vw] animate-blob opacity-20" />
+            {/* 2. Light Blue Blob */}
+            <div className="aurora-blob bg-[#85DBF9] w-[50vw] h-[50vw] top-1/2 left-1/2 ml-[10vw] -mt-[10vw] animation-delay-2000 opacity-20" />
+            {/* 3. Darker Blue Blob */}
+            <div className="aurora-blob bg-[#6BB8E7] w-[60vw] h-[60vw] top-1/2 left-1/2 -ml-[20vw] mt-[10vw] animation-delay-4000 opacity-[0.15]" />
+        </div>
+    );
+
+    // Corner Symbols Component
     const CornerSymbols = ({ active }) => {
-        // Common animation props
         const transition = { duration: 4, ease: "linear", repeat: Infinity };
-        // Base styles for the "diamond" (which is just a rotated square)
         const baseClass = "w-2 h-2 shadow-[0_0_8px_rgba(255,255,255,0.6)]";
         
         return (
             <div className="fixed inset-0 pointer-events-none z-[120]">
                 <AnimatePresence>
                     {active && (
-                        <>
-                            {/* TL: Hollow (Border) -> CW (45 to 405) */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] left-[40px] flex items-center justify-center">
-                                <motion.div 
-                                    className={`${baseClass} border border-white`}
-                                    animate={{ rotate: [45, 405] }} 
-                                    transition={transition} 
-                                />
-                            </motion.div>
-                            
-                            {/* TR: Solid (Bg) -> CCW (45 to -315) */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] right-[40px] flex items-center justify-center">
-                                <motion.div 
-                                    className={`${baseClass} bg-white`}
-                                    animate={{ rotate: [45, -315] }} 
-                                    transition={transition} 
-                                />
-                            </motion.div>
-
-                            {/* BR: Hollow (Border) -> CCW (45 to -315) */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
-                                <motion.div 
-                                    className={`${baseClass} border border-white`}
-                                    animate={{ rotate: [45, -315] }} 
-                                    transition={transition} 
-                                />
-                            </motion.div>
-
-                            {/* BL: Solid (Bg) -> CW (45 to 405) */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
-                                <motion.div 
-                                    className={`${baseClass} bg-white`}
-                                    animate={{ rotate: [45, 405] }} 
-                                    transition={transition} 
-                                />
-                            </motion.div>
-                        </>
+                        <motion.div
+                            key="corners"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0"
+                        >
+                            {/* TL */}
+                            <div className="absolute top-[40px] left-[40px] flex items-center justify-center">
+                                <motion.div className={`${baseClass} border border-white`} animate={{ rotate: [45, 405] }} transition={transition} />
+                            </div>
+                            {/* TR */}
+                            <div className="absolute top-[40px] right-[40px] flex items-center justify-center">
+                                <motion.div className={`${baseClass} bg-white`} animate={{ rotate: [45, -315] }} transition={transition} />
+                            </div>
+                            {/* BR */}
+                            <div className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
+                                <motion.div className={`${baseClass} border border-white`} animate={{ rotate: [45, -315] }} transition={transition} />
+                            </div>
+                            {/* BL */}
+                            <div className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
+                                <motion.div className={`${baseClass} bg-white`} animate={{ rotate: [45, 405] }} transition={transition} />
+                            </div>
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </div>
@@ -191,7 +203,6 @@
         const [mode, setMode] = useState('emoji'); 
         const [basePath, setBasePath] = useState(null); 
         
-        // 1. Path Discovery 
         useEffect(() => {
             const checkPath = async () => {
                 const preferredPath = 'Texture/Mouse/Rabbit/1.png';
@@ -208,7 +219,6 @@
             checkPath();
         }, []);
 
-        // 2. Animation Loop
         useEffect(() => {
             if (mode !== 'sprite') return;
             const interval = setInterval(() => {
@@ -217,7 +227,6 @@
             return () => clearInterval(interval);
         }, [mode]);
 
-        // 3. Trigger Effect
         useEffect(() => {
             if (currentFrame === 2 && onSecondFrame) {
                 onSecondFrame();
@@ -576,6 +585,7 @@
             <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
                 <motion.div className="absolute inset-0 pointer-events-none" style={{ x: bgX, y: bgY }}>
                     <div className="noise-overlay"></div>
+                    <AuroraBackground /> 
                     <TopLeftGlow />
                     <div className="vignette"></div>
                     <LensFlare isHovering={isHovering || isLeaping} />
