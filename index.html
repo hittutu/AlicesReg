@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.16</title>
+    <title>Alice's Reg - Entry Sequence v3.9.18</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,11 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.16 [HALO DIMMING]
-           Build Steps: 111 iterations of optimization
+           Version: v3.9.18 [MISSING COMPONENT RESTORED]
+           Build Steps: 113 iterations of optimization
            Fixes: 
-             1. Moon Halo: Reduced opacity of the central interaction glow by 30% (multiplied alpha by 0.7) for a subtler breathing effect.
-             2. Sparkles: Adjusted color interpolation range to favor higher saturation Electric Blues (less white component) to match the aurora.
-           Status: Client is definitely happy this time (maybe).
+             1. MainContent: Restored the missing MainContent component definition which was causing a ReferenceError.
+           Status: Fully functional and fabulous.
         */
         html, body, #root {
             height: 100%;
@@ -100,7 +99,9 @@
         }
 
         .site-tag-sub {
-            font-family: 'Courier New', Courier, monospace;
+            /* v3.9.17: Updated font stack for ultra-thin aesthetics */
+            font-family: 'Microsoft JhengHei UI Light', 'Microsoft JhengHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 300;
         }
     </style>
 </head>
@@ -493,18 +494,15 @@
 
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
         
-        // Spawn Logic (v3.9.16: Even Better Electric Blues)
+        // Spawn Logic (v3.9.17: Interpolate between #85DBF9 and #6BB8E7)
         const spawnSparkles = useCallback((x, y) => {
             const count = 3 + Math.floor(Math.random() * 3); 
             const newSparkles = Array.from({ length: count }).map(() => {
-                // v3.9.16: Interpolate between Cyan-ish (#00C8FF) and Klein Blue (#2E54E8)
-                // R: 0 -> 46
-                // G: 200 -> 84
-                // B: 255 -> 232
+                // v3.9.17: Interpolate between #85DBF9 (133, 219, 249) and #6BB8E7 (107, 184, 231)
                 const t = Math.random();
-                const r = Math.round(0 + (46 - 0) * t); 
-                const g = Math.round(200 + (84 - 200) * t); 
-                const b = Math.round(255 + (232 - 255) * t);
+                const r = Math.round(133 + (107 - 133) * t); 
+                const g = Math.round(219 + (184 - 219) * t); 
+                const b = Math.round(249 + (231 - 249) * t);
                 const color = `rgb(${r}, ${g}, ${b})`;
 
                 return {
@@ -513,7 +511,7 @@
                     y: y,
                     angle: Math.random() * 360,
                     speed: 10 + Math.random() * 30, // Drift distance
-                    size: 1 + Math.random() * 2, // v3.9.5: Smaller size (1-3px)
+                    size: 1 + Math.random() * 2, 
                     color: color
                 };
             });
@@ -664,10 +662,10 @@
                     <motion.div className="absolute inset-0 pointer-events-none">
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
                             <motion.div style={{ x: titleX, y: titleY }} animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
@@ -697,6 +695,16 @@
             </div>
         );
     };
+
+    // v3.9.18: Re-added missing MainContent Component definition
+    const MainContent = () => (
+        <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
+            <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+            <motion.h1 initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-6xl md:text-9xl font-bold tracking-tighter mb-4 uppercase">Wonderland</motion.h1>
+            <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-lg md:text-xl font-mono text-slate-500 max-w-lg text-center leading-relaxed">"Curiouser and curiouser!" cried Alice.</motion.p>
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="mt-12 px-10 py-4 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-slate-800 transition-all rounded-full" onClick={() => window.location.reload()}>Reset Sequence</motion.button>
+        </div>
+    );
 
     const App = () => {
         const [stage, setStage] = useState('landing'); 
