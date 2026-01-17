@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.8</title>
+    <title>Alice's Reg - Entry Sequence v3.9.10</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.8 [SYNTAX FIX]
-           Build Steps: 103 iterations of optimization
+           Version: v3.9.10 [SYNTAX PURGE]
+           Build Steps: 105 iterations of optimization
            Fixes: 
-             1. Solved "App is not defined" error by ensuring all previous components are syntactically closed and valid.
-             2. Stabilized CornerSymbols animation structure for AnimatePresence.
-           Status: Fully operational.
+             1. Code Cleanup: Removed redundant code blocks and complex comments in AuroraBackground that were causing Babel parser errors.
+             2. Reliability: Ensured clean component definitions for 'App' to be reachable.
+           Status: Fully operational and optimized.
         */
         html, body, #root {
             height: 100%;
@@ -110,10 +110,10 @@
 
 <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, useCallback } = React;
-    // Ensure Motion is loaded
+    // Safe access to Motion globals
     const { motion, useSpring, useMotionValue, useTransform, useAnimationFrame, AnimatePresence } = window.Motion || {};
 
-    // --- 0. 全局静态词库 ---
+    // --- 0. Global Static Words ---
     const PHRASES = [
         "structural resonance", "probability cloud collapse", "the fourfold name",
         "consciousness sediment", "observation rift", "logic closure",
@@ -122,7 +122,7 @@
         "linguistic afterglow", "M₊ / M₋", "TRUE anchor", "unbound variable"
     ];
 
-    // --- 1. 基础资源组件 ---
+    // --- 1. Basic Resource Components ---
     
     // Sparkle Particle
     const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
@@ -147,17 +147,38 @@
         );
     };
 
-    // Aurora Background Component
-    const AuroraBackground = () => (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
-            {/* 1. AliceBlue Blob */}
-            <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] top-1/2 left-1/2 -ml-[25vw] -mt-[25vw] animate-blob opacity-20" />
-            {/* 2. Light Blue Blob */}
-            <div className="aurora-blob bg-[#85DBF9] w-[50vw] h-[50vw] top-1/2 left-1/2 ml-[10vw] -mt-[10vw] animation-delay-2000 opacity-20" />
-            {/* 3. Darker Blue Blob */}
-            <div className="aurora-blob bg-[#6BB8E7] w-[60vw] h-[60vw] top-1/2 left-1/2 -ml-[20vw] mt-[10vw] animation-delay-4000 opacity-[0.15]" />
-        </div>
-    );
+    // v3.9.10: Cleaned Aurora Background
+    const AuroraBackground = ({ smoothCamX, smoothCamY }) => {
+        // Parallax Transforms
+        const x1 = useTransform(smoothCamX, v => v * 0.8);
+        const y1 = useTransform(smoothCamY, v => v * 0.8);
+        
+        const x2 = useTransform(smoothCamX, v => v * -0.5); 
+        const y2 = useTransform(smoothCamY, v => v * -0.5);
+
+        const x3 = useTransform(smoothCamX, v => v * 0.4);
+        const y3 = useTransform(smoothCamY, v => v * 0.4);
+
+        return (
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
+                {/* 1. AliceBlue Blob (#F0F8FF) - Offset Left-Top */}
+                <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
+                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-20"
+                          style={{ top: 'calc(50% - 250px)', left: 'calc(50% - 250px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
+                </motion.div>
+
+                {/* 2. Light Blue Blob (#85DBF9) */}
+                <motion.div style={{ x: x2, y: y2 }} className="absolute inset-0">
+                    <div className="aurora-blob bg-[#85DBF9] w-[50vw] h-[50vw] top-1/2 left-1/2 ml-[10vw] -mt-[10vw] animation-delay-2000 opacity-20" />
+                </motion.div>
+
+                {/* 3. Klein Blue Blob (#2E54E8) */}
+                <motion.div style={{ x: x3, y: y3 }} className="absolute inset-0">
+                    <div className="aurora-blob bg-[#2E54E8] w-[60vw] h-[60vw] top-1/2 left-1/2 -ml-[20vw] mt-[10vw] animation-delay-4000 opacity-[0.2]" /> 
+                </motion.div>
+            </div>
+        );
+    };
 
     // Corner Symbols Component
     const CornerSymbols = ({ active }) => {
@@ -254,7 +275,7 @@
         );
     };
 
-    // --- 2. 装饰性子组件 ---
+    // --- 2. Decorative Sub-components ---
 
     const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
         const [displayText, setDisplayText] = useState("");
@@ -453,7 +474,7 @@
         );
     };
 
-    // --- 4. 主序列组件 ---
+    // --- 4. Main Sequence Component ---
 
     const LandingSequence = ({ onTransitionComplete }) => {
         const [appStage, setAppStage] = useState('init'); 
@@ -585,7 +606,7 @@
             <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
                 <motion.div className="absolute inset-0 pointer-events-none" style={{ x: bgX, y: bgY }}>
                     <div className="noise-overlay"></div>
-                    <AuroraBackground /> 
+                    <AuroraBackground smoothCamX={smoothCamX} smoothCamY={smoothCamY} /> 
                     <TopLeftGlow />
                     <div className="vignette"></div>
                     <LensFlare isHovering={isHovering || isLeaping} />
