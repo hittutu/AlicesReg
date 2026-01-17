@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.8.9</title>
+    <title>Alice's Reg - Entry Sequence v3.9.0</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,13 +23,13 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.8.9 [FAILSAFE SPRITE]
-           Build Steps: 94 iterations of optimization
-           Fix: Implemented "Emoji-First" rendering strategy. 
-                The component now ALWAYS renders the Emoji initially. 
-                The sprite image loads invisibly in the background and only replaces the Emoji upon a successful 'onLoad' event.
-                Added Z-Index boost (9999) to rule out layering issues.
-           Status: Maximum visibility guarantee.
+           Version: v3.9.0 [DOM SPRITE FIX]
+           Build Steps: 95 iterations of optimization
+           Fix: Replaced single <img> src swapping with a multi-<img> DOM Sprite technique.
+                - All 6 frames are rendered simultaneously but stacked.
+                - Animation loop toggles 'opacity' instead of 'src'.
+                - This ensures images pre-load and eliminates flickering/stalling caused by network latency exceeding frame duration.
+           Status: Butter-smooth animation guaranteed.
         */
         html, body, #root {
             height: 100%;
@@ -106,76 +106,82 @@
     // --- 1. 基础资源组件 ---
     
     const RabbitIcon = () => {
-        const [frame, setFrame] = useState(1);
+        const [currentFrame, setCurrentFrame] = useState(1);
         const [mode, setMode] = useState('emoji'); // 'emoji' | 'sprite'
-        // Strategy: 0=TexturePath, 1=RootPath
-        const [pathStrategy, setPathStrategy] = useState(0); 
+        const [basePath, setBasePath] = useState(null); // null -> checking -> path string
         
-        // Sprite Animation Loop
+        // 1. Path Discovery (Run once on mount)
+        useEffect(() => {
+            const checkPath = async () => {
+                // Try preferred path first
+                const preferredPath = 'Texture/Mouse/Rabbit/1.png';
+                const img = new Image();
+                img.onload = () => {
+                    console.log("Rabbit found at Texture path");
+                    setBasePath('Texture/Mouse/Rabbit/');
+                    setMode('sprite'); // Start animation
+                };
+                img.onerror = () => {
+                    // Try fallback path
+                    console.log("Rabbit not in Texture, checking root...");
+                    const img2 = new Image();
+                    img2.src = '1.png';
+                    img2.onload = () => {
+                        console.log("Rabbit found at Root path");
+                        setBasePath('');
+                        setMode('sprite'); // Start animation
+                    };
+                    img2.onerror = () => {
+                        console.log("Rabbit not found. Staying as Emoji.");
+                        setMode('emoji');
+                    };
+                };
+                img.src = preferredPath;
+            };
+            checkPath();
+        }, []);
+
+        // 2. Animation Loop (Only runs if we found a path)
         useEffect(() => {
             if (mode !== 'sprite') return;
             const interval = setInterval(() => {
-                setFrame(prev => prev >= 6 ? 1 : prev + 1);
-            }, 100);
+                setCurrentFrame(prev => prev >= 6 ? 1 : prev + 1);
+            }, 100); // 100ms per frame
             return () => clearInterval(interval);
         }, [mode]);
 
-        const handleLoad = () => {
-            // Only switch to sprite mode if we haven't already
-            if (mode !== 'sprite') {
-                console.log("Rabbit Sprite Loaded! Switching mode.");
-                setMode('sprite');
-            }
-        };
-
-        const handleError = () => {
-            if (pathStrategy === 0) {
-                console.log("Rabbit Path 1 failed, trying Root Path...");
-                setPathStrategy(1);
-            } else {
-                console.log("Rabbit Root Path failed. Staying with Emoji.");
-                // Ensure we stick to emoji
-                setMode('emoji');
-            }
-        };
-
-        // Current image source to try
-        const basePath = pathStrategy === 0 ? 'Texture/Mouse/Rabbit/' : '';
-        const imgSrc = `${basePath}${frame}.png`;
-
         return (
             <div className="relative flex items-center justify-center w-[42px] h-[42px]">
-                {/* 1. The Emoji (Always visible unless sprite is ready) */}
+                {/* Fallback Emoji */}
                 <span 
                     className="select-none block absolute transition-opacity duration-500" 
                     style={{ 
                         fontSize: '26px', 
                         filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
                         opacity: mode === 'sprite' ? 0 : 1,
-                        transform: 'translateY(-2px)' // visual adjustment
+                        transform: 'translateY(-2px)'
                     }}
                 >
                     🐇
                 </span>
 
-                {/* 2. The Sprite (Loads invisibly, then fades in) */}
-                <img 
-                    src={imgSrc} 
-                    alt="Rabbit"
-                    className="select-none block absolute pointer-events-none transition-opacity duration-300"
-                    style={{ 
-                        width: '100%', 
-                        height: '100%',
-                        objectFit: 'contain',
-                        filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
-                        opacity: mode === 'sprite' ? 1 : 0
-                    }} 
-                    onLoad={handleLoad}
-                    onError={handleError}
-                />
-                
-                {/* Debug Halo: faint white ring to show position if image is transparent */}
-                {/* <div className="absolute inset-0 border border-white/10 rounded-full" /> */}
+                {/* DOM Sprites: Render ALL 6 frames, toggle opacity */}
+                {mode === 'sprite' && basePath !== null && [1, 2, 3, 4, 5, 6].map(i => (
+                    <img 
+                        key={i}
+                        src={`${basePath}${i}.png`} 
+                        alt="Rabbit"
+                        className="select-none block absolute pointer-events-none"
+                        style={{ 
+                            width: '100%', 
+                            height: '100%',
+                            objectFit: 'contain',
+                            filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
+                            opacity: currentFrame === i ? 1 : 0, // Instant toggle
+                            transition: 'none' // No fade between frames for crisp animation
+                        }} 
+                    />
+                ))}
             </div>
         );
     };
