@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.2</title>
+    <title>Alice's Reg - Entry Sequence v3.9.3</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,11 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.2 [CORNER SYMBOLS & SPARKLE FIX]
-           Build Steps: 97 iterations of optimization
+           Version: v3.9.3 [ALIGNMENT TWEAK]
+           Build Steps: 98 iterations of optimization
            Fixes: 
-             1. Sparkle Trigger: Moved frame listener to useEffect to guarantee firing.
-             2. Added Corner Symbols: Rotating diamonds (◇/◆) at 40px offsets with specific rotation directions.
-           Status: Visual effects complete.
+             1. Corner Symbols: Adjusted padding from 40px to 35px for tighter alignment.
+           Status: Visual effects polished.
         */
         html, body, #root {
             height: 100%;
@@ -122,7 +121,7 @@
         );
     };
 
-    // v3.9.2: Corner Symbols Component
+    // v3.9.3: Corner Symbols Component (Position adjusted to 35px)
     const CornerSymbols = ({ active }) => {
         const glowStyle = { textShadow: '0 0 8px rgba(255,255,255,0.6)', color: '#fff', fontSize: '14px', lineHeight: 1 };
         const commonTransition = { duration: 4, ease: "linear", repeat: Infinity };
@@ -133,22 +132,22 @@
                     {active && (
                         <>
                             {/* TL: ◇ CW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] left-[40px] flex items-center justify-center">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[35px] left-[35px] flex items-center justify-center">
                                 <motion.div style={glowStyle} animate={{ rotate: 360 }} transition={commonTransition}>◇</motion.div>
                             </motion.div>
                             
                             {/* TR: ◆ CCW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[40px] right-[40px] flex items-center justify-center">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-[35px] right-[35px] flex items-center justify-center">
                                 <motion.div style={glowStyle} animate={{ rotate: -360 }} transition={commonTransition}>◆</motion.div>
                             </motion.div>
 
                             {/* BR: ◇ CCW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[35px] right-[35px] flex items-center justify-center">
                                 <motion.div style={glowStyle} animate={{ rotate: -360 }} transition={commonTransition}>◇</motion.div>
                             </motion.div>
 
                             {/* BL: ◆ CW */}
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute bottom-[35px] left-[35px] flex items-center justify-center">
                                 <motion.div style={glowStyle} animate={{ rotate: 360 }} transition={commonTransition}>◆</motion.div>
                             </motion.div>
                         </>
@@ -189,7 +188,7 @@
             return () => clearInterval(interval);
         }, [mode]);
 
-        // 3. v3.9.2 Fix: Separate Trigger Effect
+        // 3. Trigger Effect
         useEffect(() => {
             if (currentFrame === 2 && onSecondFrame) {
                 onSecondFrame();
