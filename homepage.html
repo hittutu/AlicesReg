@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v1.11</title>
+    <title>Alice's Reg - v1.18</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            /* v1.11 核心色调 */
-            --moon-white-base: #e9ebed; 
+            /* v1.18 暖月白基调 */
+            --moon-white-base: #fdfcfb; 
             --bg-top: #ffffff;
-            --bg-bottom: #cbd5e1;
+            --bg-bottom: #e2e0dc;
             --rotation-speed: 0.004;
         }
 
@@ -27,7 +27,7 @@
             width: 100vw;
         }
 
-        /* --- 极光星云样式 v1.11 --- */
+        /* --- 极光星云样式 v1.18 --- */
         .aurora-container {
             position: absolute;
             inset: 0;
@@ -38,33 +38,106 @@
 
         .aurora-blob {
             position: absolute;
-            filter: blur(120px); /* 增加模糊度让过渡更丝滑 */
-            opacity: 0.5;
-            mix-blend-mode: color-dodge; 
-            animation: blob 18s infinite cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 50%;
+            mix-blend-mode: color-dodge;
         }
 
-        @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(3vw, -5vh) scale(1.1); }
-            66% { transform: translate(-2vw, 4vh) scale(0.95); }
-            100% { transform: translate(0px, 0px) scale(1); }
+        .colored-blob {
+            filter: blur(90px); /* 稍微调低一点模糊，让它和纹理结合更好 */
+            opacity: 0.3; 
+        }
+
+        /* 光团 1 (粉色 - 极度深潜) */
+        .blob-1 {
+            width: 60vw; height: 60vw;
+            bottom: -35%; left: -25%; 
+            animation: blob-move-1 25s infinite alternate ease-in-out, holo-shift-1 20s infinite alternate linear;
+        }
+
+        /* 光团 2 (蓝色 - 侧翼护卫) */
+        .blob-2 {
+            width: 50vw; height: 50vw;
+            bottom: -15%; left: -10%;
+            animation: blob-move-2 22s infinite alternate ease-in-out, holo-shift-2 18s infinite alternate linear;
+        }
+
+        /* 光团 3 (白色 - 绝对霸权) */
+        .blob-3 {
+            width: 95vw; height: 95vw; 
+            top: 50%; left: 68%;
+            transform: translate(-50%, -50%);
+            z-index: 2; 
+            filter: blur(80px); 
+            opacity: 0.8; 
+            background-color: #ffffff;
+            animation: blob-move-3 30s infinite alternate ease-in-out; 
+        }
+
+        /* --- v1.18 新增: 星沙纹理 (Diamond Dust) --- */
+        .star-sand-texture {
+            position: absolute;
+            inset: 0;
+            z-index: 6; /* 在极光之上，噪声之下 */
+            background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/background-homepage-1.png');
+            background-size: 800px; /* 调整平铺大小，保证颗粒感 */
+            background-repeat: repeat;
+            opacity: 0.5; /* 纹理基础透明度 */
+            mix-blend-mode: overlay; /* 叠加模式：保留高光细节，融入暗部 */
+            pointer-events: none;
+            
+            /* 核心：径向蒙版 - 只在左下角显现 */
+            -webkit-mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%);
+            mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%);
+            
+            /* 缓慢的呼吸动效，让纹理像在闪烁 */
+            animation: texture-breathe 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes texture-breathe {
+            0% { opacity: 0.4; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.02); }
+        }
+
+        /* --- 虹光转换关键帧 --- */
+        @keyframes holo-shift-1 {
+            0% { background-color: #ffdde1; } 
+            50% { background-color: #f6d365; }
+            100% { background-color: #fda085; }
+        }
+
+        @keyframes holo-shift-2 {
+            0% { background-color: #84fab0; } 
+            50% { background-color: #8fd3f4; } 
+            100% { background-color: #a18cd1; } 
+        }
+
+        /* --- 物理位移关键帧 --- */
+        @keyframes blob-move-1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-2vw, 2vh) scale(1.05); }
+        }
+        @keyframes blob-move-2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(2vw, -2vh) scale(1.1); }
+        }
+        @keyframes blob-move-3 {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-48%, -52%) scale(1.02); }
         }
 
         /* 噪声滤镜蒙版 */
         .noise-mask {
             position: absolute;
             inset: 0;
-            z-index: 6;
-            opacity: 0.03; 
+            z-index: 7; /* 最顶层 */
+            opacity: 0.035; 
             pointer-events: none;
         }
 
         /* --- 基础动效 --- */
         .drift-bg {
             background-size: 200% 200%;
-            animation: drift-slow 25s ease-in-out infinite;
+            animation: drift-slow 40s ease-in-out infinite;
         }
 
         @keyframes drift-slow {
@@ -78,10 +151,10 @@
         }
 
         .glass-morphism {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.25); 
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -93,57 +166,55 @@
         }
 
         .orb-pulse {
-            box-shadow: 0 0 60px rgba(255, 255, 255, 0.4);
-            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 1), rgba(230, 235, 250, 0.95));
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.7);
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 1), rgba(240, 240, 235, 0.95));
         }
 
         .input-verify {
-            background: rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             transition: all 0.4s ease;
         }
 
         .input-verify:focus {
-            background: rgba(255, 255, 255, 0.8);
-            border-color: #60a5fa;
-            box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #fca5a5;
+            box-shadow: 0 0 20px rgba(252, 165, 165, 0.2);
         }
     </style>
 </head>
 <body>
 
-    <!-- v1.11 核心背景层 -->
+    <!-- v1.18 核心背景层 -->
     <div id="background-root" class="fixed inset-0 z-0">
-        <!-- 基础层 -->
-        <div class="absolute inset-0 bg-white"></div>
+        <!-- 基础层: 暖月白 -->
+        <div class="absolute inset-0 bg-[#fdfcfb]"></div>
         
-        <!-- v1.11 极光星云 (重定位至左下角) -->
+        <!-- 极光星云 (底层光) -->
         <div class="aurora-container">
-            <!-- 1. 白色光团 (液态水银) - 核心定位在左下方 -->
-            <div class="aurora-blob bg-white w-[60vw] h-[60vw] bottom-[-10%] left-[-10%]"></div>
-            
-            <!-- 2. 青色光团 (高能极光) - 稍微向中心发散 -->
-            <div class="aurora-blob bg-cyan-400 w-[55vw] h-[55vw] bottom-[5%] left-[10%]" style="animation-delay: 2s;"></div>
-            
-            <!-- 3. 初樱色光团 (v1.11 修改为 #ffd3da) - 填补左侧边缘 -->
-            <div class="aurora-blob bg-[#ffd3da] w-[65vw] h-[65vw] bottom-[15%] left-[-15%]" style="animation-delay: 4s;"></div>
+            <div class="aurora-blob colored-blob blob-1"></div>
+            <div class="aurora-blob colored-blob blob-2"></div>
+            <div class="aurora-blob blob-3"></div>
         </div>
 
-        <!-- v1.11 噪声滤镜 -->
+        <!-- v1.18 星沙纹理 (中层质感) -->
+        <div class="star-sand-texture"></div>
+
+        <!-- 噪声滤镜 (顶层胶片感) -->
         <svg class="noise-mask">
             <filter id="noiseFilter">
-                <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+                <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" stitchTiles="stitch"/>
             </filter>
             <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
         </svg>
 
         <!-- 渐变遮罩 -->
-        <div class="absolute inset-0 z-20 pointer-events-none mix-blend-multiply opacity-40" 
+        <div class="absolute inset-0 z-20 pointer-events-none mix-blend-multiply opacity-30" 
              style="background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));"></div>
 
         <!-- 动态漂移层 -->
         <div class="absolute inset-0 z-15 opacity-30 mix-blend-soft-light drift-bg" 
-             style="background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e2e8f0 100%);"></div>
+             style="background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e7e5e4 100%);"></div>
     </div>
 
     <!-- 万花筒主容器 -->
@@ -153,18 +224,15 @@
         </div>
     </div>
 
-    <!-- 中心球体 (Tea Party Record) -->
+    <!-- 中心球体 -->
     <div id="center-hub" class="absolute top-1/2 left-[68%] -translate-x-1/2 -translate-y-1/2 z-50 flex items-center justify-center cursor-pointer transition-all duration-700"
          style="width: 130px; height: 130px;">
-        
         <div id="hub-orb" class="absolute inset-0 rounded-full orb-pulse transition-all duration-700"></div>
-        
         <div id="hub-content-default" class="relative z-10 text-center transition-all duration-500">
             <h2 class="text-slate-800 font-bold tracking-[0.25em] text-[10px] uppercase">Tea Party</h2>
             <div class="w-4 h-[1px] bg-slate-400 mx-auto my-1.5 opacity-30"></div>
             <h2 class="text-slate-500 font-light tracking-[0.2em] text-[8px] uppercase">Record</h2>
         </div>
-
         <div id="hub-content-open" class="hidden relative z-10 w-full px-8 flex flex-col items-center opacity-0 scale-95 transition-all duration-500">
             <div class="flex items-center gap-2 mb-4 text-slate-400">
                 <i data-lucide="sparkles" class="w-3 h-3"></i>
@@ -174,7 +242,7 @@
                 <input type="text" placeholder="Phrase 01" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center">
                 <input type="text" placeholder="Phrase 02" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center">
             </div>
-            <button class="mt-4 w-full bg-slate-900 text-white rounded py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-blue-600 transition-colors">
+            <button class="mt-4 w-full bg-slate-900 text-white rounded py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-slate-700 transition-colors">
                 Verify sync
             </button>
         </div>
@@ -190,7 +258,7 @@
     <div class="absolute bottom-10 left-10 z-50 pointer-events-none flex items-center gap-6">
         <div class="space-y-1">
             <p id="status-speed" class="text-[9px] font-mono text-slate-400 tracking-tighter">ROT_SPD: 0.004</p>
-            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.11 [LAYOUT_SHIFT]</p>
+            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.18 [DIAMOND_DUST]</p>
         </div>
         <div class="h-8 w-[1px] bg-slate-300"></div>
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest">System_Awaiting_User_Sync</p>
@@ -261,7 +329,7 @@
                         c.style.opacity = '1';
                         c.style.zIndex = '10';
                     });
-                    content.style.background = 'rgba(255, 255, 255, 0.12)';
+                    content.style.background = 'rgba(255, 255, 255, 0.25)'; 
                     const h3 = inner.querySelector('.slice-h3');
                     const p = inner.querySelector('.slice-p');
                     const iconWrapper = inner.querySelector('.slice-icon-wrapper');
