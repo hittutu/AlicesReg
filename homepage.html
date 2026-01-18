@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v1.08</title>
+    <title>Alice's Reg - v1.11</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            /* v1.08 指定月白色 (更加暗沉): 采用更具深度的月影灰白 */
-            --moon-white-base: #d2cad0; 
-            --bg-top: #f1f5f9;
-            --bg-bottom: #64748b;
+            /* v1.11 核心色调 */
+            --moon-white-base: #e9ebed; 
+            --bg-top: #ffffff;
+            --bg-bottom: #cbd5e1;
             --rotation-speed: 0.004;
         }
 
@@ -27,7 +27,41 @@
             width: 100vw;
         }
 
-        /* 极光背景漂移 */
+        /* --- 极光星云样式 v1.11 --- */
+        .aurora-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            filter: blur(120px); /* 增加模糊度让过渡更丝滑 */
+            opacity: 0.5;
+            mix-blend-mode: color-dodge; 
+            animation: blob 18s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+        }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(3vw, -5vh) scale(1.1); }
+            66% { transform: translate(-2vw, 4vh) scale(0.95); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+
+        /* 噪声滤镜蒙版 */
+        .noise-mask {
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            opacity: 0.03; 
+            pointer-events: none;
+        }
+
+        /* --- 基础动效 --- */
         .drift-bg {
             background-size: 200% 200%;
             animation: drift-slow 25s ease-in-out infinite;
@@ -39,27 +73,15 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 虹彩层旋转 */
-        .iridescent-layer {
-            animation: spin-ultra-slow 180s linear infinite;
-        }
-
-        @keyframes spin-ultra-slow {
-            from { transform: rotate(0deg) scale(1.5); }
-            to { transform: rotate(360deg) scale(1.5); }
-        }
-
-        /* 万花筒切片几何形状 */
         .slice-clip {
             clip-path: polygon(50% 50%, 100% 21.13%, 100% 78.87%);
         }
 
-        /* 磨砂玻璃质感 */
         .glass-morphism {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -70,43 +92,58 @@
             border-right-color: transparent;
         }
 
-        /* 中心球体脉冲 */
         .orb-pulse {
-            box-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
-            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 1), rgba(210, 215, 230, 0.95));
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.4);
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 1), rgba(230, 235, 250, 0.95));
         }
 
         .input-verify {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.4s ease;
         }
 
         .input-verify:focus {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.8);
             border-color: #60a5fa;
-            box-shadow: 0 0 20px rgba(96, 165, 250, 0.15);
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
         }
     </style>
 </head>
 <body>
 
-    <!-- v1.08 核心背景层 -->
+    <!-- v1.11 核心背景层 -->
     <div id="background-root" class="fixed inset-0 z-0">
         <!-- 基础层 -->
-        <div class="absolute inset-0 bg-[#f8fafc]"></div>
+        <div class="absolute inset-0 bg-white"></div>
         
-        <!-- v1.08 渐变遮罩: 上浅下暗 -->
-        <div class="absolute inset-0 z-10 pointer-events-none mix-blend-multiply opacity-60" 
+        <!-- v1.11 极光星云 (重定位至左下角) -->
+        <div class="aurora-container">
+            <!-- 1. 白色光团 (液态水银) - 核心定位在左下方 -->
+            <div class="aurora-blob bg-white w-[60vw] h-[60vw] bottom-[-10%] left-[-10%]"></div>
+            
+            <!-- 2. 青色光团 (高能极光) - 稍微向中心发散 -->
+            <div class="aurora-blob bg-cyan-400 w-[55vw] h-[55vw] bottom-[5%] left-[10%]" style="animation-delay: 2s;"></div>
+            
+            <!-- 3. 初樱色光团 (v1.11 修改为 #ffd3da) - 填补左侧边缘 -->
+            <div class="aurora-blob bg-[#ffd3da] w-[65vw] h-[65vw] bottom-[15%] left-[-15%]" style="animation-delay: 4s;"></div>
+        </div>
+
+        <!-- v1.11 噪声滤镜 -->
+        <svg class="noise-mask">
+            <filter id="noiseFilter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+        </svg>
+
+        <!-- 渐变遮罩 -->
+        <div class="absolute inset-0 z-20 pointer-events-none mix-blend-multiply opacity-40" 
              style="background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));"></div>
 
         <!-- 动态漂移层 -->
-        <div class="absolute inset-0 opacity-40 mix-blend-soft-light drift-bg" 
-             style="background: radial-gradient(circle at 50% 50%, #ffffff 0%, #94a3b8 100%);"></div>
-
-        <!-- 虹彩层 -->
-        <div class="absolute -inset-[50%] opacity-15 mix-blend-overlay iridescent-layer"
-             style="background: conic-gradient(from 0deg, transparent 0%, #ffc0cb 15%, #e0ffff 30%, #ffd700 50%, #ffc0cb 70%, transparent 100%);"></div>
+        <div class="absolute inset-0 z-15 opacity-30 mix-blend-soft-light drift-bg" 
+             style="background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e2e8f0 100%);"></div>
     </div>
 
     <!-- 万花筒主容器 -->
@@ -138,7 +175,7 @@
                 <input type="text" placeholder="Phrase 02" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center">
             </div>
             <button class="mt-4 w-full bg-slate-900 text-white rounded py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-blue-600 transition-colors">
-                Verify
+                Verify sync
             </button>
         </div>
     </div>
@@ -153,14 +190,13 @@
     <div class="absolute bottom-10 left-10 z-50 pointer-events-none flex items-center gap-6">
         <div class="space-y-1">
             <p id="status-speed" class="text-[9px] font-mono text-slate-400 tracking-tighter">ROT_SPD: 0.004</p>
-            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.08 [FIXED_STABLE]</p>
+            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.11 [LAYOUT_SHIFT]</p>
         </div>
         <div class="h-8 w-[1px] bg-slate-300"></div>
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest">System_Awaiting_User_Sync</p>
     </div>
 
     <script>
-        // --- Configuration ---
         const SLICES = [
             { title: "溺水的星辰", subtitle: "The Drowned Star", bg: "#0a1a2a", text: "#ff6b9d", icon: "star" },
             { title: "密封的光流", subtitle: "The Sealed Lightflow", bg: "linear-gradient(135deg, #e0e0e0 0%, #00FFFF 50%, #A020F0 100%)", text: "#ffffff", icon: "lock" },
@@ -175,7 +211,6 @@
         let isPaused = false;
         const wheel = document.getElementById('wheel');
         
-        // --- Initialize Kaleidoscope ---
         function initSlices() {
             SLICES.forEach((data, i) => {
                 const baseAngle = i * 60;
@@ -189,7 +224,6 @@
                 const inner = document.createElement('div');
                 inner.className = 'counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%]';
                 
-                // v1.08: Added specific classes to avoid 'null' style errors after Lucide replacement
                 inner.innerHTML = `
                     <div class="slice-icon-wrapper mb-2 opacity-50 transition-all duration-700">
                         <i data-lucide="${data.icon}" style="width: 22px; height: 22px;"></i>
@@ -202,25 +236,20 @@
                 content.appendChild(inner);
                 wheel.appendChild(container);
 
-                // Interactions
                 container.addEventListener('mouseenter', () => {
                     isPaused = true;
                     document.querySelectorAll('.slice-container').forEach(c => c.style.opacity = '0.2');
                     container.style.opacity = '1';
                     container.style.zIndex = '30';
                     content.style.background = data.bg;
-                    
-                    // v1.08: Robust querying using pre-defined classes
                     const h3 = inner.querySelector('.slice-h3');
                     const p = inner.querySelector('.slice-p');
                     const iconWrapper = inner.querySelector('.slice-icon-wrapper');
-                    
                     if(h3) h3.style.color = data.text;
                     if(p) p.style.color = data.text;
                     if(iconWrapper) {
                         iconWrapper.style.color = data.text;
                         iconWrapper.style.opacity = '1';
-                        // Handle the SVG that Lucide generates
                         const svg = iconWrapper.querySelector('svg');
                         if(svg) svg.style.stroke = data.text;
                     }
@@ -233,11 +262,9 @@
                         c.style.zIndex = '10';
                     });
                     content.style.background = 'rgba(255, 255, 255, 0.12)';
-                    
                     const h3 = inner.querySelector('.slice-h3');
                     const p = inner.querySelector('.slice-p');
                     const iconWrapper = inner.querySelector('.slice-icon-wrapper');
-                    
                     if(h3) h3.style.color = '#334155';
                     if(p) p.style.color = '#334155';
                     if(iconWrapper) {
@@ -251,24 +278,19 @@
             lucide.createIcons();
         }
 
-        // --- Render Loop ---
         function animate() {
             if (!isPaused) {
                 currentRotation += targetSpeed;
             }
-            
             wheel.style.transform = `rotate(${currentRotation}deg)`;
-
             const sliceContents = document.querySelectorAll('.counter-rotate-content');
             sliceContents.forEach((el, i) => {
                 const baseAngle = i * 60;
                 el.style.transform = `rotate(${-currentRotation - baseAngle}deg)`;
             });
-
             requestAnimationFrame(animate);
         }
 
-        // --- Hub Interactions ---
         const hub = document.getElementById('center-hub');
         const defaultContent = document.getElementById('hub-content-default');
         const openContent = document.getElementById('hub-content-open');
