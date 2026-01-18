@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.26</title>
+    <title>Alice's Reg - Entry Sequence v3.9.27</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,12 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.26 [ETERNAL POETRY]
-           Build Steps: 121 iterations of optimization
+           Version: v3.9.27 [WORMHOLE TO HOME]
+           Build Steps: 122 iterations of optimization
            Fixes: 
-             1. Poetic Restoration: Re-injected all soul-binding comments into the source code as requested.
-             2. Preserved: Thin line collapse (0.001), 0.3s sync delay, Ultra-grain noise (0.98), and Singularity bloom (25%).
-           Status: Code and Soul unified.
+             1. Navigation: Replaced internal stage switch with window.location redirect to 'homepage.html' upon sequence completion.
+             2. Preserved all poetic annotations and high-fidelity visual tweaks (0.98 grain, 0.3s delay, 0.001 line).
+           Status: Portal to homepage active.
         */
         html, body, #root {
             height: 100%;
@@ -48,7 +48,7 @@
             top: -10%; left: -10%; width: 120%; height: 120%;
             opacity: 0.045; pointer-events: none; z-index: 5; 
             /* v3.9.22: Ultra-fine grain SVG noise */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); {/* // 燃烧的银河-银河质感 */}
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .vignette {
@@ -162,7 +162,7 @@
         return (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
                 
-                {/* // 燃烧的银河 - 云团*/}
+                {/* // 燃烧的银河 */}
                 <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
                      <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.085]"
                           style={{ top: 'calc(50% - 130px)', left: 'calc(50% - 130px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
@@ -271,6 +271,8 @@
             </div>
         );
     };
+
+    // --- 2. Decorative Sub-components ---
 
     const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
         const [displayText, setDisplayText] = useState("");
@@ -654,7 +656,6 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
-                            // v3.9.25: Added delay: 0.3 to sync with horizon line compression
                             appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } : // Entry
                             isTransitioning ? { duration: 1.5 } : // Exit
                             { duration: 1.5 } // Hover/Default
@@ -679,7 +680,6 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
-                            // v3.9.25: Added delay: 0.3 to sync with horizon line compression
                             appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } :
                             isTransitioning ? { duration: 1.5 } :
                             { duration: 1.5 }
@@ -737,29 +737,18 @@
         );
     };
 
-    const MainContent = () => (
-        <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
-            <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-            <motion.h1 initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-6xl md:text-9xl font-bold tracking-tighter mb-4 uppercase">Wonderland</motion.h1>
-            <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-lg md:text-xl font-mono text-slate-500 max-w-lg text-center leading-relaxed">"Curiouser and curiouser!" cried Alice.</motion.p>
-            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="mt-12 px-10 py-4 bg-black text-white font-mono text-xs uppercase tracking-widest hover:bg-slate-800 transition-all rounded-full" onClick={() => window.location.reload()}>Reset Sequence</motion.button>
-        </div>
-    );
-
     const App = () => {
-        const [stage, setStage] = useState('landing'); 
+        // v3.9.27: Refined completion logic to redirect directly to homepage.html
+        const onSequenceEnd = () => {
+            window.location.href = 'homepage.html';
+        };
+
         return (
             <div className="relative w-screen h-screen bg-[#080808]">
                 <AnimatePresence mode="wait">
-                    {stage === 'landing' ? (
-                        <motion.div key="landing-wrapper" exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="w-screen h-screen">
-                            <LandingSequence onTransitionComplete={() => setStage('main')} />
-                        </motion.div>
-                    ) : (
-                        <motion.div key="main-wrapper" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="w-screen h-screen">
-                            <MainContent />
-                        </motion.div>
-                    )}
+                    <motion.div key="landing-wrapper" exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="w-screen h-screen">
+                        <LandingSequence onTransitionComplete={onSequenceEnd} />
+                    </motion.div>
                 </AnimatePresence>
             </div>
         );
