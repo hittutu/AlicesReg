@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.24</title>
+    <title>Alice's Reg - Entry Sequence v3.9.23</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,11 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.24 [WHITE BLOOM]
-           Build Steps: 121 iterations of optimization
+           Version: v3.9.25 [TIMING SYNC]
+           Build Steps: 120 iterations of optimization
            Fixes: 
-             1. White Aurora: Increased opacity by ~40% (0.06 -> 0.085) to bring back some presence while maintaining atmosphere.
-           Status: Optimized.
+             1. Singularity Entry: Added a 0.3s delay to the bloom animation of the central Core and Halo during the collapse phase.
+                This ensures the horizon line fully compresses before the singularity explodes into existence, creating perfect rhythmic sync.
+           Status: Rhythmic Perfection.
         */
         html, body, #root {
             height: 100%;
@@ -642,8 +643,7 @@
                             </div>
                         )}
                     </AnimatePresence>
-                    
-                    {/* // AliceBlue的水波环绕溺水的星辰 */}
+                    {/* v3.9.20: Singularity Entry Animation (v3.9.20 Fix: Scale 0.25) */}
                     <motion.div 
                         className="absolute rounded-full pointer-events-none" 
                         style={{ 
@@ -661,21 +661,21 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
-                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } : // Entry
+                            // v3.9.25: Added delay: 0.3 to sync with horizon line compression
+                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } : // Entry
                             isTransitioning ? { duration: 1.5 } : // Exit
                             { duration: 1.5 } // Hover/Default
                         }
                     />
                     
-                    {/* // 溺水的星辰-视界中心，引力奇点 ，自愿投入星光跳入的兔子洞 */}
-                    {/* // 绝对清晰，绝对明亮，绝对稳定，永远居中，于一切之上 */}
+                    {/* v3.9.20: Core Entry Animation (v3.9.20 Fix: Scale 0.25) */}
                     <motion.div 
                         className="relative rounded-full bg-slate-200" 
                         style={{ 
                             width: 14, 
                             height: 14, 
                             boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, 
-                            zIndex: 999 
+                            zIndex: 35 
                         }} 
                         animate={
                             appStage === 'init' ? { scale: 0.25, opacity: 0 } :
@@ -685,7 +685,8 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
-                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut" } :
+                            // v3.9.25: Added delay: 0.3 to sync with horizon line compression
+                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } :
                             isTransitioning ? { duration: 1.5 } :
                             { duration: 1.5 }
                         }
