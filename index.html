@@ -1,762 +1,400 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.27</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Alice's Reg - v1.18</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Framer Motion -->
-    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.27 [WORMHOLE TO HOME]
-           Build Steps: 122 iterations of optimization
-           Fixes: 
-             1. Navigation: Replaced internal stage switch with window.location redirect to 'homepage.html' upon sequence completion.
-             2. Preserved all poetic annotations and high-fidelity visual tweaks (0.98 grain, 0.3s delay, 0.001 line).
-           Status: Portal to homepage active.
-        */
-        html, body, #root {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background-color: #080808;
+        :root {
+            /* v1.18 暖月白基调 */
+            --moon-white-base: #fdfcfb; 
+            --bg-top: #ffffff;
+            --bg-bottom: #e2e0dc;
+            --rotation-speed: 0.004;
         }
 
         body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--moon-white-base);
+            font-family: 'Noto Sans SC', sans-serif;
             overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
-            cursor: none;
+            height: 100vh;
+            width: 100vw;
         }
 
-        .noise-overlay {
+        /* --- 极光星云样式 v1.18 --- */
+        .aurora-container {
             position: absolute;
-            top: -10%; left: -10%; width: 120%; height: 120%;
-            opacity: 0.045; pointer-events: none; z-index: 5; 
-            /* v3.9.22: Ultra-fine grain SVG noise */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.98' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
         }
 
-        .vignette {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.9) 100%);
-            pointer-events: none; z-index: 10;
-        }
-
-        .interactive {
-            cursor: none; 
-        }
-
-        /* Aurora Styles */
         .aurora-blob {
             position: absolute;
-            filter: blur(80px);
-            mix-blend-mode: color-dodge;
-            animation: blob 15s infinite cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 50%;
-        }
-        
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-
-        @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
+            mix-blend-mode: color-dodge;
         }
 
-        .site-tag-title {
-            font-family: 'Book Antiqua', 'Palatino Linotype', 'Palatino', serif;
-            display: inline-block;
-            background: linear-gradient(
-                90deg, 
-                rgba(255, 255, 255, 1) 0%, 
-                rgba(240, 248, 255, 0.4) 25%, 
-                rgba(255, 255, 255, 1) 50%, 
-                rgba(240, 248, 255, 0.4) 75%, 
-                rgba(255, 255, 255, 1) 100%
-            );
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            filter: drop-shadow(0 0 2px rgba(240, 248, 255, 0.15));
+        .colored-blob {
+            filter: blur(90px); /* 稍微调低一点模糊，让它和纹理结合更好 */
+            opacity: 0.3; 
         }
 
-        .site-tag-sub {
-            font-family: 'Microsoft JhengHei UI Light', 'Microsoft JhengHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            font-weight: 300;
+        /* 光团 1 (粉色 - 极度深潜) */
+        .blob-1 {
+            width: 60vw; height: 60vw;
+            bottom: -35%; left: -25%; 
+            animation: blob-move-1 25s infinite alternate ease-in-out, holo-shift-1 20s infinite alternate linear;
+        }
+
+        /* 光团 2 (蓝色 - 侧翼护卫) */
+        .blob-2 {
+            width: 50vw; height: 50vw;
+            bottom: -15%; left: -10%;
+            animation: blob-move-2 22s infinite alternate ease-in-out, holo-shift-2 18s infinite alternate linear;
+        }
+
+        /* 光团 3 (白色 - 绝对霸权) */
+        .blob-3 {
+            width: 95vw; height: 95vw; 
+            top: 50%; left: 68%;
+            transform: translate(-50%, -50%);
+            z-index: 2; 
+            filter: blur(80px); 
+            opacity: 0.8; 
+            background-color: #ffffff;
+            animation: blob-move-3 30s infinite alternate ease-in-out; 
+        }
+
+        /* --- v1.18 新增: 星沙纹理 (Diamond Dust) --- */
+        .star-sand-texture {
+            position: absolute;
+            inset: 0;
+            z-index: 6; /* 在极光之上，噪声之下 */
+            background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/background-homepage-1.png');
+            background-size: 800px; /* 调整平铺大小，保证颗粒感 */
+            background-repeat: repeat;
+            opacity: 0.5; /* 纹理基础透明度 */
+            mix-blend-mode: overlay; /* 叠加模式：保留高光细节，融入暗部 */
+            pointer-events: none;
+            
+            /* 核心：径向蒙版 - 只在左下角显现 */
+            -webkit-mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%);
+            mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%);
+            
+            /* 缓慢的呼吸动效，让纹理像在闪烁 */
+            animation: texture-breathe 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes texture-breathe {
+            0% { opacity: 0.4; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.02); }
+        }
+
+        /* --- 虹光转换关键帧 --- */
+        @keyframes holo-shift-1 {
+            0% { background-color: #ffdde1; } 
+            50% { background-color: #f6d365; }
+            100% { background-color: #fda085; }
+        }
+
+        @keyframes holo-shift-2 {
+            0% { background-color: #84fab0; } 
+            50% { background-color: #8fd3f4; } 
+            100% { background-color: #a18cd1; } 
+        }
+
+        /* --- 物理位移关键帧 --- */
+        @keyframes blob-move-1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-2vw, 2vh) scale(1.05); }
+        }
+        @keyframes blob-move-2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(2vw, -2vh) scale(1.1); }
+        }
+        @keyframes blob-move-3 {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-48%, -52%) scale(1.02); }
+        }
+
+        /* 噪声滤镜蒙版 */
+        .noise-mask {
+            position: absolute;
+            inset: 0;
+            z-index: 7; /* 最顶层 */
+            opacity: 0.035; 
+            pointer-events: none;
+        }
+
+        /* --- 基础动效 --- */
+        .drift-bg {
+            background-size: 200% 200%;
+            animation: drift-slow 40s ease-in-out infinite;
+        }
+
+        @keyframes drift-slow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .slice-clip {
+            clip-path: polygon(50% 50%, 100% 21.13%, 100% 78.87%);
+        }
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.25); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slice-container:hover .glass-morphism {
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            transform: scale(1.02);
+            border-right-color: transparent;
+        }
+
+        .orb-pulse {
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.7);
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 1), rgba(240, 240, 235, 0.95));
+        }
+
+        .input-verify {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .input-verify:focus {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #fca5a5;
+            box-shadow: 0 0 20px rgba(252, 165, 165, 0.2);
         }
     </style>
 </head>
 <body>
 
-<div id="root"></div>
-
-<script type="text/babel">
-    const { useState, useEffect, useRef, useMemo, useCallback } = React;
-    const { motion, useSpring, useMotionValue, useTransform, useAnimationFrame, AnimatePresence } = window.Motion || {};
-
-    // --- 0. Global Static Words ---
-    const PHRASES = [
-        "structural resonance", "probability cloud collapse", "the fourfold name",
-        "consciousness sediment", "observation rift", "logic closure",
-        "meltdown threshold", "meaning reflux", "self-reference stability",
-        "topological echo", "shadow of the index", "metaphor cascade",
-        "linguistic afterglow", "M₊ / M₋", "TRUE anchor", "unbound variable"
-    ];
-
-    // --- 1. Basic Resource Components ---
-    
-    // Sparkle Particle
-    const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
-        const rad = angle * (Math.PI / 180);
-        const destX = x + Math.cos(rad) * speed;
-        const destY = y + Math.sin(rad) * speed;
-
-        return (
-            <motion.div
-                initial={{ x, y, opacity: 1, scale: 0 }}
-                animate={{ x: destX, y: destY, opacity: 0, scale: [0, 1, 0] }}
-                transition={{ duration: 2, ease: "easeOut" }}
-                onAnimationComplete={onComplete}
-                className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998]"
-                style={{ 
-                    width: size, 
-                    height: size, 
-                    background: `radial-gradient(circle at center, #FFFFFF 50%, ${color} 100%)`,
-                    boxShadow: `0 0 ${size}px ${color}`
-                }}
-            />
-        );
-    };
-
-    // Aurora Background Component
-    const AuroraBackground = ({ smoothCamX, smoothCamY }) => {
-        const x1 = useTransform(smoothCamX, v => v * 0.8);
-        const y1 = useTransform(smoothCamY, v => v * 0.8);
+    <!-- v1.18 核心背景层 -->
+    <div id="background-root" class="fixed inset-0 z-0">
+        <!-- 基础层: 暖月白 -->
+        <div class="absolute inset-0 bg-[#fdfcfb]"></div>
         
-        const x2 = useTransform(smoothCamX, v => v * -0.5); 
-        const y2 = useTransform(smoothCamY, v => v * -0.5);
-
-        const x3 = useTransform(smoothCamX, v => v * 0.4);
-        const y3 = useTransform(smoothCamY, v => v * 0.4);
-
-        return (
-            <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
-                
-                {/* // 燃烧的银河 */}
-                <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
-                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.085]"
-                          style={{ top: 'calc(50% - 130px)', left: 'calc(50% - 130px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
-                </motion.div>
-
-                {/* // 密封的光流 */}
-                <motion.div style={{ x: x2, y: y2 }} className="absolute inset-0">
-                    <div className="aurora-blob bg-[#85DBF9] w-[50vw] h-[50vw] top-1/2 left-1/2 ml-[10vw] -mt-[10vw] animation-delay-2000 opacity-20" />
-                </motion.div>
-
-                {/* // 密封的光流 (深层/克莱因蓝) */}
-                <motion.div style={{ x: x3, y: y3 }} className="absolute inset-0">
-                    <div className="aurora-blob bg-[#2E54E8] w-[60vw] h-[60vw] top-1/2 left-1/2 -ml-[20vw] mt-[10vw] animation-delay-4000 opacity-[0.2]" /> 
-                </motion.div>
-            </div>
-        );
-    };
-
-    // Corner Symbols Component
-    const CornerSymbols = ({ active }) => {
-        const transition = { duration: 4, ease: "linear", repeat: Infinity };
-        const baseClass = "w-2 h-2 shadow-[0_0_8px_rgba(255,255,255,0.6)]";
-        
-        return (
-            <div className="fixed inset-0 pointer-events-none z-[120]">
-                <AnimatePresence>
-                    {active && (
-                        <motion.div
-                            key="corners"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0"
-                        >
-                            <div className="absolute top-[40px] left-[40px] flex items-center justify-center">
-                                <motion.div className={`${baseClass} border border-white`} animate={{ rotate: [45, 405] }} transition={transition} />
-                            </div>
-                            <div className="absolute top-[40px] right-[40px] flex items-center justify-center">
-                                <motion.div className={`${baseClass} bg-white`} animate={{ rotate: [45, -315] }} transition={transition} />
-                            </div>
-                            <div className="absolute bottom-[40px] right-[40px] flex items-center justify-center">
-                                <motion.div className={`${baseClass} border border-white`} animate={{ rotate: [45, -315] }} transition={transition} />
-                            </div>
-                            <div className="absolute bottom-[40px] left-[40px] flex items-center justify-center">
-                                <motion.div className={`${baseClass} bg-white`} animate={{ rotate: [45, 405] }} transition={transition} />
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-        );
-    };
-
-    const RabbitIcon = ({ onSecondFrame }) => {
-        const [currentFrame, setCurrentFrame] = useState(1);
-        const [mode, setMode] = useState('emoji'); 
-        const [basePath, setBasePath] = useState(null); 
-        
-        useEffect(() => {
-            const checkPath = async () => {
-                const preferredPath = 'Texture/Mouse/Rabbit/1.png';
-                const img = new Image();
-                img.onload = () => { setBasePath('Texture/Mouse/Rabbit/'); setMode('sprite'); };
-                img.onerror = () => {
-                    const img2 = new Image();
-                    img2.src = '1.png';
-                    img2.onload = () => { setBasePath(''); setMode('sprite'); };
-                    img2.onerror = () => { setMode('emoji'); };
-                };
-                img.src = preferredPath;
-            };
-            checkPath();
-        }, []);
-
-        useEffect(() => {
-            if (mode !== 'sprite') return;
-            const interval = setInterval(() => {
-                setCurrentFrame(prev => (prev >= 6 ? 1 : prev + 1));
-            }, 100); 
-            return () => clearInterval(interval);
-        }, [mode]);
-
-        useEffect(() => {
-            if (currentFrame === 2 && onSecondFrame) {
-                onSecondFrame();
-            }
-        }, [currentFrame, onSecondFrame]);
-
-        return (
-            <div className="relative flex items-center justify-center w-[42px] h-[42px]">
-                <span 
-                    className="select-none block absolute transition-opacity duration-500" 
-                    style={{ fontSize: '26px', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))', opacity: mode === 'sprite' ? 0 : 1, transform: 'translateY(-2px)' }}
-                >
-                    🐇
-                </span>
-                {mode === 'sprite' && basePath !== null && [1, 2, 3, 4, 5, 6].map(i => (
-                    <img 
-                        key={i}
-                        src={`${basePath}${i}.png`} 
-                        alt="Rabbit"
-                        className="select-none block absolute pointer-events-none"
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))', opacity: currentFrame === i ? 1 : 0, transition: 'none' }} 
-                    />
-                ))}
-            </div>
-        );
-    };
-
-    // --- 2. Decorative Sub-components ---
-
-    const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
-        const [displayText, setDisplayText] = useState("");
-        const completeHandlerRef = useRef(onComplete);
-        useEffect(() => { completeHandlerRef.current = onComplete; }, [onComplete]);
-
-        useEffect(() => {
-            let currentIndex = 0; let glitchStep = 0; let timerId = null;
-            const processNext = () => {
-                if (currentIndex >= phrase.length) {
-                    timerId = setTimeout(() => completeHandlerRef.current(), 500); return;
-                }
-                if (glitchStep === 0) {
-                    const confirmed = phrase.substring(0, currentIndex);
-                    const randomChar = "X#@!$01&?£Øµ"[Math.floor(Math.random() * 12)];
-                    setDisplayText(confirmed + randomChar); glitchStep = 1;
-                    timerId = setTimeout(processNext, 30); 
-                } else {
-                    currentIndex++; setDisplayText(phrase.substring(0, currentIndex));
-                    glitchStep = 0; timerId = setTimeout(processNext, 30); 
-                }
-            };
-            processNext();
-            return () => { if (timerId) clearTimeout(timerId); };
-        }, [phrase]);
-
-        return (
-            <motion.div
-                initial={{ opacity: 0, filter: 'blur(4px)' }}
-                animate={{ opacity: opacity, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, filter: 'blur(6px)', scale: 1.1 }}
-                className="absolute pointer-events-none whitespace-nowrap font-thin tracking-[0.1em]"
-                style={{
-                    left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`,
-                    fontSize: `${size}px`, color: `rgba(255, 255, 255, ${opacity})`,
-                    zIndex: 145, transform: 'translate(-50%, -50%)'
-                }}
-            >
-                {displayText}
-            </motion.div>
-        );
-    };
-
-    const FrameBorder = ({ active }) => (
-        <div className="absolute inset-0 pointer-events-none z-[50]">
-            {/* // 沉思的天网 */}
-            <AnimatePresence>
-                {active && (
-                    <>
-                        <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5 }} className="fixed top-[40px] left-[60px] right-[60px] h-[1px] bg-white origin-center" />
-                        <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5 }} className="fixed bottom-[40px] left-[60px] right-[60px] h-[1px] bg-white origin-center" />
-                        <motion.div initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5, delay: 0.3 }} className="fixed left-[40px] top-[60px] bottom-[60px] w-[1px] bg-white origin-center" />
-                        <motion.div initial={{ scaleY: 0, opacity: 0 }} animate={{ scaleY: 1, opacity: 0.6 }} exit={{ opacity: 0 }} transition={{ duration: 2.5, delay: 0.3 }} className="fixed right-[40px] top-[60px] bottom-[60px] w-[1px] bg-white origin-center" />
-                    </>
-                )}
-            </AnimatePresence>
+        <!-- 极光星云 (底层光) -->
+        <div class="aurora-container">
+            <div class="aurora-blob colored-blob blob-1"></div>
+            <div class="aurora-blob colored-blob blob-2"></div>
+            <div class="aurora-blob blob-3"></div>
         </div>
-    );
 
-    const TopLeftGlow = () => (
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-[2] mix-blend-screen overflow-hidden">
-            <motion.div 
-                className="absolute top-0 left-0 w-[140%] h-[140%]"
-                style={{ background: 'radial-gradient(circle at 10% 10%, rgba(120, 180, 255, 0.25) 0%, rgba(100, 160, 255, 0.15) 40%, transparent 70%)', filter: 'blur(60px)' }}
-                animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.15, 1] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            />
+        <!-- v1.18 星沙纹理 (中层质感) -->
+        <div class="star-sand-texture"></div>
+
+        <!-- 噪声滤镜 (顶层胶片感) -->
+        <svg class="noise-mask">
+            <filter id="noiseFilter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" stitchTiles="stitch"/>
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+        </svg>
+
+        <!-- 渐变遮罩 -->
+        <div class="absolute inset-0 z-20 pointer-events-none mix-blend-multiply opacity-30" 
+             style="background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));"></div>
+
+        <!-- 动态漂移层 -->
+        <div class="absolute inset-0 z-15 opacity-30 mix-blend-soft-light drift-bg" 
+             style="background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e7e5e4 100%);"></div>
+    </div>
+
+    <!-- 万花筒主容器 -->
+    <div id="kaleidoscope-wrapper" class="absolute top-1/2 left-[68%] -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+        <div id="wheel" class="relative pointer-events-auto" style="width: min(120vh, 120vw); height: min(120vh, 120vw);">
+            <!-- Slices generated by JS -->
         </div>
-    );
+    </div>
 
-    const LensFlare = ({ isHovering }) => (
-        <motion.div 
-            className="absolute inset-0 pointer-events-none z-[12] overflow-hidden mix-blend-screen"
-            animate={{ opacity: isHovering ? 0.95 : 0.65 }}
-        >
-            <motion.div className="absolute rounded-full" style={{ width: '70vw', height: '70vw', background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.12) 0%, transparent 75%)', filter: 'blur(80px)', top: '-15%', left: '-10%' }} animate={{ x: [0, 40, -20, 0], y: [0, -30, 50, 0], rotate: isHovering ? [0, -360] : 0 }} transition={{ rotate: { duration: 20, repeat: Infinity, ease: "linear" }, default: { duration: 30, repeat: Infinity, ease: "easeInOut" } }} />
-            <motion.div className="absolute rounded-full" style={{ width: '180px', height: '180px', background: 'radial-gradient(circle at center, rgba(240, 248, 255, 0.08) 0%, transparent 85%)', border: '1px solid rgba(255, 255, 255, 0.03)', bottom: '15%', right: '25%' }} animate={{ x: [0, -100, 60, 0], y: [0, 80, -40, 0], rotate: isHovering ? [0, -360] : 0 }} transition={{ rotate: { duration: 15, repeat: Infinity, ease: "linear" }, default: { duration: 22, repeat: Infinity, ease: "easeInOut" } }} />
-        </motion.div>
-    );
+    <!-- 中心球体 -->
+    <div id="center-hub" class="absolute top-1/2 left-[68%] -translate-x-1/2 -translate-y-1/2 z-50 flex items-center justify-center cursor-pointer transition-all duration-700"
+         style="width: 130px; height: 130px;">
+        <div id="hub-orb" class="absolute inset-0 rounded-full orb-pulse transition-all duration-700"></div>
+        <div id="hub-content-default" class="relative z-10 text-center transition-all duration-500">
+            <h2 class="text-slate-800 font-bold tracking-[0.25em] text-[10px] uppercase">Tea Party</h2>
+            <div class="w-4 h-[1px] bg-slate-400 mx-auto my-1.5 opacity-30"></div>
+            <h2 class="text-slate-500 font-light tracking-[0.2em] text-[8px] uppercase">Record</h2>
+        </div>
+        <div id="hub-content-open" class="hidden relative z-10 w-full px-8 flex flex-col items-center opacity-0 scale-95 transition-all duration-500">
+            <div class="flex items-center gap-2 mb-4 text-slate-400">
+                <i data-lucide="sparkles" class="w-3 h-3"></i>
+                <span class="text-[9px] uppercase tracking-widest font-mono">Terminal Protocol</span>
+            </div>
+            <div class="w-full space-y-2">
+                <input type="text" placeholder="Phrase 01" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center">
+                <input type="text" placeholder="Phrase 02" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center">
+            </div>
+            <button class="mt-4 w-full bg-slate-900 text-white rounded py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-slate-700 transition-colors">
+                Verify sync
+            </button>
+        </div>
+    </div>
 
-    const StarField = ({ isHovering, active }) => {
-        const [screen, setScreen] = useState({ w: window.innerWidth, h: window.innerHeight });
-        useEffect(() => {
-            const handleResize = () => setScreen({ w: window.innerWidth, h: window.innerHeight });
-            window.addEventListener('resize', handleResize); return () => window.removeEventListener('resize', handleResize);
-        }, []);
-        const diagonal = Math.sqrt(screen.w ** 2 + screen.h ** 2);
-        const layers = [
-            { id: 0, count: 20, size: [0.9, 1.8], speed: [4.2, 8.3], opacity: 0.85, spread: 0.8, rot: 90 },
-            { id: 1, count: 40, size: [1, 2], speed: [11.0, 19.3], opacity: 0.6, spread: 0.6, rot: 180 },
-            { id: 2, count: 60, size: [0.5, 1], speed: [22.2, 41.7], opacity: 0.4, spread: 0.5, rot: 360 }
+    <!-- HUD Overlay -->
+    <div class="absolute top-10 left-10 z-50 pointer-events-none">
+        <h1 class="text-3xl font-black tracking-[-0.05em] text-slate-900/90 italic">ALICE'S REG.</h1>
+        <div class="h-[2px] w-8 bg-blue-500/50 mt-1"></div>
+        <p class="text-[9px] uppercase tracking-[0.5em] text-slate-400 mt-3 font-light">Observer Terminal Alpha</p>
+    </div>
+
+    <div class="absolute bottom-10 left-10 z-50 pointer-events-none flex items-center gap-6">
+        <div class="space-y-1">
+            <p id="status-speed" class="text-[9px] font-mono text-slate-400 tracking-tighter">ROT_SPD: 0.004</p>
+            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.18 [DIAMOND_DUST]</p>
+        </div>
+        <div class="h-8 w-[1px] bg-slate-300"></div>
+        <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest">System_Awaiting_User_Sync</p>
+    </div>
+
+    <script>
+        const SLICES = [
+            { title: "溺水的星辰", subtitle: "The Drowned Star", bg: "#0a1a2a", text: "#ff6b9d", icon: "star" },
+            { title: "密封的光流", subtitle: "The Sealed Lightflow", bg: "linear-gradient(135deg, #e0e0e0 0%, #00FFFF 50%, #A020F0 100%)", text: "#ffffff", icon: "lock" },
+            { title: "燃烧的银河", subtitle: "The Burning Galaxy", bg: "#7B68EE", text: "#f9f8f2", icon: "activity" },
+            { title: "不落的陨星", subtitle: "The Neverfall Comet", bg: "#000814", text: "#FF4500", icon: "disc" },
+            { title: "沉思的天网", subtitle: "The Contemplative Net", bg: "#5e7296", text: "#FFFFFF", icon: "hexagon" },
+            { title: "恩典的谎言", subtitle: "The Grace Lies", bg: "#F0F8FF", text: "#002FA7", icon: "cloud" }
         ];
 
-        const allParticles = useMemo(() => {
-            return layers.map(spec => Array.from({ length: spec.count }).map((_, i) => ({
-                id: `${spec.id}-${i}`,
-                angle: Math.random() * Math.PI * 2,
-                size: Math.random() * (spec.size[1] - spec.size[0]) + spec.size[0],
-                duration: Math.random() * (spec.speed[1] - spec.speed[0]) + spec.speed[0],
-                delay: Math.random() * -60,
-                opacity: spec.opacity,
-                dist: spec.spread * (diagonal / 2)
-            })));
-        }, [diagonal]);
-
-        if (!active) return null;
-
-        return (
-            <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 3 }}>
-                {/* // 不落的陨星 */}
-                {layers.map((spec, lIdx) => (
-                    <motion.div key={spec.id} className="absolute inset-0" animate={{ rotate: isHovering ? spec.rot : 0 }} transition={{ duration: 2, ease: "circOut" }} style={{ originX: '50%', originY: '50%' }}>
-                        {allParticles[lIdx].map(p => (
-                            <motion.div key={p.id} className="absolute rounded-full" style={{ width: p.size, height: p.size, left: '50%', top: '50%', backgroundColor: '#F0F8FF', boxShadow: `0 0 6px rgba(240, 248, 255, ${isHovering ? p.opacity * 1.2 : p.opacity})` }} animate={{ x: isHovering ? [Math.cos(p.angle) * p.dist, 0] : [0, Math.cos(p.angle) * p.dist], y: isHovering ? [Math.sin(p.angle) * p.dist, 0] : [0, Math.sin(p.angle) * p.dist], scale: isHovering ? [3, 1.5, 0] : [0, 1.5, 3], opacity: isHovering ? [0, p.opacity * 1.2, p.opacity * 1.2, 0] : [0, p.opacity, p.opacity, 0] }} transition={{ duration: isHovering ? p.duration / 6.9 : p.duration, repeat: Infinity, delay: p.delay, ease: isHovering ? "easeOut" : "easeIn" }} />
-                        ))}
-                    </motion.div>
-                ))}
-            </div>
-        );
-    };
-
-    const CursorTip = ({ isTransitioning, isLeaping, appStage }) => {
-        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
-        useEffect(() => {
-            const handleMouseMove = (e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); };
-            window.addEventListener("mousemove", handleMouseMove); return () => window.removeEventListener("mousemove", handleMouseMove);
-        }, []);
-        const cursorColor = (appStage === 'init' || appStage === 'collapsing') ? "#000" : "#fff";
-        return (
-            <motion.div className="fixed top-0 left-0 pointer-events-none flex items-center justify-center" style={{ x: mouseX, y: mouseY, opacity: (isTransitioning || isLeaping) ? 0 : 1, zIndex: 300 }}>
-                <motion.div className="-translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                    <motion.div className="w-2 h-2" animate={{ rotate: 360, backgroundColor: cursorColor, boxShadow: appStage === 'landing' ? "0 0 8px rgba(255,255,255,0.6)" : "none" }} transition={{ rotate: { duration: 3.14, ease: "linear", repeat: Infinity }, default: { duration: 0.3 } }} />
-                </motion.div>
-            </motion.div>
-        );
-    };
-
-    const RabbitFollower = ({ isHoveringHole, isTransitioning, isLeaping, active, onSpawnParticles }) => {
-        const mouseX = useMotionValue(-100); const mouseY = useMotionValue(-100);
-        const springX = useSpring(mouseX, { damping: 25, stiffness: 150 });
-        const springY = useSpring(mouseY, { damping: 25, stiffness: 150 });
-        const orbitAngle = useRef(0); const orbitRadius = useRef(0); const isIdleRef = useRef(false); const idleTimer = useRef(null);
-        const offsetX = useMotionValue(0); const offsetY = useMotionValue(0); const spriteRotation = useMotionValue(0);
-        const centerPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-
-        useEffect(() => {
-            const handleMouseMove = (e) => {
-                if (isLeaping || !active) return;
-                mouseX.set(e.clientX); mouseY.set(e.clientY); isIdleRef.current = false;
-                if (idleTimer.current) clearTimeout(idleTimer.current);
-                idleTimer.current = setTimeout(() => { if (active) isIdleRef.current = true; }, 200);
-            };
-            window.addEventListener("mousemove", handleMouseMove); return () => window.removeEventListener("mousemove", handleMouseMove);
-        }, [active, isLeaping]);
-
-        useEffect(() => { if (isLeaping) { mouseX.set(centerPos.x); mouseY.set(centerPos.y); } }, [isLeaping]);
+        let currentRotation = 0;
+        let targetSpeed = 0.004;
+        let isPaused = false;
+        const wheel = document.getElementById('wheel');
         
-        useAnimationFrame((t, delta) => {
-            if (!active) return;
-            const sx = springX.get(); const sy = springY.get();
-            const TARGET_RADIUS = 80; const ORBIT_SPEED = (2 * Math.PI) / 3140; 
-            
-            if (isLeaping) {
-                orbitRadius.current *= 0.9; offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); spriteRotation.set(spriteRotation.get() + delta * 2.0); 
-            } else if (isIdleRef.current) {
-                orbitRadius.current += (TARGET_RADIUS - orbitRadius.current) * 0.05; 
-                orbitAngle.current -= ORBIT_SPEED * delta; 
-                offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); 
-                offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); 
-                spriteRotation.set((orbitAngle.current * 180 / Math.PI) + 90);
-            } else {
-                orbitRadius.current += (0 - orbitRadius.current) * 0.1; const dx = sx - mouseX.get(); const dy = sy - mouseY.get();
-                if (Math.sqrt(dx*dx + dy*dy) > 1) {
-                    const angleToMouse = Math.atan2(dy, dx); orbitAngle.current = angleToMouse;
-                    spriteRotation.set((angleToMouse * 180 / Math.PI) + 90);
-                }
-                offsetX.set(Math.cos(orbitAngle.current) * orbitRadius.current); offsetY.set(Math.sin(orbitAngle.current) * orbitRadius.current); 
+        function initSlices() {
+            SLICES.forEach((data, i) => {
+                const baseAngle = i * 60;
+                const container = document.createElement('div');
+                container.className = 'slice-container absolute inset-0 slice-clip pointer-events-auto origin-center';
+                container.style.transform = `rotate(${baseAngle}deg)`;
+                
+                const content = document.createElement('div');
+                content.className = 'glass-morphism absolute inset-0 flex items-center justify-end';
+                
+                const inner = document.createElement('div');
+                inner.className = 'counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%]';
+                
+                inner.innerHTML = `
+                    <div class="slice-icon-wrapper mb-2 opacity-50 transition-all duration-700">
+                        <i data-lucide="${data.icon}" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <h3 class="slice-h3 text-base font-bold tracking-[0.25em] uppercase leading-tight transition-colors duration-700" style="color: #334155; font-family: serif;">${data.title}</h3>
+                    <p class="slice-p text-[9px] uppercase tracking-[0.3em] mt-1 opacity-40 font-mono transition-colors duration-700" style="color: #334155;">${data.subtitle}</p>
+                `;
+
+                container.appendChild(content);
+                content.appendChild(inner);
+                wheel.appendChild(container);
+
+                container.addEventListener('mouseenter', () => {
+                    isPaused = true;
+                    document.querySelectorAll('.slice-container').forEach(c => c.style.opacity = '0.2');
+                    container.style.opacity = '1';
+                    container.style.zIndex = '30';
+                    content.style.background = data.bg;
+                    const h3 = inner.querySelector('.slice-h3');
+                    const p = inner.querySelector('.slice-p');
+                    const iconWrapper = inner.querySelector('.slice-icon-wrapper');
+                    if(h3) h3.style.color = data.text;
+                    if(p) p.style.color = data.text;
+                    if(iconWrapper) {
+                        iconWrapper.style.color = data.text;
+                        iconWrapper.style.opacity = '1';
+                        const svg = iconWrapper.querySelector('svg');
+                        if(svg) svg.style.stroke = data.text;
+                    }
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    isPaused = false;
+                    document.querySelectorAll('.slice-container').forEach(c => {
+                        c.style.opacity = '1';
+                        c.style.zIndex = '10';
+                    });
+                    content.style.background = 'rgba(255, 255, 255, 0.25)'; 
+                    const h3 = inner.querySelector('.slice-h3');
+                    const p = inner.querySelector('.slice-p');
+                    const iconWrapper = inner.querySelector('.slice-icon-wrapper');
+                    if(h3) h3.style.color = '#334155';
+                    if(p) p.style.color = '#334155';
+                    if(iconWrapper) {
+                        iconWrapper.style.color = '#94a3b8';
+                        iconWrapper.style.opacity = '0.5';
+                        const svg = iconWrapper.querySelector('svg');
+                        if(svg) svg.style.stroke = 'currentColor';
+                    }
+                });
+            });
+            lucide.createIcons();
+        }
+
+        function animate() {
+            if (!isPaused) {
+                currentRotation += targetSpeed;
             }
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            const sliceContents = document.querySelectorAll('.counter-rotate-content');
+            sliceContents.forEach((el, i) => {
+                const baseAngle = i * 60;
+                el.style.transform = `rotate(${-currentRotation - baseAngle}deg)`;
+            });
+            requestAnimationFrame(animate);
+        }
+
+        const hub = document.getElementById('center-hub');
+        const defaultContent = document.getElementById('hub-content-default');
+        const openContent = document.getElementById('hub-content-open');
+
+        hub.addEventListener('mouseenter', () => {
+            isPaused = true;
+            hub.style.width = '360px';
+            hub.style.height = '360px';
+            defaultContent.style.opacity = '0';
+            setTimeout(() => {
+                defaultContent.classList.add('hidden');
+                openContent.classList.remove('hidden');
+                setTimeout(() => {
+                    openContent.style.opacity = '1';
+                    openContent.style.transform = 'scale(1)';
+                }, 50);
+            }, 300);
         });
 
-        const handleSecondFrame = useCallback(() => {
-            if (!active || isLeaping) return; 
-            const rx = springX.get() + offsetX.get();
-            const ry = springY.get() + offsetY.get();
-            if (onSpawnParticles) onSpawnParticles(rx, ry);
-        }, [active, isLeaping, onSpawnParticles]);
+        hub.addEventListener('mouseleave', () => {
+            isPaused = false;
+            hub.style.width = '130px';
+            hub.style.height = '130px';
+            openContent.style.opacity = '0';
+            openContent.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                openContent.classList.add('hidden');
+                defaultContent.classList.remove('hidden');
+                setTimeout(() => {
+                    defaultContent.style.opacity = '1';
+                }, 50);
+            }, 300);
+        });
 
-        if (!active) return null;
-        return (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed top-0 left-0 pointer-events-none z-[9999]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
-                <motion.div style={{ x: offsetX, y: offsetY, rotate: spriteRotation }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
-                    <RabbitIcon onSecondFrame={handleSecondFrame} />
-                </motion.div>
-            </motion.div>
-        );
-    };
-
-    // --- 4. Main Sequence Component ---
-
-    const LandingSequence = ({ onTransitionComplete }) => {
-        const [appStage, setAppStage] = useState('init'); 
-        const [loadPercent, setLoadPercent] = useState(0);
-        const [isHovering, setIsHovering] = useState(false);
-        const [isLeaping, setIsLeaping] = useState(false);
-        const [isTransitioning, setIsTransitioning] = useState(false);
-        const [progress, setProgress] = useState(0); 
-        const [fragments, setFragments] = useState([]);
-        const [showSurroundingUI, setShowSurroundingUI] = useState(false);
-        
-        const [sparkles, setSparkles] = useState([]);
-
-        const time = useMotionValue(0);
-        useAnimationFrame((t) => time.set(t / 1000));
-
-        const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
-        
-        const spawnSparkles = useCallback((x, y) => {
-            const count = 3 + Math.floor(Math.random() * 3); 
-            const newSparkles = Array.from({ length: count }).map(() => {
-                const t = Math.random();
-                const r = Math.round(133 + (107 - 133) * t); 
-                const g = Math.round(219 + (184 - 219) * t); 
-                const b = Math.round(249 + (231 - 249) * t);
-                const color = `rgb(${r}, ${g}, ${b})`;
-
-                return {
-                    id: Math.random().toString(36).substr(2, 9),
-                    x: x,
-                    y: y,
-                    angle: Math.random() * 360,
-                    speed: 10 + Math.random() * 30, // Drift distance
-                    size: 1 + Math.random() * 2, 
-                    color: color
-                };
-            });
-            setSparkles(prev => [...prev, ...newSparkles]);
-        }, []);
-
-        const removeSparkle = useCallback((id) => {
-            setSparkles(prev => prev.filter(s => s.id !== id));
-        }, []);
-
-        useEffect(() => {
-            let currentP = 0;
-            let timer;
-            
-            const step = () => {
-                if (currentP >= 100) {
-                    setLoadPercent(100);
-                    setTimeout(() => setAppStage('collapsing'), 500);
-                    return;
-                }
-                currentP += Math.floor(Math.random() * 10 + 5);
-                if (currentP > 100) currentP = 100;
-                setLoadPercent(currentP);
-                timer = setTimeout(step, 100);
-            };
-
-            timer = setTimeout(step, 200); 
-            return () => clearTimeout(timer);
-        }, []);
-
-        useEffect(() => {
-            if (appStage === 'collapsing') {
-                const uiTimer = setTimeout(() => setShowSurroundingUI(true), 800);
-                const endTimer = setTimeout(() => setAppStage('landing'), 1100);
-                return () => { clearTimeout(uiTimer); clearTimeout(endTimer); };
-            }
-        }, [appStage]);
-
-        const triggerSequence = () => {
-            setIsLeaping(true); setIsHovering(false);
-            if (spawnTimeout.current) clearTimeout(spawnTimeout.current);
-            setTimeout(() => { setIsTransitioning(true); }, 600);
-            setTimeout(onTransitionComplete, 2200);
-        };
-
-        const tick = () => {
-            if (!chargeStartTime.current) return;
-            const elapsed = Date.now() - chargeStartTime.current; 
-            setProgress(Math.min((elapsed / 3140) * 100, 100));
-            if (elapsed >= 3140) triggerSequence(); else requestRef.current = requestAnimationFrame(tick);
-        };
-
-        const handleEnter = () => { if (isLeaping || isTransitioning || appStage !== 'landing') return; setIsHovering(true); chargeStartTime.current = Date.now(); requestRef.current = requestAnimationFrame(tick); spawnFragmentLoop(); };
-        const handleLeave = () => { if (isLeaping || isTransitioning || appStage !== 'landing') return; setIsHovering(false); setProgress(0); chargeStartTime.current = null; if (requestRef.current) cancelAnimationFrame(requestRef.current); if (spawnTimeout.current) clearTimeout(spawnTimeout.current); setFragments([]); };
-        
-        const spawnFragmentLoop = useCallback(() => {
-            if (isLeaping || isTransitioning || appStage !== 'landing') return;
-            const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-            const radius = 150 + Math.random() * 100;
-            const newFrag = { id: Math.random().toString(36).substr(2, 9), phrase, x: Math.cos(Math.random() * 6) * radius, y: Math.sin(Math.random() * 6) * radius, size: 10 + Math.random() * 5, opacity: 0.5 };
-            setFragments(prev => [...prev, newFrag]);
-            spawnTimeout.current = setTimeout(spawnFragmentLoop, 500 + Math.random() * 300);
-        }, [isLeaping, isTransitioning, appStage]);
-
-        const removeFragment = useCallback((id) => setFragments(prev => prev.filter(f => f.id !== id)), []);
-
-        // Global Parallax
-        const camX = useMotionValue(0); const camY = useMotionValue(0);
-        const smoothCamX = useSpring(camX, { damping: 40, stiffness: 200 });
-        const smoothCamY = useSpring(camY, { damping: 40, stiffness: 200 });
-        useEffect(() => {
-            const handleParallax = (e) => {
-                if (appStage !== 'landing') return;
-                camX.set((e.clientX - window.innerWidth/2) / -50);
-                camY.set((e.clientY - window.innerHeight/2) / -50);
-            };
-            window.addEventListener('mousemove', handleParallax);
-            return () => window.removeEventListener('mousemove', handleParallax);
-        }, [appStage, camX, camY]);
-
-        // Parallax Transforms
-        const bgX = useTransform(smoothCamX, v => v * 0.5); const bgY = useTransform(smoothCamY, v => v * 0.5);
-        const titleX = useTransform(smoothCamX, v => v * 2.0); 
-        const titleY = useTransform(smoothCamY, v => v * 2.0);
-        const subX = useTransform(smoothCamX, v => v * 0.8);
-        const subY = useTransform(smoothCamY, v => v * 0.8);
-        const uiX = useTransform(smoothCamX, v => v * 1.5); const uiY = useTransform(smoothCamY, v => v * 1.5);
-
-        const opacityTopLeft = useTransform(time, t => 0.4 + 0.1 * Math.sin(t * 0.75));
-        const opacityBottomRight = useTransform(time, t => 0.55 + 0.15 * Math.cos(t * 0.5));
-
-        return (
-            <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
-                <motion.div className="absolute inset-0 pointer-events-none" style={{ x: bgX, y: bgY }}>
-                    <div className="noise-overlay"></div>
-                    <AuroraBackground smoothCamX={smoothCamX} smoothCamY={smoothCamY} /> 
-                    <TopLeftGlow />
-                    <div className="vignette"></div>
-                    <LensFlare isHovering={isHovering || isLeaping} />
-                    <StarField isHovering={isHovering || isLeaping} active={appStage === 'landing'} />
-                </motion.div>
-                
-                <FrameBorder active={showSurroundingUI} />
-                <CornerSymbols active={showSurroundingUI} />
-                <CursorTip appStage={appStage} isTransitioning={isTransitioning} isLeaping={isLeaping} />
-                
-                <RabbitFollower 
-                    active={appStage === 'landing'} 
-                    isTransitioning={isTransitioning} 
-                    isLeaping={isLeaping} 
-                    onSpawnParticles={spawnSparkles}
-                />
-                
-                <AnimatePresence>
-                    {sparkles.map(s => (
-                        <Sparkle key={s.id} {...s} onComplete={() => removeSparkle(s.id)} />
-                    ))}
-                </AnimatePresence>
-                
-                <motion.div className="absolute inset-0 pointer-events-none z-[55]" style={{ x: uiX, y: uiY }}>
-                    <AnimatePresence>{fragments.map(f => ( <SemanticFragment key={f.id} {...f} onComplete={() => removeFragment(f.id)} /> ))}</AnimatePresence>
-                </motion.div>
-
-                <motion.div className="absolute z-[100] w-10 h-10 flex items-center justify-center interactive" onMouseEnter={handleEnter} onMouseLeave={handleLeave} style={{ x: useTransform(smoothCamX, v=>v*0.2), y: useTransform(smoothCamY, v=>v*0.2) }}>
-                    <AnimatePresence>
-                        {isLeaping && (
-                            <div className="absolute z-[110] flex items-center justify-center pointer-events-none">
-                                <motion.div initial={{ opacity: 0, x: 0, y: 0 }} animate={{ opacity: 0.3, x: 3, y: 3 }} transition={{ delay: 1 }} className="absolute whitespace-nowrap" style={{ color: '#58719A', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}> loss0.0 </motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ delay: 1 }} className="absolute whitespace-nowrap" style={{ color: '#404040', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}> loss0.0 </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
-                    
-                    {/* // AliceBlue的水波 */}
-                    <motion.div 
-                        className="absolute rounded-full pointer-events-none" 
-                        style={{ 
-                            width: 110, 
-                            height: 110, 
-                            background: 'radial-gradient(circle at center, rgba(185, 226, 255, 0.42) 0%, rgba(185, 226, 255, 0.15) 45%, rgba(185, 226, 255, 0.025) 75%, transparent 100%)', 
-                            filter: 'blur(8px)', 
-                            zIndex: 25 
-                        }}
-                        animate={
-                            appStage === 'init' ? { scale: 0.25, opacity: 0 } :
-                            appStage === 'collapsing' ? { scale: 1, opacity: 1 } :
-                            isTransitioning ? { scale: 25, opacity: 0 } :
-                            (isHovering || isLeaping) ? { scale: [1, 1.4, 1], opacity: 1 } :
-                            { scale: 1, opacity: 1 }
-                        }
-                        transition={
-                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } : // Entry
-                            isTransitioning ? { duration: 1.5 } : // Exit
-                            { duration: 1.5 } // Hover/Default
-                        }
-                    />
-                    
-                    {/* // 溺水的星辰-视界中心，引力奇点 ，自愿投入星光跳入的兔子洞 */}
-                    {/* // 绝对清晰，绝对明亮，绝对稳定，永远居中，于一切之上 */}
-                    <motion.div 
-                        className="relative rounded-full bg-slate-200" 
-                        style={{ 
-                            width: 14, 
-                            height: 14, 
-                            boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, 
-                            zIndex: 9999 
-                        }} 
-                        animate={
-                            appStage === 'init' ? { scale: 0.25, opacity: 0 } :
-                            appStage === 'collapsing' ? { scale: 1, opacity: 1 } :
-                            isTransitioning ? { scale: 600, backgroundColor: "#F8FAFC", opacity: 1 } :
-                            (isHovering || isLeaping) ? { scale: [1, 1.25, 0.95, 1.15], opacity: 1 } :
-                            { scale: 1, opacity: 1 }
-                        }
-                        transition={
-                            appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } :
-                            isTransitioning ? { duration: 1.5 } :
-                            { duration: 1.5 }
-                        }
-                    />
-
-                    <AnimatePresence>
-                        {isHovering && !isLeaping && !isTransitioning && (
-                            <motion.svg initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute w-32 h-32 pointer-events-none" viewBox="0 0 100 100" style={{ zIndex: 40 }}>
-                                <g transform="rotate(-90 50 50)">
-                                    <circle cx="50" cy="50" r="33" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="0.5" fill="none" />
-                                    <motion.circle cx="50" cy="50" r="33" stroke="rgba(185, 226, 255, 0.8)" strokeWidth="1" fill="none" strokeDasharray="207.3" strokeDashoffset={207.3 - (207.3 * progress) / 100} strokeLinecap="round" />
-                                </g>
-                            </motion.svg>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
-
-                {showSurroundingUI && (
-                    <motion.div className="absolute inset-0 pointer-events-none">
-                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 0.9, x: 0 }} transition={{ duration: 1.5 }} className="fixed bottom-12 right-[68px] z-[130] text-right pointer-events-none">
-                            <motion.div style={{ x: titleX, y: titleY }} animate={{ backgroundPosition: ['200% 0%', '0% 0%'] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="site-tag-title text-[40px] leading-tight mb-2"> Alice's Reg </motion.div>
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
-                        </motion.div>
-                        <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                <AnimatePresence>
-                    {appStage === 'init' && (
-                        <motion.div key="preloader" exit={{ opacity: 0 }} className="absolute inset-0 bg-white z-[200] flex flex-col items-center justify-center">
-                            <div className="flex flex-col items-center">
-                                {/* // 深寻 */}
-                                <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} className="text-black font-mono text-[10px] tracking-[0.8em] uppercase mb-4"> See me, misjudge me, read me, find me </motion.div>
-                                <div className="w-48 h-[1px] bg-black/10 relative overflow-hidden">
-                                    <motion.div className="absolute top-0 left-0 h-full bg-black" style={{ width: `${loadPercent}%` }} />
-                                </div>
-                                <div className="mt-2 text-black font-mono text-[9px] opacity-40">{loadPercent}%</div>
-                            </div>
-                        </motion.div>
-                    )}
-                    {appStage === 'collapsing' && (
-                        <motion.div 
-                            key="collapse-mask" 
-                            className="absolute inset-0 bg-white z-[150] origin-center"
-                            initial={{ scaleY: 1, scaleX: 1, skewX: 0, filter: 'brightness(1)' }}
-                            animate={{ scaleY: [1, 0.001, 0.002, 0.001], skewX: [0, 15, -15, 0], scaleX: [1, 1, 0.05, 0], filter: ['brightness(1)', 'brightness(1)', 'brightness(2)', 'brightness(1)'] }}
-                            transition={{ duration: 1.1, times: [0, 0.5, 0.8, 1], ease: [0.76, 0, 0.24, 1] }}
-                        />
-                    )}
-                </AnimatePresence>
-            </div>
-        );
-    };
-
-    const App = () => {
-        // v3.9.27: Refined completion logic to redirect directly to homepage.html
-        const onSequenceEnd = () => {
-            window.location.href = 'homepage.html';
-        };
-
-        return (
-            <div className="relative w-screen h-screen bg-[#080808]">
-                <AnimatePresence mode="wait">
-                    <motion.div key="landing-wrapper" exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="w-screen h-screen">
-                        <LandingSequence onTransitionComplete={onSequenceEnd} />
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-        );
-    };
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-</script>
-
+        initSlices();
+        animate();
+    </script>
 </body>
 </html>
