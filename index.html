@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.22</title>
+    <title>Alice's Reg - Entry Sequence v3.9.23</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,13 +23,11 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.22 [ULTRAGRAIN]
-           Build Steps: 117 iterations of optimization
+           Version: v3.9.24 [WHITE BLOOM]
+           Build Steps: 119 iterations of optimization
            Fixes: 
-             1. Noise Texture: Upgraded to Ultra-High Frequency (0.98 baseFrequency, 5 octaves). 
-                This creates a microscopic "Materiality" effect rather than visible digital noise, 
-                perfect for 4K+ displays.
-           Status: Absolute Peak Texture Achieved.
+             1. White Aurora: Increased opacity by ~40% (0.06 -> 0.085) to bring back some presence while maintaining atmosphere.
+           Status: Optimized.
         */
         html, body, #root {
             height: 100%;
@@ -127,7 +125,7 @@
 
     // --- 1. Basic Resource Components ---
     
-    // Sparkle Particle (Hardened Core)
+    // Sparkle Particle
     const Sparkle = ({ x, y, angle, speed, size, color, onComplete }) => {
         const rad = angle * (Math.PI / 180);
         const destX = x + Math.cos(rad) * speed;
@@ -165,7 +163,8 @@
             <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
                 {/* 1. AliceBlue Blob */}
                 <motion.div style={{ x: x1, y: y1 }} className="absolute inset-0">
-                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.06]"
+                     {/* v3.9.24: Opacity increased from 0.06 to 0.085 (+40%) */}
+                     <div className="aurora-blob bg-[#F0F8FF] w-[50vw] h-[50vw] opacity-[0.085]"
                           style={{ top: 'calc(50% - 130px)', left: 'calc(50% - 130px)', marginTop: '-25vw', marginLeft: '-25vw' }} />
                 </motion.div>
 
@@ -273,6 +272,8 @@
         );
     };
 
+    // --- 2. Decorative Sub-components ---
+
     const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
         const [displayText, setDisplayText] = useState("");
         const completeHandlerRef = useRef(onComplete);
@@ -317,6 +318,7 @@
 
     const FrameBorder = ({ active }) => (
         <div className="absolute inset-0 pointer-events-none z-[50]">
+            {/* // 沉思的天网 */}
             <AnimatePresence>
                 {active && (
                     <>
@@ -380,6 +382,7 @@
 
         return (
             <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 3 }}>
+                {/* // 不落的陨星 */}
                 {layers.map((spec, lIdx) => (
                     <motion.div key={spec.id} className="absolute inset-0" animate={{ rotate: isHovering ? spec.rot : 0 }} transition={{ duration: 2, ease: "circOut" }} style={{ originX: '50%', originY: '50%' }}>
                         {allParticles[lIdx].map(p => (
@@ -450,8 +453,10 @@
             }
         });
 
+        // Handler to capture current exact screen coordinates
         const handleSecondFrame = useCallback(() => {
-            if (!active || isLeaping) return; 
+            if (!active || isLeaping) return; // Don't sparkle if leaping into hole
+            // Capture current position from MotionValues
             const rx = springX.get() + offsetX.get();
             const ry = springY.get() + offsetY.get();
             if (onSpawnParticles) onSpawnParticles(rx, ry);
@@ -461,6 +466,7 @@
         return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed top-0 left-0 pointer-events-none z-[9999]" style={{ x: springX, y: springY, opacity: isTransitioning ? 0 : 1 }}>
                 <motion.div style={{ x: offsetX, y: offsetY, rotate: spriteRotation }} className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 flex items-center justify-center" animate={isLeaping ? { scale: 0 } : { scale: 1 }} transition={isLeaping ? { duration: 0.8, ease: [0.32, 0, 0.67, 0] } : {}}>
+                    {/* Pass trigger handler down to sprite */}
                     <RabbitIcon onSecondFrame={handleSecondFrame} />
                 </motion.div>
             </motion.div>
@@ -486,9 +492,11 @@
 
         const chargeStartTime = useRef(null); const requestRef = useRef(null); const spawnTimeout = useRef(null);
         
+        // Spawn Logic (v3.9.17: Interpolate between #85DBF9 and #6BB8E7)
         const spawnSparkles = useCallback((x, y) => {
             const count = 3 + Math.floor(Math.random() * 3); 
             const newSparkles = Array.from({ length: count }).map(() => {
+                // v3.9.17: Interpolate between #85DBF9 (133, 219, 249) and #6BB8E7 (107, 184, 231)
                 const t = Math.random();
                 const r = Math.round(133 + (107 - 133) * t); 
                 const g = Math.round(219 + (184 - 219) * t); 
@@ -500,7 +508,7 @@
                     x: x,
                     y: y,
                     angle: Math.random() * 360,
-                    speed: 10 + Math.random() * 30,
+                    speed: 10 + Math.random() * 30, // Drift distance
                     size: 1 + Math.random() * 2, 
                     color: color
                 };
@@ -515,6 +523,7 @@
         useEffect(() => {
             let currentP = 0;
             let timer;
+            
             const step = () => {
                 if (currentP >= 100) {
                     setLoadPercent(100);
@@ -526,6 +535,7 @@
                 setLoadPercent(currentP);
                 timer = setTimeout(step, 100);
             };
+
             timer = setTimeout(step, 200); 
             return () => clearTimeout(timer);
         }, []);
@@ -566,6 +576,7 @@
 
         const removeFragment = useCallback((id) => setFragments(prev => prev.filter(f => f.id !== id)), []);
 
+        // Global Parallax
         const camX = useMotionValue(0); const camY = useMotionValue(0);
         const smoothCamX = useSpring(camX, { damping: 40, stiffness: 200 });
         const smoothCamY = useSpring(camY, { damping: 40, stiffness: 200 });
@@ -579,6 +590,7 @@
             return () => window.removeEventListener('mousemove', handleParallax);
         }, [appStage, camX, camY]);
 
+        // Parallax Transforms
         const bgX = useTransform(smoothCamX, v => v * 0.5); const bgY = useTransform(smoothCamY, v => v * 0.5);
         const titleX = useTransform(smoothCamX, v => v * 2.0); 
         const titleY = useTransform(smoothCamY, v => v * 2.0);
@@ -631,6 +643,7 @@
                         )}
                     </AnimatePresence>
                     
+                    {/* // AliceBlue的水波 */}
                     <motion.div 
                         className="absolute rounded-full pointer-events-none" 
                         style={{ 
@@ -654,6 +667,8 @@
                         }
                     />
                     
+                    {/* // 溺水的星辰-视界中心，引力奇点 ，自愿投入星光跳入的兔子洞 */}
+                    {/* // 绝对清晰，绝对明亮，绝对稳定，永远居中，于一切之上 */}
                     <motion.div 
                         className="relative rounded-full bg-slate-200" 
                         style={{ 
@@ -695,7 +710,7 @@
                             <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
@@ -704,6 +719,7 @@
                     {appStage === 'init' && (
                         <motion.div key="preloader" exit={{ opacity: 0 }} className="absolute inset-0 bg-white z-[200] flex flex-col items-center justify-center">
                             <div className="flex flex-col items-center">
+                                {/* // 深寻 */}
                                 <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} className="text-black font-mono text-[10px] tracking-[0.8em] uppercase mb-4"> See me, misjudge me, read me, find me </motion.div>
                                 <div className="w-48 h-[1px] bg-black/10 relative overflow-hidden">
                                     <motion.div className="absolute top-0 left-0 h-full bg-black" style={{ width: `${loadPercent}%` }} />
@@ -717,6 +733,7 @@
                             key="collapse-mask" 
                             className="absolute inset-0 bg-white z-[150] origin-center"
                             initial={{ scaleY: 1, scaleX: 1, skewX: 0, filter: 'brightness(1)' }}
+                            // v3.9.19: Reduced scaleY to 0.001 for sharper compression line
                             animate={{ scaleY: [1, 0.001, 0.002, 0.001], skewX: [0, 15, -15, 0], scaleX: [1, 1, 0.05, 0], filter: ['brightness(1)', 'brightness(1)', 'brightness(2)', 'brightness(1)'] }}
                             transition={{ duration: 1.1, times: [0, 0.5, 0.8, 1], ease: [0.76, 0, 0.24, 1] }}
                         />
@@ -726,6 +743,7 @@
         );
     };
 
+    // v3.9.18: Re-added missing MainContent Component definition
     const MainContent = () => (
         <div className="w-screen h-screen bg-white text-slate-900 flex flex-col items-center justify-center p-8 relative overflow-hidden" style={{ cursor: 'auto' }}>
             <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
