@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v2.6</title>
+    <title>Alice's Reg - v2.7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            /* v2.6 基调: 极致纯净底色 */
+            /* v2.7 基调: 极致纯净底色 */
             --moon-white-base: #fcfdfd; 
             --bg-top: #ffffff;
             --bg-bottom: #dfe4ea;
@@ -78,6 +78,57 @@
         @keyframes blob-move-3 { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-49%, -51%) scale(1.02); } }
         @keyframes texture-breathe { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 1.0; transform: scale(1.02); } }
 
+        /* --- v2.7 皇家边框系统动画 --- */
+        @keyframes frame-expand-x {
+            0% { transform: scaleX(0); opacity: 0; }
+            100% { transform: scaleX(1); opacity: 0.6; }
+        }
+        @keyframes frame-expand-y {
+            0% { transform: scaleY(0); opacity: 0; }
+            100% { transform: scaleY(1); opacity: 0.6; }
+        }
+        @keyframes rotate-cw {
+            0% { transform: rotate(45deg); }
+            100% { transform: rotate(405deg); }
+        }
+        @keyframes rotate-ccw {
+            0% { transform: rotate(45deg); }
+            100% { transform: rotate(-315deg); }
+        }
+
+        /* 边框线条样式 */
+        .frame-line {
+            background-color: black;
+            position: fixed;
+            z-index: 55;
+            pointer-events: none;
+            transform-origin: center;
+        }
+        .frame-line-h {
+            height: 1px;
+            left: 60px;
+            right: 60px;
+            animation: frame-expand-x 2.5s ease-out forwards;
+        }
+        .frame-line-v {
+            width: 1px;
+            top: 60px;
+            bottom: 60px;
+            animation: frame-expand-y 2.5s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        /* 装饰菱形样式 */
+        .corner-symbol {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            z-index: 120;
+            pointer-events: none;
+            border-color: black;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+
         /* --- 纹理层 --- */
         .star-sand-texture {
             position: absolute;
@@ -102,12 +153,6 @@
             pointer-events: none;
         }
 
-        .drift-bg {
-            background-size: 200% 200%;
-            animation: drift-slow 40s ease-in-out infinite;
-        }
-        @keyframes drift-slow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
         /* --- 万花筒切片 --- */
         .slice-clip {
             clip-path: polygon(50% 50%, 100% 21.13%, 100% 78.87%);
@@ -124,7 +169,7 @@
             border-right-color: transparent;
         }
 
-        /* --- v2.6 悬停遮罩板 --- */
+        /* --- v2.7 悬停遮罩板 --- */
         .hover-color-plate {
             position: absolute;
             inset: 0;
@@ -136,19 +181,18 @@
                         backdrop-filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* 默认悬停 70% 透明度 */
         .slice-container:hover .hover-color-plate {
             opacity: 0.7; 
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
         }
 
-        /* v2.6: 三个指定模块应用 90% 不透明度 */
+        /* 三个核心模块 90% 不透明度 */
         .slice-container.high-density-slice:hover .hover-color-plate {
             opacity: 0.9 !important;
         }
 
-        /* --- 分形层 (骨架、火彩、底座) --- */
+        /* --- 分形层 --- */
         .fractal-layer {
             position: absolute;
             inset: 0;
@@ -221,13 +265,37 @@
 </head>
 <body>
 
+    <!-- v2.7 皇家边框组件 (FrameBorder) -->
+    <div id="frame-border-container">
+        <!-- 顶部横线 -->
+        <div class="frame-line frame-line-h" style="top: 40px;"></div>
+        <!-- 底部横线 -->
+        <div class="frame-line frame-line-h" style="bottom: 40px;"></div>
+        <!-- 左侧竖线 -->
+        <div class="frame-line frame-line-v" style="left: 40px;"></div>
+        <!-- 右侧竖线 -->
+        <div class="frame-line frame-line-v" style="right: 40px;"></div>
+    </div>
+
+    <!-- v2.7 四角菱形组件 (CornerSymbols) -->
+    <div id="corner-symbols-container">
+        <!-- 左上角 (TL) - 空心旋转 -->
+        <div class="corner-symbol border-2 border-black" style="top: 40px; left: 40px; margin-left: -4px; margin-top: -4px; animation: rotate-cw 4s linear infinite;"></div>
+        <!-- 右上角 (TR) - 实心反向旋转 -->
+        <div class="corner-symbol bg-black" style="top: 40px; right: 40px; margin-right: -4px; margin-top: -4px; animation: rotate-ccw 4s linear infinite;"></div>
+        <!-- 右下角 (BR) - 空心反向旋转 -->
+        <div class="corner-symbol border-2 border-black" style="bottom: 40px; right: 40px; margin-right: -4px; margin-bottom: -4px; animation: rotate-ccw 4s linear infinite;"></div>
+        <!-- 左下角 (BL) - 实心旋转 -->
+        <div class="corner-symbol bg-black" style="bottom: 40px; left: 40px; margin-left: -4px; margin-bottom: -4px; animation: rotate-cw 4s linear infinite;"></div>
+    </div>
+
     <!-- 背景层 -->
     <div id="background-root" class="fixed inset-0 z-0">
         <div class="absolute inset-0 bg-[#fdfcfb]"></div>
         <div class="aurora-container">
             <div class="aurora-blob colored-blob blob-1"></div>
             <div class="aurora-blob colored-blob blob-2"></div>
-            <div class="aurora-blob colored-blob blob-3"></div>
+            <div class="aurora-blob blob-3"></div>
         </div>
         <div class="star-sand-texture"></div>
         <svg class="noise-mask">
@@ -270,17 +338,17 @@
         </div>
     </div>
 
-    <!-- HUD Overlay -->
-    <div class="absolute top-10 left-10 z-50 pointer-events-none">
-        <h1 class="text-3xl font-black tracking-[-0.05em] text-slate-900/90 italic">ALICE'S REG.</h1>
-        <div class="h-[2px] w-8 bg-blue-500/50 mt-1" />
+    <!-- HUD Overlay - v2.7: Book Antiqua & 50px -->
+    <div class="absolute top-10 left-10 z-[60] pointer-events-none">
+        <h1 class="font-black tracking-[-0.05em] text-slate-900/90 italic" style="font-family: 'Book Antiqua', serif; font-size: 50px;">ALICE'S REG.</h1>
+        <div class="h-[2px] w-12 bg-blue-500/50 mt-1" />
         <p class="text-[9px] uppercase tracking-[0.5em] text-slate-400 mt-3 font-light">Observer Terminal Alpha</p>
     </div>
 
     <div class="absolute bottom-10 left-10 z-50 pointer-events-none flex items-center gap-6">
         <div class="space-y-1">
             <p id="status-speed" class="text-[9px] font-mono text-slate-400 tracking-tighter">ROT_SPD: 0.004</p>
-            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 2.6 [TRIPLE_90]</p>
+            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 2.7 [FRAMED_ROYAL]</p>
         </div>
         <div class="h-8 w-[1px] bg-slate-300" />
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest">System_Awaiting_User_Sync</p>
@@ -340,7 +408,6 @@
             const container = document.createElement('div');
             container.className = 'slice-container absolute inset-0 slice-clip pointer-events-auto origin-center transition-opacity duration-500';
             
-            // v2.6: 为指定的三个核心模块添加高浓度类名
             if (["恩典的谎言", "溺水的星辰", "不落的陨星"].includes(data.title)) {
                 container.classList.add('high-density-slice');
             }
