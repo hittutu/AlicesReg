@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v4.7</title>
+    <title>Alice's Reg - v5.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -24,17 +24,16 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-            cursor: none; /* 隐藏原生光标 */
+            cursor: none; 
         }
 
-        /* --- v4.7 鼠标跟随系统 --- */
+        /* --- 鼠标跟随系统 --- */
         #cursor-tip {
             position: fixed;
             width: 10px;
             height: 10px;
             pointer-events: none;
             z-index: 9999;
-            /* v4.7: 高饱和、高亮度，去灰 */
             background: linear-gradient(
                 90deg, 
                 hsla(200, 90%, 85%, 1) 0%, 
@@ -44,7 +43,7 @@
                 hsla(200, 90%, 85%, 1) 100%
             );
             background-size: 200% 100%;
-            animation: lineShimmer 2s linear infinite; /* 加快流转速度以体现晶体感 */
+            animation: lineShimmer 2s linear infinite;
             border-radius: 2px;
             box-shadow: none; 
             transform-origin: center;
@@ -62,7 +61,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 兔子光晕 */
             filter: drop-shadow(0 4px 15px rgba(120, 130, 160, 0.6)); 
         }
 
@@ -89,7 +87,7 @@
             font-size: 26px;
         }
 
-        /* --- 视觉装饰样式 --- */
+        /* --- 视觉装饰 --- */
         .system-inscription {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 10px;
@@ -157,7 +155,7 @@
             animation: textShimmer 12s linear infinite;
         }
 
-        /* --- 背景光影系统 --- */
+        /* --- 背景系统 --- */
         .aurora-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
         .aurora-blob { position: absolute; border-radius: 50%; mix-blend-mode: color-dodge; }
         .colored-blob { filter: blur(100px); opacity: 0.7; }
@@ -173,7 +171,22 @@
         @keyframes blob-move-3 { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-49%, -51%) scale(1.02); } }
 
         @keyframes texture-drift { 0% { background-position: 0 0; } 100% { background-position: 1000px -1000px; } }
-        .star-sand-texture { position: absolute; inset: 0; z-index: 6; background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/background-homepage-1.png'); background-size: 800px; background-repeat: repeat; opacity: 1.0; mix-blend-mode: overlay; pointer-events: none; -webkit-mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%); mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%); animation: texture-drift 200s linear infinite; }
+        
+        /* v5.2: 进一步调整 background-size 为 1022px 以吃掉最后一点缝隙 */
+        .star-sand-texture { 
+            position: absolute; inset: 0; z-index: 6; 
+            background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/background-homepage-1.png'); 
+            background-size: 1022px; /* v5.2: 1023px -> 1022px */
+            background-repeat: repeat; 
+            opacity: 1.0; 
+            mix-blend-mode: overlay; 
+            pointer-events: none; 
+            -webkit-mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%); 
+            mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%); 
+            animation: texture-drift 200s linear infinite; 
+            will-change: background-position;
+            transform: translateZ(0); /* 强制硬件加速 */
+        }
         
         .noise-mask { position: absolute; inset: 0; z-index: 7; opacity: 0.035; pointer-events: none; }
 
@@ -201,14 +214,19 @@
 
         .fractal-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; mix-blend-mode: normal; opacity: 1.0; z-index: 1; filter: blur(0px); }
         .fractal-half { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
-        .fractal-spinner-main { position: absolute; top: 50%; left: 50%; width: 140%; height: 140%; margin-left: -70%; margin-top: -70%; animation: spin-fractal 20s linear infinite; z-index: 3; }
-        .fractal-spinner-fire { position: absolute; top: 50%; left: 50%; width: 140%; height: 140%; margin-left: -70%; margin-top: -70%; animation: spin-fractal-reverse 40s linear infinite; z-index: 2; background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/homepage-kaleidoscope-opal-firecolor-1.png'); background-size: 512px; background-repeat: repeat; opacity: 1.0; }
-        .fractal-spinner-base { position: absolute; top: 50%; left: 50%; width: 140%; height: 140%; margin-left: -70%; margin-top: -70%; animation: spin-fractal 114.2s linear infinite; z-index: 1; background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/homepage_kaleidoscope-bg.png'); background-size: 800px; background-repeat: repeat; opacity: 1.0; }
+        .fractal-spinner-main { position: absolute; top: 50%; left: 50%; width: 140%; height: 140%; margin-left: -70%; margin-top: -70%; animation: spin-fractal 31.4s linear infinite; z-index: 3; }
+        .fractal-spinner-fire { position: absolute; top: 50%; left: 50%; width: 140%; height: 140%; margin-left: -70%; margin-top: -70%; z-index: 2; background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/homepage-kaleidoscope-opal-firecolor-1.png'); background-size: 512px; background-repeat: repeat; opacity: 1.0; animation: spin-fractal-reverse 31.4s linear infinite; }
+        .fractal-spinner-base { position: absolute; top: 50%; left: 50%; width: 140%; height: 140%; margin-left: -70%; margin-top: -70%; z-index: 1; background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/homepage_kaleidoscope-bg.png'); background-size: 800px; background-repeat: repeat; opacity: 1.0; animation: spin-fractal 114.2s linear infinite; }
 
         @keyframes spin-fractal { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes spin-fractal-reverse { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .hub-orb-flat { border: 1px solid rgba(0, 0, 0, 0.08); background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 1), rgba(245, 245, 240, 0.98)); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02); }
+        /* v5.1 & v5.2 中心枢纽: 纯白扁平无阴影 */
+        .hub-orb-flat { 
+            border: 1px solid rgba(0, 0, 0, 0.08); 
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: none; 
+        }
         .input-verify { background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.3); transition: all 0.4s ease; }
         .input-verify:focus { background: rgba(255, 255, 255, 0.9); border-color: #fca5a5; box-shadow: 0 0 20px rgba(252, 165, 165, 0.2); }
     </style>
@@ -247,25 +265,17 @@
         <div class="corner-symbol bg-black" style="bottom: 40px; left: 40px; margin-left: -4px; margin-bottom: -4px; animation: rotate-cw 4s linear infinite;"></div>
     </div>
 
-    <!-- 背景系统 -->
+    <!-- 背景系统 (压暗基底 -> 极光光团 -> 2px重叠纹理) -->
     <div id="background-root" class="fixed inset-0 z-0">
         <div class="absolute inset-0 bg-[#fdfcfb]"></div>
-        
-        <!-- 1. 压暗基底 -->
         <div class="absolute inset-0 z-[1] pointer-events-none mix-blend-multiply opacity-30" 
              style="background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));"></div>
-
-        <!-- 2. 光团 (Color Dodge) -->
         <div class="aurora-container">
             <div class="aurora-blob colored-blob blob-1"></div>
             <div class="aurora-blob colored-blob blob-2"></div>
             <div class="aurora-blob blob-3"></div>
         </div>
-
-        <!-- 3. 纹理 -->
         <div class="star-sand-texture"></div>
-
-        <!-- 4. 噪点 -->
         <svg class="noise-mask">
             <filter id="noiseFilter">
                 <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" stitchTiles="stitch"/>
@@ -314,7 +324,7 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 4.7 [LAZY_RABBIT]</p>
+        <p class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 5.2 [SEAMLESS_VOYAGE]</p>
     </div>
 
     <script>
@@ -334,9 +344,8 @@
         let orbitAngle = 0;
         let orbitRadius = 0;
         let isIdle = false;
-        let lastMoveTime = Date.now();
+        let lastTime = performance.now();
         let cursorSelfRotation = 0;
-        
         let rabbitFrameMode = 'emoji'; 
         let currentFrame = 1;
         const totalFrames = 6;
@@ -376,7 +385,13 @@
 
         window.addEventListener('mousemove', (e) => {
             targetX = e.clientX; targetY = e.clientY;
-            isIdle = false; lastMoveTime = Date.now();
+            isIdle = false; 
+        });
+        
+        let idleCheckTimer;
+        window.addEventListener('mousemove', () => {
+            clearTimeout(idleCheckTimer);
+            idleCheckTimer = setTimeout(() => { isIdle = true; }, 200);
         });
 
         // --- 核心循环 ---
@@ -395,12 +410,12 @@
                         <stop offset="100%" stop-color="rgba(72, 209, 204, 0.5)" />
                     </linearGradient>
                 </defs>
-                <g stroke="url(#iridescent-shine)" stroke-width="0.4" fill="none">
+                <g stroke="url(#iridescent-shine)" stroke-width="0.4" fill="none" stroke-opacity="0.7">
                     <g stroke-opacity="0.4"><circle cx="100" cy="0" r="90" /><circle cx="100" cy="200" r="90" /><circle cx="0" cy="100" r="90" /><circle cx="200" cy="100" r="90" /></g>
                     <g stroke-width="0.15" stroke-opacity="0.5"><path d="M100 0 L100 200 M0 100 L200 100" /><circle cx="100" cy="100" r="50" /><circle cx="100" cy="100" r="30" /><path d="M50 50 L150 150 M150 50 L50 150" /></g>
                     <g stroke-width="0.2" stroke-opacity="0.6"><path d="M100 10 Q150 50 190 100 Q150 150 100 190 Q50 150 10 100 Q50 50 10 100" /><path d="M10 100 Q50 150 100 190 Q150 150 190 100 Q150 50 100 10 Q50 50 10 100" /></g>
                     <g stroke-width="0.4" stroke-opacity="0.8"><path d="M100 35 Q165 100 100 165 Q35 100 100 35" /><path d="M35 100 Q100 165 165 100 Q100 35 35 100" /></g>
-                    <path d="M100 65 L135 120 L65 120 Z" stroke-width="0.4"/><path d="M100 135 L135 80 L65 80 Z" stroke-width="0.4"/>
+                    <path d="M100 65 L135 120 L65 120 Z" stroke-width="0.4" stroke-opacity="0.7"/><path d="M100 135 L135 80 L65 80 Z" stroke-width="0.4" stroke-opacity="0.7"/>
                 </g>
             </svg>
         `;
@@ -436,17 +451,21 @@
         }
 
         function animate() {
-            if (!isPaused) currentRotation += targetSpeed;
+            const now = performance.now();
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            if (!isPaused) currentRotation += targetSpeed; 
             wheel.style.transform = `rotate(${currentRotation}deg)`;
             document.querySelectorAll('.counter-rotate-content').forEach((el, i) => { el.style.transform = `rotate(${-currentRotation - (i * 60)}deg)`; });
 
-            // 光标自旋
             cursorSelfRotation += 0.5;
             cursorTip.style.transform = `translate(${targetX}px, ${targetY}px) rotate(${cursorSelfRotation}deg) translate(-50%, -50%)`;
 
-            // v4.7: 慵懒物理引擎 (Stiffness 0.04, Damping 0.92)
-            const stiffness = 0.04; const damping = 0.92;
-            if (Date.now() - lastMoveTime > 200) isIdle = true;
+            const timeScale = dt * 60; 
+            const stiffness = 0.015 * timeScale; 
+            const damping = Math.pow(0.92, timeScale); 
+
             let ax = (targetX - rabbitX) * stiffness;
             let ay = (targetY - rabbitY) * stiffness;
             rabbitVX = (rabbitVX + ax) * damping;
@@ -455,13 +474,13 @@
 
             let finalX = rabbitX, finalY = rabbitY, rotation = 0;
             if (isIdle) {
-                orbitRadius += (80 - orbitRadius) * 0.05;
-                orbitAngle -= 0.02; 
+                orbitRadius += (80 - orbitRadius) * 0.05 * timeScale;
+                orbitAngle -= 2.0 * dt; 
                 finalX += Math.cos(orbitAngle) * orbitRadius;
                 finalY += Math.sin(orbitAngle) * orbitRadius;
                 rotation = (orbitAngle * 180 / Math.PI) + 90;
             } else {
-                orbitRadius += (0 - orbitRadius) * 0.1;
+                orbitRadius += (0 - orbitRadius) * 0.1 * timeScale;
                 finalX += Math.cos(orbitAngle) * orbitRadius;
                 finalY += Math.sin(orbitAngle) * orbitRadius;
                 if (Math.abs(rabbitVX) > 0.05 || Math.abs(rabbitVY) > 0.05) {
