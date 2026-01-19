@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v1.34</title>
+    <title>Alice's Reg - v2.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            /* v1.34: 极致纯净底色 */
+            /* v2.6 基调: 极致纯净底色 */
             --moon-white-base: #fcfdfd; 
             --bg-top: #ffffff;
             --bg-bottom: #dfe4ea;
@@ -27,7 +27,7 @@
             width: 100vw;
         }
 
-        /* --- 背景光影系统 --- */
+        /* --- 背景系统 --- */
         .aurora-container {
             position: absolute;
             inset: 0;
@@ -108,27 +108,47 @@
         }
         @keyframes drift-slow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* --- 万花筒切片样式 --- */
+        /* --- 万花筒切片 --- */
         .slice-clip {
             clip-path: polygon(50% 50%, 100% 21.13%, 100% 78.87%);
         }
 
         .glass-morphism {
-            background: rgba(255, 255, 255, 0.0); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent; 
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         .slice-container:hover .glass-morphism {
-            backdrop-filter: blur(0px);
-            -webkit-backdrop-filter: blur(0px);
             transform: scale(1.02);
             border-right-color: transparent;
         }
 
-        /* --- 分形层 --- */
+        /* --- v2.6 悬停遮罩板 --- */
+        .hover-color-plate {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            opacity: 0;
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                        backdrop-filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 默认悬停 70% 透明度 */
+        .slice-container:hover .hover-color-plate {
+            opacity: 0.7; 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* v2.6: 三个指定模块应用 90% 不透明度 */
+        .slice-container.high-density-slice:hover .hover-color-plate {
+            opacity: 0.9 !important;
+        }
+
+        /* --- 分形层 (骨架、火彩、底座) --- */
         .fractal-layer {
             position: absolute;
             inset: 0;
@@ -136,6 +156,8 @@
             overflow: hidden;
             mix-blend-mode: normal; 
             opacity: 1.0; 
+            z-index: 1; 
+            filter: blur(0px); 
         }
 
         .fractal-half {
@@ -145,7 +167,6 @@
             overflow: hidden;
         }
 
-        /* 1. 骨架层 (Main) - 逆时针，快 */
         .fractal-spinner-main {
             position: absolute;
             top: 50%; left: 50%; 
@@ -155,7 +176,6 @@
             z-index: 3; 
         }
 
-        /* 2. 火彩层 (Fire) - 顺时针，慢 */
         .fractal-spinner-fire {
             position: absolute;
             top: 50%; left: 50%; 
@@ -167,10 +187,8 @@
             background-size: 512px;
             background-repeat: repeat;
             opacity: 1.0; 
-            mix-blend-mode: normal; 
         }
 
-        /* 3. 底座层 (Base) - 逆时针，极慢 */
         .fractal-spinner-base {
             position: absolute;
             top: 50%; left: 50%; 
@@ -182,7 +200,6 @@
             background-size: 800px;
             background-repeat: repeat;
             opacity: 1.0; 
-            mix-blend-mode: normal; 
         }
 
         @keyframes spin-fractal { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
@@ -223,7 +240,7 @@
              style="background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));"></div>
     </div>
 
-    <!-- 万花筒主容器 -->
+    <!-- 万花筒容器 -->
     <div id="kaleidoscope-wrapper" class="absolute top-1/2 left-[68%] -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
         <div id="wheel" class="relative pointer-events-auto" style="width: min(120vh, 120vw); height: min(120vh, 120vw);">
         </div>
@@ -256,27 +273,27 @@
     <!-- HUD Overlay -->
     <div class="absolute top-10 left-10 z-50 pointer-events-none">
         <h1 class="text-3xl font-black tracking-[-0.05em] text-slate-900/90 italic">ALICE'S REG.</h1>
-        <div class="h-[2px] w-8 bg-blue-500/50 mt-1"></div>
+        <div class="h-[2px] w-8 bg-blue-500/50 mt-1" />
         <p class="text-[9px] uppercase tracking-[0.5em] text-slate-400 mt-3 font-light">Observer Terminal Alpha</p>
     </div>
 
     <div class="absolute bottom-10 left-10 z-50 pointer-events-none flex items-center gap-6">
         <div class="space-y-1">
             <p id="status-speed" class="text-[9px] font-mono text-slate-400 tracking-tighter">ROT_SPD: 0.004</p>
-            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.34 [REFINED_LINES]</p>
+            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 2.6 [TRIPLE_90]</p>
         </div>
-        <div class="h-8 w-[1px] bg-slate-300"></div>
+        <div class="h-8 w-[1px] bg-slate-300" />
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest">System_Awaiting_User_Sync</p>
     </div>
 
     <script>
         const SLICES_DATA = [
-            { title: "溺水的星辰", subtitle: "The Drowned Star", bg: "#0a1a2a", text: "#ff6b9d", icon: "star" },
-            { title: "密封的光流", subtitle: "The Sealed Lightflow", bg: "linear-gradient(135deg, #e0e0e0 0%, #00FFFF 50%, #A020F0 100%)", text: "#ffffff", icon: "lock" },
-            { title: "燃烧的银河", subtitle: "The Burning Galaxy", bg: "#7B68EE", text: "#f9f8f2", icon: "activity" },
-            { title: "不落的陨星", subtitle: "The Neverfall Comet", bg: "#000814", text: "#FF4500", icon: "disc" },
-            { title: "沉思的天网", subtitle: "The Contemplative Net", bg: "#5e7296", text: "#FFFFFF", icon: "hexagon" },
-            { title: "恩典的谎言", subtitle: "The Grace Lies", bg: "#F0F8FF", text: "#002FA7", icon: "cloud" }
+            { title: "溺水的星辰", subtitle: "The Drowned Star", bg: "#0a1a2a", text: "#ff6b9d" },
+            { title: "密封的光流", subtitle: "The Sealed Lightflow", bg: "linear-gradient(135deg, #e0e0e0 0%, #00FFFF 50%, #A020F0 100%)", text: "#ffffff" },
+            { title: "燃烧的银河", subtitle: "The Burning Galaxy", bg: "#7B68EE", text: "#f9f8f2" },
+            { title: "不落的陨星", subtitle: "The Neverfall Comet", bg: "#000814", text: "#FF4500" },
+            { title: "沉思的天网", subtitle: "The Contemplative Net", bg: "#5e7296", text: "#FFFFFF" },
+            { title: "恩典的谎言", subtitle: "The Grace Lies", bg: "#F0F8FF", text: "#002FA7" }
         ];
 
         let currentRotation = 0;
@@ -284,7 +301,6 @@
         let isPaused = false;
         const wheel = document.getElementById('wheel');
         
-        // v1.34: 骨架层 SVG (线条粗细减半)
         const fractalSVG = `
             <svg class="fractal-spinner-main" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -295,25 +311,25 @@
                         <stop offset="100%" stop-color="rgba(72, 209, 204, 0.5)" />
                     </linearGradient>
                 </defs>
-                <g stroke="url(#iridescent-shine)" stroke-width="0.4" fill="none"> <!-- v1.34: 0.8 -> 0.4 -->
+                <g stroke="url(#iridescent-shine)" stroke-width="0.4" fill="none">
                     <g stroke-opacity="0.4">
                         <circle cx="100" cy="0" r="90" /> <circle cx="100" cy="200" r="90" />
                         <circle cx="0" cy="100" r="90" /> <circle cx="200" cy="100" r="90" />
                     </g>
-                    <g stroke-width="0.15" stroke-opacity="0.5"> <!-- v1.34: 0.3 -> 0.15 -->
+                    <g stroke-width="0.15" stroke-opacity="0.5">
                         <path d="M100 0 L100 200 M0 100 L200 100" />
                         <circle cx="100" cy="100" r="50" /> <circle cx="100" cy="100" r="30" />
                         <path d="M50 50 L150 150 M150 50 L50 150" />
                     </g>
-                    <g stroke-width="0.2" stroke-opacity="0.6"> <!-- v1.34: 0.4 -> 0.2 -->
+                    <g stroke-width="0.2" stroke-opacity="0.6">
                         <path d="M100 10 Q150 50 190 100 Q150 150 100 190 Q50 150 10 100 Q50 50 10 100" />
                         <path d="M10 100 Q50 150 100 190 Q150 150 190 100 Q150 50 100 10 Q50 50 10 100" />
                     </g>
-                    <g stroke-width="0.4" stroke-opacity="0.8"> <!-- v1.34: 0.8 -> 0.4 -->
+                    <g stroke-width="0.4" stroke-opacity="0.8">
                         <path d="M100 35 Q165 100 100 165 Q35 100 100 35" />
                         <path d="M35 100 Q100 165 165 100 Q100 35 35 100" />
                     </g>
-                    <path d="M100 65 L135 120 L65 120 Z" stroke-width="0.4"/> <!-- v1.34: 0.8 -> 0.4 -->
+                    <path d="M100 65 L135 120 L65 120 Z" stroke-width="0.4"/>
                     <path d="M100 135 L135 80 L65 80 Z" stroke-width="0.4"/>
                 </g>
             </svg>
@@ -322,7 +338,12 @@
         function createSliceDOM(data, index) {
             const baseAngle = index * 60;
             const container = document.createElement('div');
-            container.className = 'slice-container absolute inset-0 slice-clip pointer-events-auto origin-center';
+            container.className = 'slice-container absolute inset-0 slice-clip pointer-events-auto origin-center transition-opacity duration-500';
+            
+            // v2.6: 为指定的三个核心模块添加高浓度类名
+            if (["恩典的谎言", "溺水的星辰", "不落的陨星"].includes(data.title)) {
+                container.classList.add('high-density-slice');
+            }
             container.style.transform = `rotate(${baseAngle}deg)`;
             
             const glassLayer = document.createElement('div');
@@ -343,52 +364,42 @@
                 </div>
             `;
 
+            const hoverPlate = document.createElement('div');
+            hoverPlate.className = 'hover-color-plate';
+            hoverPlate.style.background = data.bg;
+
             const contentHTML = `
-                <div class="counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%] relative z-20">
+                <div class="counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%] relative z-[20]">
                     <h3 class="slice-h3 text-base font-bold tracking-[0.25em] uppercase leading-tight transition-colors duration-700" style="color: #334155; font-family: serif;">${data.title}</h3>
                     <p class="slice-p text-[9px] uppercase tracking-[0.3em] mt-1 opacity-40 font-mono transition-colors duration-700" style="color: #334155;">${data.subtitle}</p>
                 </div>
             `;
 
-            glassLayer.innerHTML = fractalLayerHTML + contentHTML;
+            glassLayer.innerHTML = fractalLayerHTML;
+            glassLayer.appendChild(hoverPlate); 
+            glassLayer.insertAdjacentHTML('beforeend', contentHTML);
             container.appendChild(glassLayer);
             
             container.addEventListener('mouseenter', () => {
                 isPaused = true;
-                document.querySelectorAll('.slice-container').forEach(c => c.style.opacity = '0.3');
-                container.style.opacity = '1';
                 container.style.zIndex = '30';
-                glassLayer.style.background = data.bg;
-                
                 const h3 = glassLayer.querySelector('.slice-h3');
                 const p = glassLayer.querySelector('.slice-p');
                 const fractals = glassLayer.querySelectorAll('.fractal-spinner-main g'); 
-
                 if(h3) h3.style.color = data.text;
                 if(p) p.style.color = data.text;
                 fractals.forEach(f => f.setAttribute('stroke', data.text));
-                
-                glassLayer.querySelectorAll('.fractal-spinner-main').forEach(s => s.style.opacity = '0.4');
-                glassLayer.querySelectorAll('.fractal-spinner-fire').forEach(s => s.style.opacity = '1.0');
-                glassLayer.querySelectorAll('.fractal-spinner-base').forEach(s => s.style.opacity = '1.0'); 
             });
 
             container.addEventListener('mouseleave', () => {
                 isPaused = false;
-                document.querySelectorAll('.slice-container').forEach(c => { c.style.opacity = '1'; c.style.zIndex = '10'; });
-                glassLayer.style.background = 'rgba(255, 255, 255, 0.0)';
-                
+                container.style.zIndex = '10';
                 const h3 = glassLayer.querySelector('.slice-h3');
                 const p = glassLayer.querySelector('.slice-p');
                 const fractals = glassLayer.querySelectorAll('.fractal-spinner-main g');
-
                 if(h3) h3.style.color = '#334155';
                 if(p) p.style.color = '#334155';
                 fractals.forEach(f => f.setAttribute('stroke', 'url(#iridescent-shine)'));
-                
-                glassLayer.querySelectorAll('.fractal-spinner-main').forEach(s => s.style.opacity = '1.0');
-                glassLayer.querySelectorAll('.fractal-spinner-fire').forEach(s => s.style.opacity = '1.0');
-                glassLayer.querySelectorAll('.fractal-spinner-base').forEach(s => s.style.opacity = '1.0');
             });
 
             return container;
