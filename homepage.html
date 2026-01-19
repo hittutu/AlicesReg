@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v1.33</title>
+    <title>Alice's Reg - v1.34</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            /* v1.33: 极致纯净底色 */
+            /* v1.34: 极致纯净底色 */
             --moon-white-base: #fcfdfd; 
             --bg-top: #ffffff;
             --bg-bottom: #dfe4ea;
@@ -44,7 +44,7 @@
 
         .colored-blob {
             filter: blur(100px); 
-            opacity: 0.6; /* v1.33: 提高背景光团亮度，使其更凝实 */
+            opacity: 0.6; 
         }
 
         .blob-1 {
@@ -78,7 +78,7 @@
         @keyframes blob-move-3 { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-49%, -51%) scale(1.02); } }
         @keyframes texture-breathe { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 1.0; transform: scale(1.02); } }
 
-        /* --- 纹理层 (100% Opacity) --- */
+        /* --- 纹理层 --- */
         .star-sand-texture {
             position: absolute;
             inset: 0;
@@ -86,7 +86,7 @@
             background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/background-homepage-1.png');
             background-size: 800px;
             background-repeat: repeat;
-            opacity: 1.0; /* v1.33: 100% 不透明度 */
+            opacity: 1.0; 
             mix-blend-mode: overlay; 
             pointer-events: none;
             -webkit-mask-image: radial-gradient(circle at 0% 100%, black 0%, transparent 60%);
@@ -128,7 +128,7 @@
             border-right-color: transparent;
         }
 
-        /* --- 分形层 v1.33 --- */
+        /* --- 分形层 --- */
         .fractal-layer {
             position: absolute;
             inset: 0;
@@ -155,7 +155,7 @@
             z-index: 3; 
         }
 
-        /* 2. 火彩层 (Fire) - 顺时针，慢 - v1.33: 100% Opacity */
+        /* 2. 火彩层 (Fire) - 顺时针，慢 */
         .fractal-spinner-fire {
             position: absolute;
             top: 50%; left: 50%; 
@@ -166,11 +166,11 @@
             background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/homepage-kaleidoscope-opal-firecolor-1.png');
             background-size: 512px;
             background-repeat: repeat;
-            opacity: 1.0; /* 拉满 */
-            mix-blend-mode: normal; /* 正常模式，便于陛下观察颜色 */
+            opacity: 1.0; 
+            mix-blend-mode: normal; 
         }
 
-        /* 3. 底座层 (Base) - 逆时针，极慢 - v1.33: 100% Opacity */
+        /* 3. 底座层 (Base) - 逆时针，极慢 */
         .fractal-spinner-base {
             position: absolute;
             top: 50%; left: 50%; 
@@ -181,7 +181,7 @@
             background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/homepage_kaleidoscope-bg.png');
             background-size: 800px;
             background-repeat: repeat;
-            opacity: 1.0; /* 拉满 */
+            opacity: 1.0; 
             mix-blend-mode: normal; 
         }
 
@@ -263,7 +263,7 @@
     <div class="absolute bottom-10 left-10 z-50 pointer-events-none flex items-center gap-6">
         <div class="space-y-1">
             <p id="status-speed" class="text-[9px] font-mono text-slate-400 tracking-tighter">ROT_SPD: 0.004</p>
-            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.33 [PRISTINE_ASSETS]</p>
+            <p class="text-[9px] font-mono text-slate-400 tracking-tighter">VER: 1.34 [REFINED_LINES]</p>
         </div>
         <div class="h-8 w-[1px] bg-slate-300"></div>
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest">System_Awaiting_User_Sync</p>
@@ -284,7 +284,7 @@
         let isPaused = false;
         const wheel = document.getElementById('wheel');
         
-        // 骨架层 SVG
+        // v1.34: 骨架层 SVG (线条粗细减半)
         const fractalSVG = `
             <svg class="fractal-spinner-main" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -295,26 +295,26 @@
                         <stop offset="100%" stop-color="rgba(72, 209, 204, 0.5)" />
                     </linearGradient>
                 </defs>
-                <g stroke="url(#iridescent-shine)" stroke-width="0.8" fill="none">
+                <g stroke="url(#iridescent-shine)" stroke-width="0.4" fill="none"> <!-- v1.34: 0.8 -> 0.4 -->
                     <g stroke-opacity="0.4">
                         <circle cx="100" cy="0" r="90" /> <circle cx="100" cy="200" r="90" />
                         <circle cx="0" cy="100" r="90" /> <circle cx="200" cy="100" r="90" />
                     </g>
-                    <g stroke-width="0.3" stroke-opacity="0.5">
+                    <g stroke-width="0.15" stroke-opacity="0.5"> <!-- v1.34: 0.3 -> 0.15 -->
                         <path d="M100 0 L100 200 M0 100 L200 100" />
                         <circle cx="100" cy="100" r="50" /> <circle cx="100" cy="100" r="30" />
                         <path d="M50 50 L150 150 M150 50 L50 150" />
                     </g>
-                    <g stroke-width="0.4" stroke-opacity="0.6">
-                        <path d="M100 10 Q150 50 190 100 Q150 150 100 190 Q50 150 10 100 Q50 50 100 10" />
+                    <g stroke-width="0.2" stroke-opacity="0.6"> <!-- v1.34: 0.4 -> 0.2 -->
+                        <path d="M100 10 Q150 50 190 100 Q150 150 100 190 Q50 150 10 100 Q50 50 10 100" />
                         <path d="M10 100 Q50 150 100 190 Q150 150 190 100 Q150 50 100 10 Q50 50 10 100" />
                     </g>
-                    <g stroke-width="0.8" stroke-opacity="0.8">
+                    <g stroke-width="0.4" stroke-opacity="0.8"> <!-- v1.34: 0.8 -> 0.4 -->
                         <path d="M100 35 Q165 100 100 165 Q35 100 100 35" />
                         <path d="M35 100 Q100 165 165 100 Q100 35 35 100" />
                     </g>
-                    <path d="M100 65 L135 120 L65 120 Z" stroke-width="0.8"/>
-                    <path d="M100 135 L135 82 L65 82 Z" stroke-width="0.8"/>
+                    <path d="M100 65 L135 120 L65 120 Z" stroke-width="0.4"/> <!-- v1.34: 0.8 -> 0.4 -->
+                    <path d="M100 135 L135 80 L65 80 Z" stroke-width="0.4"/>
                 </g>
             </svg>
         `;
@@ -331,9 +331,9 @@
             const fractalLayerHTML = `
                 <div class="fractal-layer">
                     <div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%);"> 
-                        <div class="fractal-spinner-base"></div> <!-- 底座层 -->
-                        <div class="fractal-spinner-fire"></div> <!-- 火彩层 -->
-                        ${fractalSVG} <!-- 骨架层 -->
+                        <div class="fractal-spinner-base"></div> 
+                        <div class="fractal-spinner-fire"></div> 
+                        ${fractalSVG} 
                     </div>
                     <div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%); transform: scaleY(-1); transform-origin: 50% 50%;"> 
                         <div class="fractal-spinner-base"></div>
@@ -369,7 +369,6 @@
                 fractals.forEach(f => f.setAttribute('stroke', data.text));
                 
                 glassLayer.querySelectorAll('.fractal-spinner-main').forEach(s => s.style.opacity = '0.4');
-                // 激活时火彩层稍微减淡一点以便看清文字，但依然保持高不透明度
                 glassLayer.querySelectorAll('.fractal-spinner-fire').forEach(s => s.style.opacity = '1.0');
                 glassLayer.querySelectorAll('.fractal-spinner-base').forEach(s => s.style.opacity = '1.0'); 
             });
@@ -387,7 +386,7 @@
                 if(p) p.style.color = '#334155';
                 fractals.forEach(f => f.setAttribute('stroke', 'url(#iridescent-shine)'));
                 
-                glassLayer.querySelectorAll('.fractal-spinner-main').forEach(s => s.style.opacity = '1');
+                glassLayer.querySelectorAll('.fractal-spinner-main').forEach(s => s.style.opacity = '1.0');
                 glassLayer.querySelectorAll('.fractal-spinner-fire').forEach(s => s.style.opacity = '1.0');
                 glassLayer.querySelectorAll('.fractal-spinner-base').forEach(s => s.style.opacity = '1.0');
             });
