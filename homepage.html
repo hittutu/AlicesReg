@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v6.5 Seamless</title>
+    <title>Alice's Reg - v6.6 Translucent</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -20,7 +20,8 @@
             --theme-border: rgba(0, 0, 0, 0.08);
             --theme-blob-mode: color-dodge;
             --theme-blob-opacity: 0.6;
-            --theme-center-blob-opacity: 0.85;
+            /* v6.6: 调优中心光团透明度 (0.85 * 0.8) */
+            --theme-center-blob-opacity: 0.68;
             --theme-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
             --theme-title-gradient: linear-gradient(90deg, rgba(30, 41, 59, 0.98) 0%, rgba(100, 116, 139, 0.7) 25%, rgba(30, 41, 59, 0.98) 50%, rgba(100, 116, 139, 0.7) 75%, rgba(30, 41, 59, 0.98) 100%);
         }
@@ -36,7 +37,8 @@
             --theme-border: rgba(255, 255, 255, 0.1);
             --theme-blob-mode: screen; 
             --theme-blob-opacity: 0.55;
-            --theme-center-blob-opacity: 0.7;
+            /* v6.6: 调优中心光团透明度 (0.7 * 0.8) */
+            --theme-center-blob-opacity: 0.56;
             --theme-shadow: none; 
             --theme-title-gradient: linear-gradient(90deg, #ffffff 0%, #cbd5e1 25%, #ffffff 50%, #cbd5e1 75%, #ffffff 100%);
         }
@@ -182,11 +184,10 @@
         @keyframes rotate-cw { 0% { transform: rotate(45deg); } 100% { transform: rotate(405deg); } }
         @keyframes rotate-ccw { 0% { transform: rotate(45deg); } 100% { transform: rotate(-315deg); } }
 
-        /* --- 万花筒核心 v6.5 (移除最外侧白边) --- */
+        /* --- 万花筒核心 (无缝切片) --- */
         .slice-clip { clip-path: polygon(50% 50%, 100% 21.13%, 100% 78.87%); }
         .glass-morphism { 
             background: transparent; 
-            /* v6.5: 彻底移除 border-right 以实现板块间的无缝衔接 */
             border-right: none; 
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
             -webkit-font-smoothing: antialiased; 
@@ -230,7 +231,7 @@
         </div>
     </div>
 
-    <!-- 顶部灵魂铭文 -->
+    <!-- 顶部铭文 -->
     <div class="fixed z-[130] pointer-events-none" style="top: 6px; left: 40px;">
         <p class="system-inscription">
             Most scattered, yet most steadfast. most changeable, yet most stable.<br>
@@ -256,13 +257,14 @@
 
     <!-- 背景系统 -->
     <div id="background-root">
-        <!-- 压暗层 (Multiply) -->
+        <!-- 基础补偿层 -->
         <div class="absolute inset-0 z-[1] pointer-events-none mix-blend-multiply opacity-20" 
              style="background: linear-gradient(to bottom, #ffffff, #dfe4ea);"></div>
              
         <div class="aurora-container">
             <div class="aurora-blob colored-blob blob-1"></div>
             <div class="aurora-blob colored-blob blob-2"></div>
+            <!-- v6.6: 透明度调优核心光团 -->
             <div class="aurora-blob blob-3"></div>
         </div>
         <div class="star-sand-texture"></div>
@@ -274,7 +276,7 @@
         </svg>
     </div>
 
-    <!-- 万花筒 -->
+    <!-- 万花筒容器 -->
     <div id="kaleidoscope-wrapper" class="absolute top-1/2 left-[68%] -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
         <div id="wheel" class="relative pointer-events-auto" style="width: min(120vh, 120vw); height: min(120vh, 120vw);">
         </div>
@@ -286,7 +288,7 @@
         <div id="hub-orb" class="absolute inset-0 rounded-full hub-orb-flat"></div>
         <div id="hub-content-default" class="relative z-10 text-center transition-all duration-500">
             <h2 id="hub-text-1" class="font-bold tracking-[0.25em] text-[10px] uppercase" style="color: var(--theme-hub-text);">Tea Party</h2>
-            <div class="w-4 h-[1px] bg-slate-400 mx-auto my-1.5 opacity-40"></div>
+            <div class="w-4 h-[1px] bg-slate-300 mx-auto my-1.5 opacity-40"></div>
             <h2 id="hub-text-2" class="font-light tracking-[0.2em] text-[8px] uppercase" style="color: #94a3b8;">Record</h2>
         </div>
         <div id="hub-content-open" class="hidden relative z-10 w-full px-8 flex flex-col items-center opacity-0 scale-95 transition-all duration-500">
@@ -314,11 +316,11 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 6.5 [SEAMLESS_SLICE]</p>
+        <p class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 6.6 [TRANSLUCENT_VOID]</p>
     </div>
 
     <script>
-        // --- 时空管理 ---
+        // --- 时空管理逻辑 ---
         let currentTheme = 'day';
         function checkTheme(manual = false) {
             if (!manual) {
@@ -336,7 +338,6 @@
             }
         }
 
-        // v6.5 彩蛋
         const titleTrigger = document.getElementById('site-title-trigger');
         let eggTimer;
         titleTrigger.addEventListener('mouseenter', () => {
@@ -353,7 +354,7 @@
             { title: "恩典的谎言", subtitle: "The Grace Lies", bg: "#F0F8FF", text: "#002FA7" }
         ];
 
-        // --- 鼠标跟随与物理 ---
+        // --- 鼠标跟随与物理引擎 ---
         let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
         let rabbitX = targetX, rabbitY = targetY;
         let rabbitVX = 0, rabbitVY = 0;
@@ -402,7 +403,6 @@
             container.style.transform = `rotate(${index * 60}deg)`;
             const glassLayer = document.createElement('div');
             glassLayer.className = 'glass-morphism absolute inset-0 flex items-center justify-end overflow-hidden';
-            // v6.5: 移除了最外侧的路径 M190 58 L190 142
             glassLayer.innerHTML = `<div class="fractal-layer"><div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%);"><div class="fractal-spinner-base"></div><div class="fractal-spinner-fire"></div>${fractalSVG}</div><div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%); transform: scaleY(-1); transform-origin: 50% 50%;"><div class="fractal-spinner-base"></div><div class="fractal-spinner-fire"></div>${fractalSVG}</div></div><svg class="inner-border-svg" viewBox="0 0 200 200"><g stroke="${data.text}"><path class="etching-line" d="M115 100 L190 58" /><path class="etching-line" d="M115 100 L190 142" /></g></svg><div class="hover-color-plate" style="background:${data.bg}"></div><div class="counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%] relative z-[20]" style="transform-style: preserve-3d; backface-visibility: hidden;"><h3 class="slice-h3 text-base font-bold tracking-[0.25em] uppercase leading-tight transition-colors duration-700" style="color: #334155; font-family: serif;">${data.title}</h3><p class="slice-p text-[9px] uppercase tracking-[0.3em] mt-1 opacity-40 font-mono transition-colors duration-700" style="color: #334155;">${data.subtitle}</p></div>`;
             container.appendChild(glassLayer);
             container.addEventListener('mouseenter', () => {
