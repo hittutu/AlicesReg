@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v8.4 Ultra Thin</title>
+    <title>Alice's Reg - v8.3 Anchor Fixed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -42,6 +42,7 @@
             --theme-center-blob-mode: screen;
             --theme-center-blob-opacity: 0.7; 
             --theme-shadow: none; 
+            /* v8.3: 加深黑夜流光对比度，确保可见 */
             --theme-title-gradient: linear-gradient(90deg, #ffffff 0%, #94a3b8 25%, #ffffff 50%, #94a3b8 75%, #ffffff 100%);
         }
 
@@ -89,6 +90,7 @@
         }
         @keyframes lineShimmer { 0% { background-position: 100% 0%; } 100% { background-position: -100% 0%; } }
 
+        /* v8.3: 修复文字遮罩，移除 will-change: transform 以避免渲染冲突 */
         .site-tag-title {
             font-family: 'Book Antiqua', serif; font-size: 40px; font-weight: 900; line-height: 1.2; padding: 0 0 5px 0;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: auto; cursor: pointer;
@@ -97,16 +99,16 @@
             background-clip: text; text-fill-color: transparent;
             filter: drop-shadow(0 0 1px rgba(240, 248, 255, 0.05)); 
             animation: textShimmer 12s linear infinite;
-            will-change: background-position;
+            will-change: background-position; /* 仅优化背景位置 */
         }
-        @keyframes textShimmer { 0% { background-position: 100% 0%; } 100% { background-position: -100% 0%; } }
 
-        /* --- 背景系统 v8.4 --- */
+        /* --- 背景系统 v8.3 (锚点修复) --- */
         #background-root { position: fixed; inset: 0; z-index: 0; background-color: var(--theme-void-bg); transition: background-color 1s ease; will-change: transform; }
         .aurora-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
         .aurora-blob { position: absolute; border-radius: 50%; mix-blend-mode: var(--theme-blob-mode); transition: all 1s ease; }
         .colored-blob { filter: blur(100px); opacity: var(--theme-blob-opacity); }
         
+        /* v8.3: 暴力内推坐标，确保死锁左下角 (-35%) */
         .blob-1 { width: 70vw; height: 70vw; bottom: -35%; left: -35%; animation: blob-move-1 25s infinite alternate ease-in-out, holo-shift-1 20s infinite alternate linear; }
         .blob-2 { width: 55vw; height: 55vw; bottom: -20%; left: -10%; animation: blob-move-2 22s infinite alternate ease-in-out, holo-shift-2 18s infinite alternate linear; }
         
@@ -117,10 +119,14 @@
             animation: blob-move-3 30s infinite alternate ease-in-out; transition: all 1s ease;
         }
 
+        @keyframes holo-shift-1 { 0% { background-color: #ffdde1; } 50% { background-color: #f6d365; } 100% { background-color: #fda085; } }
+        @keyframes holo-shift-2 { 0% { background-color: #84fab0; } 50% { background-color: #8fd3f4; } 100% { background-color: #a18cd1; } }
         @keyframes blob-move-1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-1vw, 1vh) scale(1.05); } }
         @keyframes blob-move-2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(1vw, -1vh) scale(1.1); } }
         @keyframes blob-move-3 { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-49%, -51%) scale(1.02); } }
 
+        @keyframes texture-drift { 0% { background-position: 0 0; } 100% { background-position: 1000px -1000px; } }
+        
         .star-sand-texture { 
             position: absolute; inset: 0; z-index: 6; 
             background-image: url('https://www.alicesreg.icu/Texture/bg/homepage/background-homepage-1.png'); 
@@ -132,10 +138,9 @@
             will-change: background-position;
             image-rendering: -webkit-optimize-contrast;
         }
-        @keyframes texture-drift { 0% { background-position: 0 0; } 100% { background-position: 1000px -1000px; } }
         .noise-mask { position: absolute; inset: 0; z-index: 7; opacity: 0.035; pointer-events: none; }
 
-        /* --- 皇家框架 v8.4 (1px 发丝精度) --- */
+        /* --- 皇家框架 --- */
         .frame-line { background-color: var(--theme-text-primary); position: fixed; z-index: 55; pointer-events: none; transition: background-color 1s ease; }
         .frame-line-h { height: 1px; left: 60px; right: 60px; animation: frame-expand-x 2.5s ease-out forwards; }
         .frame-line-v { width: 1px; top: 60px; bottom: 60px; animation: frame-expand-y 2.5s ease-out 0.3s forwards; opacity: 0; }
@@ -155,16 +160,7 @@
         .slice-container.high-density-slice:hover .hover-color-plate { opacity: 0.9 !important; }
 
         .inner-border-svg { position: absolute; inset: 0; z-index: 15; pointer-events: none; overflow: visible; }
-        
-        /* v8.4 FIX: 板块包边线细一倍 (0.375 -> 0.1875) */
-        .etching-line { 
-            fill: none; 
-            stroke-width: 0.1875; 
-            stroke-linecap: round; 
-            stroke-dasharray: 200; 
-            stroke-dashoffset: 200; 
-            transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1); 
-        }
+        .etching-line { fill: none; stroke-width: 0.375; stroke-linecap: round; stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .slice-container:hover .etching-line { stroke-dashoffset: 0; }
 
         .fractal-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; mix-blend-mode: normal; opacity: 1.0; z-index: 1; }
@@ -271,11 +267,11 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 8.4 [91st_ITERATION]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 8.3 [ANCHOR_SHIMMER]</p>
     </div>
 
     <script>
-        // --- 核心逻辑 ---
+        // --- 核心变量 ---
         let currentTheme = 'day';
         let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
         let rabbitX = targetX, rabbitY = targetY, rabbitVX = 0, rabbitVY = 0;
@@ -306,7 +302,7 @@
         const SLICES_DATA = [
             { title: "溺水的星辰", subtitle: "The Drowned Star", bg: "#0a1a2a", text: "#ff6b9d" },
             { title: "密封的光流", subtitle: "The Sealed Lightflow", bg: "hsla(168, 55%, 65%, 1)", text: "#0f172a" },
-            { title: "燃烧的银河", subtitle: "The Burning Galaxy", bg: "#7B68EE", text: "#f9f8f2" },
+            { title: "燃烧的银河", subtitle: "The Burning Galaxy", bg: "hsl(274, 13%, 58%)", text: "#f9f8f2" },
             { title: "不落的陨星", subtitle: "The Neverfall Comet", bg: "#000814", text: "#FF4500" },
             { title: "沉思的天网", subtitle: "The Contemplative Net", bg: "#5e7296", text: "#FFFFFF" },
             { title: "恩典的谎言", subtitle: "The Grace Lies", bg: "#F0F8FF", text: "#002FA7" }
@@ -349,7 +345,7 @@
             container.style.transform = `rotate(${index * 60}deg)`;
             const glassLayer = document.createElement('div');
             glassLayer.className = 'glass-morphism absolute inset-0 flex items-center justify-end overflow-hidden';
-            glassLayer.innerHTML = `<div class="fractal-layer"><div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%);"><div class="fractal-spinner-base"></div><div class="fractal-spinner-fire"><div class="fire-texture-rotor"></div></div>${fractalSVG}</div><div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%); transform: scaleY(-1); transform-origin: 50% 50%;"><div class="fractal-spinner-base"></div><div class="fractal-spinner-fire"><div class="fire-texture-rotor"></div></div>${fractalSVG}</div></div><svg class="inner-border-svg" viewBox="0 0 200 200"><g stroke="${data.text}"><path class="etching-line" d="M115 100 L190 58" /><path class="etching-line" d="M115 100 L190 142" /></g></svg><div class="hover-color-plate" style="background:${data.bg}"></div><div class="counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%] relative z-[20]" style="transform-style: preserve-3d; backface-visibility: hidden;"><h3 class="slice-h3 text-base font-bold tracking-[0.25em] uppercase leading-tight transition-colors duration-700" style="color: #334155; font-family: serif;">${data.title}</h3><p class="slice-p text-[9px] uppercase tracking-[0.3em] mt-1 opacity-40 font-mono transition-colors duration-700" style="color: #334155;">${data.subtitle}</p></div>`;
+            glassLayer.innerHTML = `<div class="fractal-layer"><div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%);"><div class="fractal-spinner-base"></div><div class="fractal-spinner-fire"><div class="fire-texture-rotor"></div></div>${fractalSVG}</div><div class="fractal-half" style="clip-path: polygon(50% 50%, 100% 21.13%, 100% 50%); transform: scaleY(-1); transform-origin: 50% 50%;"><div class="fractal-spinner-base"></div><div class="fractal-spinner-fire"><div class="fire-texture-rotor"></div></div>${fractalSVG}</div></div><svg class="inner-border-svg" viewBox="0 0 200 200"><g stroke="${data.text}"><path class="etching-line" d="M115 100 L190 58" /><path class="etching-line" d="M115 100 L190 142" /><path class="etching-line" d="M190 58 L190 142" /></g></svg><div class="hover-color-plate" style="background:${data.bg}"></div><div class="counter-rotate-content flex flex-col items-center justify-center text-center w-64 mr-[10%] relative z-[20]" style="transform-style: preserve-3d; backface-visibility: hidden;"><h3 class="slice-h3 text-base font-bold tracking-[0.25em] uppercase leading-tight transition-colors duration-700" style="color: #334155; font-family: serif;">${data.title}</h3><p class="slice-p text-[9px] uppercase tracking-[0.3em] mt-1 opacity-40 font-mono transition-colors duration-700" style="color: #334155;">${data.subtitle}</p></div>`;
             container.appendChild(glassLayer);
             container.addEventListener('mouseenter', () => { isPaused = true; container.style.zIndex = '30'; const h3 = glassLayer.querySelector('.slice-h3'), p = glassLayer.querySelector('.slice-p'), fractals = glassLayer.querySelectorAll('.fractal-spinner-main g'); if(h3) h3.style.color = data.text; if(p) p.style.color = data.text; fractals.forEach(f => { f.setAttribute('stroke', data.text); f.setAttribute('stroke-opacity', '0.85'); }); glassLayer.querySelectorAll('.etching-line').forEach(l => { l.style.strokeDasharray = '100 100'; l.style.strokeDashoffset = '0'; }); });
             container.addEventListener('mouseleave', () => { isPaused = false; container.style.zIndex = '10'; const h3 = glassLayer.querySelector('.slice-h3'), p = glassLayer.querySelector('.slice-p'), fractals = glassLayer.querySelectorAll('.fractal-spinner-main g'); if(h3) h3.style.color = '#334155'; if(p) p.style.color = '#334155'; fractals.forEach(f => { f.setAttribute('stroke', 'url(#iridescent-shine)'); f.setAttribute('stroke-opacity', '0.7'); }); glassLayer.querySelectorAll('.etching-line').forEach(l => { l.style.strokeDashoffset = '100'; }); });
@@ -372,7 +368,10 @@
             else { orbitRadius += (0 - orbitRadius) * 0.1 * timeScale; finalX += Math.cos(orbitAngle) * orbitRadius; finalY += Math.sin(orbitAngle) * orbitRadius; if (Math.abs(rabbitVX) > 0.05 || Math.abs(rabbitVY) > 0.05) rotation = (Math.atan2(rabbitVY, rabbitVX) * 180 / Math.PI) + 90; }
             rabbitFollower.style.transform = `translate(${finalX}px, ${finalY}px) rotate(${rotation}deg)`;
             const camStiffness = 0.05 * timeScale; camX += (targetCamX - camX) * camStiffness; camY += (targetCamY - camY) * camStiffness;
+            
+            // v8.3 FIX: 增加 scale(1.1) 以防止视差露出边缘
             elBackground.style.transform = `scale(1.1) translate3d(${camX * 0.15}px, ${camY * 0.15}px, 0)`; 
+            
             const centerTransform = `translate(-50%, -50%) translate3d(${camX}px, ${camY}px, 0)`;
             elKaleidoscope.style.transform = centerTransform; elCenterHub.style.transform = centerTransform;
             elTitleMain.style.transform = `translate3d(${camX * 1.5}px, ${camY * 1.5}px, 0)`;
