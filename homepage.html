@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v8.3 Anchor Fixed</title>
+    <title>Alice's Reg - v9.0 Target Found</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -37,7 +37,8 @@
             --theme-hub-text: #0f172a;
             --theme-border: rgba(255, 255, 255, 0.1);
             --theme-blob-mode: screen; 
-            --theme-blob-opacity: 0.55;
+            /* v8.4: 黑夜模式光团不透明度优化 (原0.55 * 70% ≈ 0.385) */
+            --theme-blob-opacity: 0.385;
             --theme-center-blob-color: #ffffff;
             --theme-center-blob-mode: screen;
             --theme-center-blob-opacity: 0.7; 
@@ -52,6 +53,28 @@
             height: 100vh; width: 100vw; cursor: none; 
             transition: background-color 1s ease;
         }
+
+        /* --- Loading Screen (v9.0) --- */
+        #loading-overlay {
+            position: fixed; inset: 0; z-index: 99999;
+            background-color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
+        .loading-text {
+            font-family: 'Courier New', monospace;
+            font-weight: 900;
+            font-size: 14px;
+            color: #1e293b;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            animation: blink-text 0.15s infinite alternate;
+        }
+        @keyframes blink-text {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        .fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
 
         /* --- 鼠标跟随系统 --- */
         #cursor-tip {
@@ -103,7 +126,13 @@
         }
 
         /* --- 背景系统 v8.3 (锚点修复) --- */
-        #background-root { position: fixed; inset: 0; z-index: 0; background-color: var(--theme-void-bg); transition: background-color 1s ease; will-change: transform; }
+        #background-root { 
+            position: fixed; inset: 0; z-index: 0; 
+            background-color: var(--theme-void-bg); transition: background-color 1s ease; 
+            will-change: transform; 
+            /* v8.9 Fix: 增加 3D 变换提示，减少大屏层级闪烁 */
+            transform: translateZ(0);
+        }
         .aurora-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
         .aurora-blob { position: absolute; border-radius: 50%; mix-blend-mode: var(--theme-blob-mode); transition: all 1s ease; }
         .colored-blob { filter: blur(100px); opacity: var(--theme-blob-opacity); }
@@ -112,6 +141,10 @@
         .blob-1 { width: 70vw; height: 70vw; bottom: -35%; left: -35%; animation: blob-move-1 25s infinite alternate ease-in-out, holo-shift-1 20s infinite alternate linear; }
         .blob-2 { width: 55vw; height: 55vw; bottom: -20%; left: -10%; animation: blob-move-2 22s infinite alternate ease-in-out, holo-shift-2 18s infinite alternate linear; }
         
+        /* v8.5: 黑夜模式下进一步减小光团尺寸至原先的 70% (49vw, 38.5vw) 以匹配更幽暗的氛围 */
+        [data-theme='night'] .blob-1 { width: 49vw; height: 49vw; }
+        [data-theme='night'] .blob-2 { width: 38.5vw; height: 38.5vw; }
+
         .blob-3 { 
             width: 88vw; height: 88vw; top: 50%; left: 68%; transform: translate(-50%, -50%); 
             z-index: 2; filter: blur(80px); opacity: var(--theme-center-blob-opacity); 
@@ -150,8 +183,31 @@
         @keyframes rotate-cw { 0% { transform: rotate(45deg); } 100% { transform: rotate(405deg); } }
         @keyframes rotate-ccw { 0% { transform: rotate(45deg); } 100% { transform: rotate(-315deg); } }
 
+        /* --- 粒子系统 CSS (v8.9 Fix) --- */
+        .particle-canvas {
+            position: fixed; inset: 0; pointer-events: none;
+            /* v8.9 Fix: 修复大屏闪烁 - 强制硬件加速和层级隔离 */
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        /* 层级1：位于万花筒下方 (万花筒是 DOM 顺序堆叠，这里我们显式设置 z-index) */
+        /* 背景z-index约0-7，万花筒我们让它更高，所以这里设为 20 */
+        #particles-bg { z-index: 20; }
+        
+        /* 层级2：位于边框(z-55)之上，HUD(z-60)之上 */
+        #particles-fg { z-index: 80; }
+
         /* --- 万花筒核心 --- */
-        #kaleidoscope-wrapper { position: absolute; top: 50%; left: 68%; will-change: transform; transform: translate(-50%, -50%); }
+        /* v8.6: 显式提升万花筒层级，确保在粒子层1之上 */
+        /* v8.9 Fix: 修复大屏闪烁 - 强制硬件加速 */
+        #kaleidoscope-wrapper { 
+            position: absolute; top: 50%; left: 68%; 
+            will-change: transform; transform: translate(-50%, -50%); 
+            z-index: 40; 
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
         .slice-clip { clip-path: polygon(50% 50%, 100% 21.13%, 100% 78.87%); }
         .glass-morphism { background: transparent; border-right: none; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); -webkit-font-smoothing: antialiased; }
         .slice-container:hover .glass-morphism { transform: scale(1.02); }
@@ -186,6 +242,11 @@
     </style>
 </head>
 <body>
+
+    <!-- Loading Screen (v9.0) -->
+    <div id="loading-overlay">
+        <div class="loading-text">Target:FOUND</div>
+    </div>
 
     <!-- 鼠标跟随系统 -->
     <div id="cursor-tip"></div>
@@ -231,6 +292,9 @@
         </svg>
     </div>
 
+    <!-- 粒子系统 Canvas (Background Layer) -->
+    <canvas id="particles-bg" class="particle-canvas"></canvas>
+
     <!-- 万花筒容器 -->
     <div id="kaleidoscope-wrapper">
         <div id="wheel" class="relative pointer-events-auto" style="width: min(120vh, 120vw); height: min(120vh, 120vw);"></div>
@@ -257,6 +321,9 @@
         </div>
     </div>
 
+    <!-- 粒子系统 Canvas (Foreground Layer) -->
+    <canvas id="particles-fg" class="particle-canvas"></canvas>
+
     <!-- HUD Overlay with Easter Egg -->
     <div class="fixed z-[60] flex flex-col items-start pointer-events-none" style="top: 50px; left: 60px;">
         <div id="para-title-main"><h1 id="site-title-trigger" class="site-tag-title">Alice's Reg</h1></div>
@@ -267,13 +334,14 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 8.3 [ANCHOR_SHIMMER]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.0 [TARGET_FOUND]</p>
     </div>
 
     <script>
         // --- 核心变量 ---
         let currentTheme = 'day';
         let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
+        // v8.8 HOTFIX: 补回丢失的变量定义
         let rabbitX = targetX, rabbitY = targetY, rabbitVX = 0, rabbitVY = 0;
         let orbitAngle = 0, orbitRadius = 0, isIdle = false;
         let lastTime = performance.now(), cursorSelfRotation = 0;
@@ -286,6 +354,98 @@
         const elBackground = document.getElementById('background-root'), elKaleidoscope = document.getElementById('kaleidoscope-wrapper');
         const elCenterHub = document.getElementById('center-hub'), elTitleMain = document.getElementById('para-title-main');
         const elTitleLine = document.getElementById('para-title-line'), elTitleSub = document.getElementById('para-title-sub');
+
+        // --- 粒子系统核心 (v8.6 新增 -> v8.7 修正 -> v8.9 颜色优化) ---
+        class ParticleSystem {
+            constructor(canvasId, options) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.options = options;
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            // v8.9: 随机颜色生成器
+            getRandomColor() {
+                // R: 255 (固定)
+                // G: 141 (FF8D7C) -> 160 (FFA091)
+                // B: 124 (FF8D7C) -> 145 (FFA091)
+                const g = 141 + Math.floor(Math.random() * (160 - 141));
+                const b = 124 + Math.floor(Math.random() * (145 - 124));
+                return `rgb(255, ${g}, ${b})`;
+            }
+
+            spawn() {
+                if (this.particles.length >= this.options.count) return;
+                
+                // v8.7: 调整发射位置 (yOffset)
+                // 从左下角区域生成: x(0-30%)
+                const x = Math.random() * (this.canvas.width * 0.4); 
+                // 基准高度减去偏移量 (向上移动)
+                const baseHeight = this.canvas.height - (this.options.yOffset || 0);
+                const y = baseHeight + Math.random() * 50; 
+                
+                this.particles.push({
+                    x: x,
+                    y: y,
+                    vx: this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin), // 向右
+                    vy: -(this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin)), // 向上
+                    size: this.options.sizeMin + Math.random() * (this.options.sizeMax - this.options.sizeMin),
+                    life: 1.0,
+                    decay: 0.002 + Math.random() * 0.003,
+                    color: this.getRandomColor() // v8.9: 每个粒子赋予独立的随机颜色
+                });
+            }
+
+            updateAndDraw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    let p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= p.decay;
+
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                    } else {
+                        // v8.9: 使用粒子自带颜色
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.globalAlpha = p.life * 0.8; 
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                }
+                this.ctx.globalAlpha = 1.0;
+                
+                // 持续生成
+                if (Math.random() < 0.1) this.spawn(); 
+            }
+        }
+
+        // 初始化两层粒子 (v8.9: 大小进一步减小, v9.0: 数量降低至 70%)
+        // Background: 150px up, size 0.8-1.2px (avg 1px)
+        const particlesBg = new ParticleSystem('particles-bg', {
+            count: 28, // v9.0: 40 * 0.7 = 28
+            sizeMin: 0.8, sizeMax: 1.2, 
+            speedMin: 0.12, speedMax: 0.3, 
+            yOffset: 150 
+        });
+        
+        // Foreground: 50px up, size 1.5-2.5px (avg 2px)
+        const particlesFg = new ParticleSystem('particles-fg', {
+            count: 21, // v9.0: 30 * 0.7 = 21
+            sizeMin: 1.5, sizeMax: 2.5, 
+            speedMin: 0.48, speedMax: 0.9, 
+            yOffset: 50
+        });
 
         function checkTheme(manual = false) {
             if (!manual) { const hour = new Date().getHours(); currentTheme = (hour >= 6 && hour < 18) ? 'day' : 'night'; }
@@ -377,12 +537,29 @@
             elTitleMain.style.transform = `translate3d(${camX * 1.5}px, ${camY * 1.5}px, 0)`;
             elTitleLine.style.transform = `translate3d(${camX * 1.2}px, ${camY * 1.2}px, 0)`;
             elTitleSub.style.transform = `translate3d(${camX * 0.8}px, ${camY * 0.8}px, 0)`;
+            
+            // 渲染粒子 (v8.6)
+            particlesBg.updateAndDraw();
+            particlesFg.updateAndDraw();
+
             requestAnimationFrame(animate);
         }
 
         const hub = document.getElementById('center-hub'), defaultContent = document.getElementById('hub-content-default'), openContent = document.getElementById('hub-content-open');
         hub.addEventListener('mouseenter', () => { isPaused = true; hub.style.width = '360px'; hub.style.height = '360px'; defaultContent.style.opacity = '0'; setTimeout(() => { defaultContent.classList.add('hidden'); openContent.classList.remove('hidden'); setTimeout(() => { openContent.style.opacity = '1'; openContent.style.transform = 'scale(1)'; }, 50); }, 300); });
         hub.addEventListener('mouseleave', () => { isPaused = false; hub.style.width = '130px'; hub.style.height = '130px'; openContent.style.opacity = '0'; openContent.style.transform = 'scale(0.95)'; setTimeout(() => { openContent.classList.add('hidden'); defaultContent.classList.remove('hidden'); setTimeout(() => { defaultContent.style.opacity = '1'; }, 50); }, 300); });
+
+        // v9.0: Loading Screen Logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loading-overlay');
+            // 确保加载动画至少展示一瞬间，或者立即淡出
+            setTimeout(() => {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.remove(); // Remove from DOM after transition
+                }, 1000); 
+            }, 500); // 稍微延迟一点点 Target:FOUND
+        });
 
         checkTheme(); initRabbitSprites(); SLICES_DATA.forEach((data, i) => wheel.appendChild(createSliceDOM(data, i))); lucide.createIcons(); animate();
     </script>
