@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - Entry Sequence v3.9.29</title>
+    <title>Alice's Reg - Entry Sequence v3.9.30</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,13 +23,12 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.28 [UNIFIED SINGULARITY]
-           Build Steps: 123 iterations of optimization
+           Version: v3.9.30 [LOSS DELAY]
+           Build Steps: 125 iterations of optimization
            Fixes: 
-             1. Loss0.0 Visibility: Moved 'loss0.0' text to a higher z-index (1000) and optimized timing to ensure it renders during the leap sequence.
-             2. Singularity Z-Index: Promoted the Core (溺水的星辰) to z-index 999 as per the Emperor's decree.
-             3. Poetic Integrity: Hard-coded all requested comments back into their visual elements.
-           Status: Absolute Peak Fidelity.
+             1. Loss0.0 Timing: Adjusted 'loss0.0' entrance delay to 1.0s as per the Emperor's decree to achieve better rhythmic balance.
+             2. Maintenance: Preserved all poetic comments, high-fidelity textures (0.98), and singularity sync timings.
+           Status: Cybernetic Aesthetic Perfection.
         */
         html, body, #root {
             height: 100%;
@@ -635,7 +634,7 @@
                                 initial={{ opacity: 0, x: 0, y: 0 }} 
                                 animate={{ opacity: 0.3, x: 3, y: 3 }} 
                                 exit={{ opacity: 0 }}
-                                transition={{ delay: 0.2 }} 
+                                transition={{ delay: 1.0 }} 
                                 className="absolute whitespace-nowrap" 
                                 style={{ color: '#58719A', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}
                             > loss0.0 </motion.div>
@@ -643,7 +642,7 @@
                                 initial={{ opacity: 0 }} 
                                 animate={{ opacity: 0.3 }} 
                                 exit={{ opacity: 0 }}
-                                transition={{ delay: 0.2 }} 
+                                transition={{ delay: 1.0 }} 
                                 className="absolute whitespace-nowrap" 
                                 style={{ color: '#404040', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}
                             > loss0.0 </motion.div>
@@ -671,6 +670,7 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
+                            // v3.9.25: Added delay: 0.3 to sync with horizon line compression
                             appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } : // Entry
                             isTransitioning ? { duration: 1.5 } : // Exit
                             { duration: 1.5 } // Hover/Default
@@ -695,6 +695,7 @@
                             { scale: 1, opacity: 1 }
                         }
                         transition={
+                            // v3.9.25: Added delay: 0.3 to sync with horizon line compression
                             appStage === 'collapsing' ? { duration: 1.0, ease: "circOut", delay: 0.3 } :
                             isTransitioning ? { duration: 1.5 } :
                             { duration: 1.5 }
@@ -720,7 +721,7 @@
                             <motion.div style={{ x: subX, y: subY, opacity: opacityBottomRight }} initial={{ opacity: 0, x: -60 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.33, duration: 1.8 }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Bright as the moon, scattered as stars,<br/>gentle as air, and meandering like rivers. </motion.div>
                         </motion.div>
                         <motion.div initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1.8 }} className="fixed top-12 left-[68px] z-[130] text-left pointer-events-none">
-                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
+                            <motion.div style={{ x: subX, y: subY, opacity: opacityTopLeft }} className="site-tag-sub text-[14px] text-white/60 font-mono tracking-widest leading-relaxed max-w-[450px]"> Brief as a firefly, dazzling as fireworks,<br/>intense as liquor, and vanishing like dew. </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
