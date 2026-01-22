@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.5 True Name Activation</title>
+    <title>Alice's Reg - v9.12 Bitmap Protocol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -25,7 +25,7 @@
             --theme-center-blob-opacity: 0.48;
             --theme-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
             --theme-title-gradient: linear-gradient(90deg, rgba(30, 41, 59, 0.98) 0%, rgba(100, 116, 139, 0.7) 25%, rgba(30, 41, 59, 0.98) 50%, rgba(100, 116, 139, 0.7) 75%, rgba(30, 41, 59, 0.98) 100%);
-            /* v9.5: 激活态流光 (亮色背景下的流光) */
+            /* v9.5: 激活态流光 */
             --theme-active-text-gradient: linear-gradient(90deg, #ffffff 0%, #a5b4fc 25%, #ffffff 50%, #a5b4fc 75%, #ffffff 100%);
         }
 
@@ -39,13 +39,13 @@
             --theme-hub-text: #0f172a;
             --theme-border: rgba(255, 255, 255, 0.1);
             --theme-blob-mode: screen; 
-            /* v8.4: 黑夜模式光团不透明度优化 (原0.55 * 70% ≈ 0.385) */
+            /* v8.4: 黑夜模式光团不透明度优化 */
             --theme-blob-opacity: 0.385;
             --theme-center-blob-color: #ffffff;
             --theme-center-blob-mode: screen;
             --theme-center-blob-opacity: 0.7; 
             --theme-shadow: none; 
-            /* v8.3: 加深黑夜流光对比度，确保可见 */
+            /* v8.3: 加深黑夜流光对比度 */
             --theme-title-gradient: linear-gradient(90deg, #ffffff 0%, #94a3b8 25%, #ffffff 50%, #94a3b8 75%, #ffffff 100%);
         }
 
@@ -56,7 +56,7 @@
             transition: background-color 1s ease;
         }
 
-        /* --- Loading Screen (v9.0) --- */
+        /* --- Loading Screen --- */
         #loading-overlay {
             position: fixed; inset: 0; z-index: 99999;
             background-color: #ffffff;
@@ -115,7 +115,6 @@
         }
         @keyframes lineShimmer { 0% { background-position: 100% 0%; } 100% { background-position: -100% 0%; } }
 
-        /* v8.3: 修复文字遮罩 */
         .site-tag-title {
             font-family: 'Book Antiqua', serif; font-size: 40px; font-weight: 900; line-height: 1.2; padding: 0 0 5px 0;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: auto; cursor: pointer;
@@ -230,29 +229,44 @@
         }
         .hub-orb-flat { border: 1px solid var(--theme-border); background: var(--theme-hub-bg); box-shadow: var(--theme-shadow); transition: all 1s ease; }
         
-        /* v9.3: 锐利输入框基础样式 */
+        /* v9.12: Bitmap Protocol 输入框 (纯透明，无边框) */
         .input-verify { 
-            background: rgba(255, 255, 255, 0.5); 
-            /* v9.5: 边框调细至 rgba(0,0,0,0.6) 视觉更细 */
-            border: 1px solid rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(4px); 
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: transparent; 
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none; 
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
             border-radius: 0; 
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #334155;
         }
-        .input-verify:focus { background: rgba(255, 255, 255, 0.9); }
+        .input-verify::placeholder {
+            color: rgba(51, 65, 85, 0.5); /* 降低透明度以融合图片背景 */
+            font-size: 10px;
+            font-weight: 400;
+        }
+        .input-verify:focus { 
+            background: transparent;
+            outline: none; 
+        }
 
-        /* v9.5: 真名激活态样式 */
+        /* v9.8: 激活态 */
         .input-verify.input-activated {
-            background-color: #000000;
-            border-color: transparent;
-            background-image: var(--theme-active-text-gradient);
+            background: transparent !important;
+            border: none !important;
+            backdrop-filter: none;
+            box-shadow: none; 
+            background-image: var(--theme-title-gradient); 
             background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: textShimmer 3s linear infinite;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
             font-weight: 700;
+            font-size: 33px !important; 
         }
 
         /* v9.1: 枢纽背景纹理动画 */
@@ -262,30 +276,20 @@
         .animate-spin-slow-cw { animation: spin-slow-cw 60s linear infinite; }
         .animate-spin-slow-ccw { animation: spin-slow-ccw 45s linear infinite; }
 
-        /* v9.3: 悬浮双重边框 */
-        .floating-border {
-            position: absolute; inset: -3px; 
-            border: 1px solid rgba(0, 0, 0, 0.3); 
-            opacity: 0; 
-            transition: opacity 0.8s ease 0.2s; 
-            pointer-events: none;
-        }
-        /* v9.5: 激活后隐藏外边框 */
-        .floating-border.border-hidden {
-            opacity: 0 !important;
-            transition: opacity 0.3s ease;
-        }
-
-        /* v9.5: 核心三角形扇区样式 */
+        /* v9.7: 核心三角形扇区 */
         .tri-sector {
             fill: transparent;
-            stroke: #1e293b; /* slate-800 */
-            stroke-width: 1.5;
-            transition: fill 0.5s ease, stroke 0.5s ease;
+            stroke: none; 
+            transition: fill 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .tri-sector.activated {
             fill: #0f172a; /* slate-900 */
-            stroke: #0f172a;
+        }
+        .tri-outline {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 1.5;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -370,40 +374,39 @@
         <!-- Open Content (v9.1: Triangle Layout) -->
         <div id="hub-content-open" class="hidden relative z-20 w-full h-full opacity-0 scale-95 transition-all duration-500">
             
-            <!-- v9.3: Triangle Vertex 1: Top Center -->
-            <div class="absolute top-[18%] left-1/2 -translate-x-1/2 w-28">
-                <div class="relative">
-                    <div id="border-top" class="floating-border"></div>
-                    <input id="input-top" type="text" placeholder="Who am I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+            <!-- v9.12: Bitmap Protocol Input Areas -->
+            
+            <!-- Top Input -->
+            <div class="absolute top-[10%] left-1/2 -translate-x-1/2 w-48">
+                <div class="relative w-full flex items-center justify-center">
+                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-inputbox-up.png" class="w-full object-contain pointer-events-none select-none drop-shadow-md">
+                    <input id="input-top" type="text" placeholder="Who am I" class="input-verify absolute inset-0 w-full h-full px-4 text-[13px] outline-none text-center font-mono tracking-widest">
                 </div>
             </div>
 
-            <!-- v9.3: Triangle Vertex 2: Bottom Left -->
-            <div class="absolute bottom-[20%] left-[5%] w-28">
-                <div class="relative">
-                    <div id="border-left" class="floating-border"></div>
-                    <input id="input-left" type="text" placeholder="What I do" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+            <!-- Left Input -->
+            <div class="absolute bottom-[10%] left-[-15%] w-48">
+                <div class="relative w-full flex items-center justify-center">
+                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-inputbox-left.png" class="w-full object-contain pointer-events-none select-none drop-shadow-md">
+                    <input id="input-left" type="text" placeholder="What I do" class="input-verify absolute inset-0 w-full h-full px-4 text-[13px] outline-none text-center font-mono tracking-widest">
                 </div>
             </div>
 
-            <!-- v9.3: Triangle Vertex 3: Bottom Right -->
-            <div class="absolute bottom-[20%] right-[5%] w-28">
-                <div class="relative">
-                    <div id="border-right" class="floating-border"></div>
-                    <input id="input-right" type="text" placeholder="How do I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+            <!-- Right Input -->
+            <div class="absolute bottom-[10%] right-[-15%] w-48">
+                <div class="relative w-full flex items-center justify-center">
+                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-inputbox-right.png" class="w-full object-contain pointer-events-none select-none drop-shadow-md">
+                    <input id="input-right" type="text" placeholder="How do I" class="input-verify absolute inset-0 w-full h-full px-4 text-[13px] outline-none text-center font-mono tracking-widest">
                 </div>
             </div>
 
-            <!-- Center: Trinity Core (v9.5 Replaced Button) -->
-            <div class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 pointer-events-none z-30 flex items-center justify-center">
-                <svg width="80" height="69" viewBox="0 0 100 87" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Inverted Equilateral Triangle composed of 3 sectors -->
-                    <!-- Top Sector: (0,0) -> (100,0) -> (50, 28.8) -->
+            <!-- Center: Trinity Core (v9.7 Divine Update) -->
+            <div class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none z-30 flex items-center justify-center">
+                <svg width="160" height="138" viewBox="0 0 100 87" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path id="sector-top" class="tri-sector" d="M0 0 L100 0 L50 28.8 Z" />
-                    <!-- Left Sector: (0,0) -> (50, 86.6) -> (50, 28.8) -->
                     <path id="sector-left" class="tri-sector" d="M0 0 L50 86.6 L50 28.8 Z" />
-                    <!-- Right Sector: (100,0) -> (50, 86.6) -> (50, 28.8) -->
                     <path id="sector-right" class="tri-sector" d="M100 0 L50 86.6 L50 28.8 Z" />
+                    <path class="tri-outline" d="M0 0 L100 0 L50 86.6 Z" />
                 </svg>
             </div>
 
@@ -423,13 +426,14 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.5 [TRUE_NAME_ACTIVATION]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.12 [BITMAP_PROTOCOL]</p>
     </div>
 
     <script>
         // --- 核心变量 ---
         let currentTheme = 'day';
         let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
+        // v8.8 HOTFIX: 补回丢失的变量定义
         let rabbitX = targetX, rabbitY = targetY, rabbitVX = 0, rabbitVY = 0;
         let orbitAngle = 0, orbitRadius = 0, isIdle = false;
         let lastTime = performance.now(), cursorSelfRotation = 0;
@@ -628,10 +632,6 @@
             setTimeout(() => { 
                 defaultContent.classList.add('hidden'); 
                 openContent.classList.remove('hidden'); 
-                // v9.5: Only show border if not activated
-                document.querySelectorAll('.floating-border').forEach(el => {
-                    if(!el.classList.contains('border-hidden')) el.style.opacity = '1';
-                });
                 setTimeout(() => { 
                     openContent.style.opacity = '1'; 
                     openContent.style.transform = 'scale(1)'; 
@@ -645,7 +645,6 @@
             openContent.style.opacity = '0'; 
             openContent.style.transform = 'scale(0.95)'; 
             bgLayers.style.opacity = '0'; 
-            document.querySelectorAll('.floating-border').forEach(el => el.style.opacity = '0');
             setTimeout(() => { 
                 openContent.classList.add('hidden'); 
                 defaultContent.classList.remove('hidden'); 
@@ -664,8 +663,9 @@
         });
 
         // --- v9.5 True Name Activation Logic ---
+        // v9.6: Corrected Top Name
         const TRUENAMES = {
-            'input-top': 'Clergies',
+            'input-top': 'AClergies',
             'input-left': 'Sacrilege',
             'input-right': 'GraceLies'
         };
@@ -674,12 +674,6 @@
             'input-top': 'sector-top',
             'input-left': 'sector-left',
             'input-right': 'sector-right'
-        };
-
-        const BORDERS = {
-            'input-top': 'border-top',
-            'input-left': 'border-left',
-            'input-right': 'border-right'
         };
 
         function setupInputLogic(id) {
@@ -699,7 +693,6 @@
 
         function activateInput(id) {
             const input = document.getElementById(id);
-            const border = document.getElementById(BORDERS[id]);
             const sector = document.getElementById(SECTORS[id]);
 
             if (input.classList.contains('input-activated')) return;
@@ -708,9 +701,6 @@
             input.classList.add('input-activated');
             input.setAttribute('readonly', true); // Lock input
             
-            // 2. Hide Floating Border
-            if (border) border.classList.add('border-hidden');
-
             // 3. Fill Triangle Sector
             if (sector) sector.classList.add('activated');
         }
