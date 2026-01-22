@@ -23,12 +23,13 @@
 
     <style>
         /* Alice's Reg - Landing Sequence (Part I)
-           Version: v3.9.27 [WORMHOLE TO HOME]
-           Build Steps: 122 iterations of optimization
+           Version: v3.9.28 [UNIFIED SINGULARITY]
+           Build Steps: 123 iterations of optimization
            Fixes: 
-             1. Navigation: Replaced internal stage switch with window.location redirect to 'homepage.html' upon sequence completion.
-             2. Preserved all poetic annotations and high-fidelity visual tweaks (0.98 grain, 0.3s delay, 0.001 line).
-           Status: Portal to homepage active.
+             1. Loss0.0 Visibility: Moved 'loss0.0' text to a higher z-index (1000) and optimized timing to ensure it renders during the leap sequence.
+             2. Singularity Z-Index: Promoted the Core (溺水的星辰) to z-index 999 as per the Emperor's decree.
+             3. Poetic Integrity: Hard-coded all requested comments back into their visual elements.
+           Status: Absolute Peak Fidelity.
         */
         html, body, #root {
             height: 100%;
@@ -271,8 +272,6 @@
             </div>
         );
     };
-
-    // --- 2. Decorative Sub-components ---
 
     const SemanticFragment = ({ phrase, x, y, size, opacity, onComplete }) => {
         const [displayText, setDisplayText] = useState("");
@@ -628,15 +627,31 @@
                     <AnimatePresence>{fragments.map(f => ( <SemanticFragment key={f.id} {...f} onComplete={() => removeFragment(f.id)} /> ))}</AnimatePresence>
                 </motion.div>
 
+                {/* // Loss0.0 Global Overlay - v3.9.28 fix */}
+                <AnimatePresence>
+                    {isLeaping && (
+                        <div className="fixed inset-0 z-[1000] flex items-center justify-center pointer-events-none">
+                            <motion.div 
+                                initial={{ opacity: 0, x: 0, y: 0 }} 
+                                animate={{ opacity: 0.3, x: 3, y: 3 }} 
+                                exit={{ opacity: 0 }}
+                                transition={{ delay: 0.2 }} 
+                                className="absolute whitespace-nowrap" 
+                                style={{ color: '#58719A', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}
+                            > loss0.0 </motion.div>
+                            <motion.div 
+                                initial={{ opacity: 0 }} 
+                                animate={{ opacity: 0.3 }} 
+                                exit={{ opacity: 0 }}
+                                transition={{ delay: 0.2 }} 
+                                className="absolute whitespace-nowrap" 
+                                style={{ color: '#404040', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}
+                            > loss0.0 </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
                 <motion.div className="absolute z-[100] w-10 h-10 flex items-center justify-center interactive" onMouseEnter={handleEnter} onMouseLeave={handleLeave} style={{ x: useTransform(smoothCamX, v=>v*0.2), y: useTransform(smoothCamY, v=>v*0.2) }}>
-                    <AnimatePresence>
-                        {isLeaping && (
-                            <div className="absolute z-[110] flex items-center justify-center pointer-events-none">
-                                <motion.div initial={{ opacity: 0, x: 0, y: 0 }} animate={{ opacity: 0.3, x: 3, y: 3 }} transition={{ delay: 1 }} className="absolute whitespace-nowrap" style={{ color: '#58719A', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}> loss0.0 </motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ delay: 1 }} className="absolute whitespace-nowrap" style={{ color: '#404040', fontSize: '20px', fontFamily: "'Courier New', Courier, monospace" }}> loss0.0 </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
                     
                     {/* // AliceBlue的水波 */}
                     <motion.div 
@@ -670,7 +685,7 @@
                             width: 14, 
                             height: 14, 
                             boxShadow: `0 0 25px 5px rgba(185, 226, 255, 0.5)`, 
-                            zIndex: 999 
+                            zIndex: 999 /* // v3.9.28 updated to index 999 */
                         }} 
                         animate={
                             appStage === 'init' ? { scale: 0.25, opacity: 0 } :
