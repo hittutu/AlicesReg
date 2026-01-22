@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.4 Philosophy Trinity</title>
+    <title>Alice's Reg - v9.5 True Name Activation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -25,6 +25,8 @@
             --theme-center-blob-opacity: 0.48;
             --theme-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
             --theme-title-gradient: linear-gradient(90deg, rgba(30, 41, 59, 0.98) 0%, rgba(100, 116, 139, 0.7) 25%, rgba(30, 41, 59, 0.98) 50%, rgba(100, 116, 139, 0.7) 75%, rgba(30, 41, 59, 0.98) 100%);
+            /* v9.5: 激活态流光 (亮色背景下的流光) */
+            --theme-active-text-gradient: linear-gradient(90deg, #ffffff 0%, #a5b4fc 25%, #ffffff 50%, #a5b4fc 75%, #ffffff 100%);
         }
 
         /* 黑夜模式变量 */
@@ -113,7 +115,7 @@
         }
         @keyframes lineShimmer { 0% { background-position: 100% 0%; } 100% { background-position: -100% 0%; } }
 
-        /* v8.3: 修复文字遮罩，移除 will-change: transform 以避免渲染冲突 */
+        /* v8.3: 修复文字遮罩 */
         .site-tag-title {
             font-family: 'Book Antiqua', serif; font-size: 40px; font-weight: 900; line-height: 1.2; padding: 0 0 5px 0;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: auto; cursor: pointer;
@@ -122,26 +124,23 @@
             background-clip: text; text-fill-color: transparent;
             filter: drop-shadow(0 0 1px rgba(240, 248, 255, 0.05)); 
             animation: textShimmer 12s linear infinite;
-            will-change: background-position; /* 仅优化背景位置 */
+            will-change: background-position; 
         }
 
-        /* --- 背景系统 v8.3 (锚点修复) --- */
+        /* --- 背景系统 --- */
         #background-root { 
             position: fixed; inset: 0; z-index: 0; 
             background-color: var(--theme-void-bg); transition: background-color 1s ease; 
             will-change: transform; 
-            /* v8.9 Fix: 增加 3D 变换提示，减少大屏层级闪烁 */
             transform: translateZ(0);
         }
         .aurora-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 5; }
         .aurora-blob { position: absolute; border-radius: 50%; mix-blend-mode: var(--theme-blob-mode); transition: all 1s ease; }
         .colored-blob { filter: blur(100px); opacity: var(--theme-blob-opacity); }
         
-        /* v8.3: 暴力内推坐标，确保死锁左下角 (-35%) */
         .blob-1 { width: 70vw; height: 70vw; bottom: -35%; left: -35%; animation: blob-move-1 25s infinite alternate ease-in-out, holo-shift-1 20s infinite alternate linear; }
         .blob-2 { width: 55vw; height: 55vw; bottom: -20%; left: -10%; animation: blob-move-2 22s infinite alternate ease-in-out, holo-shift-2 18s infinite alternate linear; }
         
-        /* v8.5: 黑夜模式下进一步减小光团尺寸至原先的 70% (49vw, 38.5vw) 以匹配更幽暗的氛围 */
         [data-theme='night'] .blob-1 { width: 49vw; height: 49vw; }
         [data-theme='night'] .blob-2 { width: 38.5vw; height: 38.5vw; }
 
@@ -183,24 +182,17 @@
         @keyframes rotate-cw { 0% { transform: rotate(45deg); } 100% { transform: rotate(405deg); } }
         @keyframes rotate-ccw { 0% { transform: rotate(45deg); } 100% { transform: rotate(-315deg); } }
 
-        /* --- 粒子系统 CSS (v8.9 Fix) --- */
+        /* --- 粒子系统 CSS --- */
         .particle-canvas {
             position: fixed; inset: 0; pointer-events: none;
-            /* v8.9 Fix: 修复大屏闪烁 - 强制硬件加速和层级隔离 */
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             transform: translateZ(0);
         }
-        /* 层级1：位于万花筒下方 (万花筒是 DOM 顺序堆叠，这里我们显式设置 z-index) */
-        /* 背景z-index约0-7，万花筒我们让它更高，所以这里设为 20 */
         #particles-bg { z-index: 20; }
-        
-        /* 层级2：位于边框(z-55)之上，HUD(z-60)之上 */
         #particles-fg { z-index: 80; }
 
         /* --- 万花筒核心 --- */
-        /* v8.6: 显式提升万花筒层级，确保在粒子层1之上 */
-        /* v8.9 Fix: 修复大屏闪烁 - 强制硬件加速 */
         #kaleidoscope-wrapper { 
             position: absolute; top: 50%; left: 68%; 
             will-change: transform; transform: translate(-50%, -50%); 
@@ -238,15 +230,30 @@
         }
         .hub-orb-flat { border: 1px solid var(--theme-border); background: var(--theme-hub-bg); box-shadow: var(--theme-shadow); transition: all 1s ease; }
         
-        /* v9.3: 锐利输入框基础样式 (外框在 DOM 中实现) */
+        /* v9.3: 锐利输入框基础样式 */
         .input-verify { 
             background: rgba(255, 255, 255, 0.5); 
-            border: 1px solid #000; /* v9.3: 纯黑锐利边框 */
+            /* v9.5: 边框调细至 rgba(0,0,0,0.6) 视觉更细 */
+            border: 1px solid rgba(0, 0, 0, 0.6); 
             backdrop-filter: blur(4px); 
-            transition: all 0.4s ease; 
-            border-radius: 0; /* v9.3: 移除圆角 */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: 0; 
         }
         .input-verify:focus { background: rgba(255, 255, 255, 0.9); }
+
+        /* v9.5: 真名激活态样式 */
+        .input-verify.input-activated {
+            background-color: #000000;
+            border-color: transparent;
+            background-image: var(--theme-active-text-gradient);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShimmer 3s linear infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            font-weight: 700;
+        }
 
         /* v9.1: 枢纽背景纹理动画 */
         @keyframes spin-slow-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -255,17 +262,30 @@
         .animate-spin-slow-cw { animation: spin-slow-cw 60s linear infinite; }
         .animate-spin-slow-ccw { animation: spin-slow-ccw 45s linear infinite; }
 
-        /* v9.1: 倒三角按钮 (剪切路径) */
-        .clip-triangle-inverted { clip-path: polygon(0% 0%, 100% 0%, 50% 100%); }
-        
         /* v9.3: 悬浮双重边框 */
         .floating-border {
             position: absolute; inset: -3px; 
-            /* v9.4: Opacity reduced to 0.3 for fine, delicate look */
             border: 1px solid rgba(0, 0, 0, 0.3); 
             opacity: 0; 
-            transition: opacity 0.8s ease 0.2s; /* 略微延迟 */
+            transition: opacity 0.8s ease 0.2s; 
             pointer-events: none;
+        }
+        /* v9.5: 激活后隐藏外边框 */
+        .floating-border.border-hidden {
+            opacity: 0 !important;
+            transition: opacity 0.3s ease;
+        }
+
+        /* v9.5: 核心三角形扇区样式 */
+        .tri-sector {
+            fill: transparent;
+            stroke: #1e293b; /* slate-800 */
+            stroke-width: 1.5;
+            transition: fill 0.5s ease, stroke 0.5s ease;
+        }
+        .tri-sector.activated {
+            fill: #0f172a; /* slate-900 */
+            stroke: #0f172a;
         }
     </style>
 </head>
@@ -334,7 +354,6 @@
         <div id="hub-orb" class="absolute inset-0 rounded-full hub-orb-flat"></div>
 
         <!-- v9.1: Background Texture Layers (Only visible on open) -->
-        <!-- v9.3 Debug: Fixed paths to HomePage (capital P) -->
         <div id="hub-bg-layers" class="absolute inset-0 rounded-full overflow-hidden opacity-0 pointer-events-none transition-opacity duration-700">
             <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-1.png" class="absolute inset-0 w-full h-full object-cover animate-spin-slow-cw" style="mix-blend-mode: multiply;">
             <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-2.png" class="absolute inset-0 w-full h-full object-cover">
@@ -352,42 +371,42 @@
         <div id="hub-content-open" class="hidden relative z-20 w-full h-full opacity-0 scale-95 transition-all duration-500">
             
             <!-- v9.3: Triangle Vertex 1: Top Center -->
-            <!-- v9.4: Width reduced to w-28 (70% of w-40) -->
             <div class="absolute top-[18%] left-1/2 -translate-x-1/2 w-28">
                 <div class="relative">
-                    <div class="floating-border"></div>
-                    <input type="text" placeholder="Who am I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+                    <div id="border-top" class="floating-border"></div>
+                    <input id="input-top" type="text" placeholder="Who am I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
                 </div>
             </div>
 
             <!-- v9.3: Triangle Vertex 2: Bottom Left -->
-            <!-- v9.4: Width reduced to w-28 -->
             <div class="absolute bottom-[20%] left-[5%] w-28">
                 <div class="relative">
-                    <div class="floating-border"></div>
-                    <input type="text" placeholder="What I do" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+                    <div id="border-left" class="floating-border"></div>
+                    <input id="input-left" type="text" placeholder="What I do" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
                 </div>
             </div>
 
             <!-- v9.3: Triangle Vertex 3: Bottom Right -->
-            <!-- v9.4: Width reduced to w-28 -->
             <div class="absolute bottom-[20%] right-[5%] w-28">
                 <div class="relative">
-                    <div class="floating-border"></div>
-                    <input type="text" placeholder="How do I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+                    <div id="border-right" class="floating-border"></div>
+                    <input id="input-right" type="text" placeholder="How do I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
                 </div>
             </div>
 
-            <!-- Center: Inverted Triangle Button -->
-            <!-- v9.2: Double size (w-40 h-32), No border (via clip-path it has none, removed any shadow/border utilities) -->
-            <button class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-32 bg-slate-900 text-white text-[12px] font-bold tracking-widest hover:bg-slate-700 transition-colors clip-triangle-inverted flex items-start justify-center pt-4 z-30">
-                <span class="mt-1">VERIFY</span>
-            </button>
-
-            <!-- Decorative Label -->
-             <div class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-20">
-                <i data-lucide="triangle" class="w-32 h-32 text-slate-900 rotate-180"></i>
+            <!-- Center: Trinity Core (v9.5 Replaced Button) -->
+            <div class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 pointer-events-none z-30 flex items-center justify-center">
+                <svg width="80" height="69" viewBox="0 0 100 87" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Inverted Equilateral Triangle composed of 3 sectors -->
+                    <!-- Top Sector: (0,0) -> (100,0) -> (50, 28.8) -->
+                    <path id="sector-top" class="tri-sector" d="M0 0 L100 0 L50 28.8 Z" />
+                    <!-- Left Sector: (0,0) -> (50, 86.6) -> (50, 28.8) -->
+                    <path id="sector-left" class="tri-sector" d="M0 0 L50 86.6 L50 28.8 Z" />
+                    <!-- Right Sector: (100,0) -> (50, 86.6) -> (50, 28.8) -->
+                    <path id="sector-right" class="tri-sector" d="M100 0 L50 86.6 L50 28.8 Z" />
+                </svg>
             </div>
+
         </div>
     </div>
 
@@ -404,14 +423,13 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.4 [PHILOSOPHY_TRINITY]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.5 [TRUE_NAME_ACTIVATION]</p>
     </div>
 
     <script>
         // --- 核心变量 ---
         let currentTheme = 'day';
         let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
-        // v8.8 HOTFIX: 补回丢失的变量定义
         let rabbitX = targetX, rabbitY = targetY, rabbitVX = 0, rabbitVY = 0;
         let orbitAngle = 0, orbitRadius = 0, isIdle = false;
         let lastTime = performance.now(), cursorSelfRotation = 0;
@@ -425,7 +443,7 @@
         const elCenterHub = document.getElementById('center-hub'), elTitleMain = document.getElementById('para-title-main');
         const elTitleLine = document.getElementById('para-title-line'), elTitleSub = document.getElementById('para-title-sub');
 
-        // --- 粒子系统核心 (v8.6 新增 -> v8.7 修正 -> v8.9 颜色优化 -> v9.2 颜色修正) ---
+        // --- 粒子系统核心 ---
         class ParticleSystem {
             constructor(canvasId, options) {
                 this.canvas = document.getElementById(canvasId);
@@ -441,20 +459,12 @@
                 this.canvas.height = window.innerHeight;
             }
 
-            // v8.9 & v9.2: 随机颜色生成器 (Update for Day Mode)
             getRandomColor() {
                 if (currentTheme === 'day') {
-                    // v9.2: Day Mode -> FFED72 (255, 237, 114) to FFC16E (255, 193, 110)
-                    // R: 255
-                    // G: 193 - 237
-                    // B: 110 - 114
                     const g = 193 + Math.floor(Math.random() * (237 - 193));
                     const b = 110 + Math.floor(Math.random() * (114 - 110));
                     return `rgb(255, ${g}, ${b})`;
                 } else {
-                    // Night Mode (Previous Ember)
-                    // G: 141 (FF8D7C) -> 160 (FFA091)
-                    // B: 124 (FF8D7C) -> 145 (FFA091)
                     const g = 141 + Math.floor(Math.random() * (160 - 141));
                     const b = 124 + Math.floor(Math.random() * (145 - 124));
                     return `rgb(255, ${g}, ${b})`;
@@ -463,23 +473,19 @@
 
             spawn() {
                 if (this.particles.length >= this.options.count) return;
-                
-                // v8.7: 调整发射位置 (yOffset)
-                // 从左下角区域生成: x(0-30%)
                 const x = Math.random() * (this.canvas.width * 0.4); 
-                // 基准高度减去偏移量 (向上移动)
                 const baseHeight = this.canvas.height - (this.options.yOffset || 0);
                 const y = baseHeight + Math.random() * 50; 
                 
                 this.particles.push({
                     x: x,
                     y: y,
-                    vx: this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin), // 向右
-                    vy: -(this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin)), // 向上
+                    vx: this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin), 
+                    vy: -(this.options.speedMin + Math.random() * (this.options.speedMax - this.options.speedMin)), 
                     size: this.options.sizeMin + Math.random() * (this.options.sizeMax - this.options.sizeMin),
                     life: 1.0,
                     decay: 0.002 + Math.random() * 0.003,
-                    color: this.getRandomColor() // v8.9: 每个粒子赋予独立的随机颜色
+                    color: this.getRandomColor()
                 });
             }
 
@@ -495,7 +501,6 @@
                     if (p.life <= 0) {
                         this.particles.splice(i, 1);
                     } else {
-                        // v8.9: 使用粒子自带颜色
                         this.ctx.fillStyle = p.color;
                         this.ctx.globalAlpha = p.life * 0.8; 
                         this.ctx.beginPath();
@@ -504,27 +509,15 @@
                     }
                 }
                 this.ctx.globalAlpha = 1.0;
-                
-                // 持续生成
                 if (Math.random() < 0.1) this.spawn(); 
             }
         }
 
-        // 初始化两层粒子 (v8.9: 大小进一步减小, v9.0: 数量降低至 70%)
-        // Background: 150px up, size 0.8-1.2px (avg 1px)
         const particlesBg = new ParticleSystem('particles-bg', {
-            count: 28, // v9.0: 40 * 0.7 = 28
-            sizeMin: 0.8, sizeMax: 1.2, 
-            speedMin: 0.12, speedMax: 0.3, 
-            yOffset: 150 
+            count: 28, sizeMin: 0.8, sizeMax: 1.2, speedMin: 0.12, speedMax: 0.3, yOffset: 150 
         });
-        
-        // Foreground: 50px up, size 1.5-2.5px (avg 2px)
         const particlesFg = new ParticleSystem('particles-fg', {
-            count: 21, // v9.0: 30 * 0.7 = 21
-            sizeMin: 1.5, sizeMax: 2.5, 
-            speedMin: 0.48, speedMax: 0.9, 
-            yOffset: 50
+            count: 21, sizeMin: 1.5, sizeMax: 2.5, speedMin: 0.48, speedMax: 0.9, yOffset: 50
         });
 
         function checkTheme(manual = false) {
@@ -631,12 +624,14 @@
             hub.style.width = '360px'; 
             hub.style.height = '360px'; 
             defaultContent.style.opacity = '0';
-            bgLayers.style.opacity = '1'; /* v9.1: Fade in backgrounds */
+            bgLayers.style.opacity = '1'; 
             setTimeout(() => { 
                 defaultContent.classList.add('hidden'); 
                 openContent.classList.remove('hidden'); 
-                // v9.3: Activate border animation
-                document.querySelectorAll('.floating-border').forEach(el => el.style.opacity = '1');
+                // v9.5: Only show border if not activated
+                document.querySelectorAll('.floating-border').forEach(el => {
+                    if(!el.classList.contains('border-hidden')) el.style.opacity = '1';
+                });
                 setTimeout(() => { 
                     openContent.style.opacity = '1'; 
                     openContent.style.transform = 'scale(1)'; 
@@ -649,8 +644,7 @@
             hub.style.height = '130px'; 
             openContent.style.opacity = '0'; 
             openContent.style.transform = 'scale(0.95)'; 
-            bgLayers.style.opacity = '0'; /* v9.1: Fade out backgrounds */
-            // v9.3: Deactivate border animation
+            bgLayers.style.opacity = '0'; 
             document.querySelectorAll('.floating-border').forEach(el => el.style.opacity = '0');
             setTimeout(() => { 
                 openContent.classList.add('hidden'); 
@@ -661,17 +655,69 @@
             }, 300); 
         });
 
-        // v9.0: Loading Screen Logic
         window.addEventListener('load', () => {
             const loader = document.getElementById('loading-overlay');
-            // 确保加载动画至少展示一瞬间，或者立即淡出
             setTimeout(() => {
                 loader.classList.add('fade-out');
-                setTimeout(() => {
-                    loader.remove(); // Remove from DOM after transition
-                }, 1000); 
-            }, 500); // 稍微延迟一点点，确保用户能看到 Target:FOUND
+                setTimeout(() => { loader.remove(); }, 1000); 
+            }, 500); 
         });
+
+        // --- v9.5 True Name Activation Logic ---
+        const TRUENAMES = {
+            'input-top': 'Clergies',
+            'input-left': 'Sacrilege',
+            'input-right': 'GraceLies'
+        };
+
+        const SECTORS = {
+            'input-top': 'sector-top',
+            'input-left': 'sector-left',
+            'input-right': 'sector-right'
+        };
+
+        const BORDERS = {
+            'input-top': 'border-top',
+            'input-left': 'border-left',
+            'input-right': 'border-right'
+        };
+
+        function setupInputLogic(id) {
+            const input = document.getElementById(id);
+            if(!input) return;
+            
+            input.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                const target = TRUENAMES[id];
+                
+                // Case insensitive check
+                if (val.toLowerCase() === target.toLowerCase()) {
+                    activateInput(id);
+                }
+            });
+        }
+
+        function activateInput(id) {
+            const input = document.getElementById(id);
+            const border = document.getElementById(BORDERS[id]);
+            const sector = document.getElementById(SECTORS[id]);
+
+            if (input.classList.contains('input-activated')) return;
+
+            // 1. Input Style Transformation
+            input.classList.add('input-activated');
+            input.setAttribute('readonly', true); // Lock input
+            
+            // 2. Hide Floating Border
+            if (border) border.classList.add('border-hidden');
+
+            // 3. Fill Triangle Sector
+            if (sector) sector.classList.add('activated');
+        }
+
+        setupInputLogic('input-top');
+        setupInputLogic('input-left');
+        setupInputLogic('input-right');
 
         checkTheme(); initRabbitSprites(); SLICES_DATA.forEach((data, i) => wheel.appendChild(createSliceDOM(data, i))); lucide.createIcons(); animate();
     </script>
