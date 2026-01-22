@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.0 Target Found</title>
+    <title>Alice's Reg - v9.4 Philosophy Trinity</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -237,8 +237,36 @@
             transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), height 0.8s cubic-bezier(0.16, 1, 0.3, 1); z-index: 50;
         }
         .hub-orb-flat { border: 1px solid var(--theme-border); background: var(--theme-hub-bg); box-shadow: var(--theme-shadow); transition: all 1s ease; }
-        .input-verify { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); transition: all 0.4s ease; }
-        .input-verify:focus { background: rgba(255, 255, 255, 0.9); border-color: #fca5a5; }
+        
+        /* v9.3: 锐利输入框基础样式 (外框在 DOM 中实现) */
+        .input-verify { 
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid #000; /* v9.3: 纯黑锐利边框 */
+            backdrop-filter: blur(4px); 
+            transition: all 0.4s ease; 
+            border-radius: 0; /* v9.3: 移除圆角 */
+        }
+        .input-verify:focus { background: rgba(255, 255, 255, 0.9); }
+
+        /* v9.1: 枢纽背景纹理动画 */
+        @keyframes spin-slow-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-slow-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        
+        .animate-spin-slow-cw { animation: spin-slow-cw 60s linear infinite; }
+        .animate-spin-slow-ccw { animation: spin-slow-ccw 45s linear infinite; }
+
+        /* v9.1: 倒三角按钮 (剪切路径) */
+        .clip-triangle-inverted { clip-path: polygon(0% 0%, 100% 0%, 50% 100%); }
+        
+        /* v9.3: 悬浮双重边框 */
+        .floating-border {
+            position: absolute; inset: -3px; 
+            /* v9.4: Opacity reduced to 0.3 for fine, delicate look */
+            border: 1px solid rgba(0, 0, 0, 0.3); 
+            opacity: 0; 
+            transition: opacity 0.8s ease 0.2s; /* 略微延迟 */
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -300,24 +328,66 @@
         <div id="wheel" class="relative pointer-events-auto" style="width: min(120vh, 120vw); height: min(120vh, 120vw);"></div>
     </div>
 
-    <!-- 中心枢纽 -->
+    <!-- 中心枢纽 (v9.1 Updated) -->
     <div id="center-hub" style="width: 130px; height: 130px;">
+        <!-- Hub Base/Orb (Always Present) -->
         <div id="hub-orb" class="absolute inset-0 rounded-full hub-orb-flat"></div>
+
+        <!-- v9.1: Background Texture Layers (Only visible on open) -->
+        <!-- v9.3 Debug: Fixed paths to HomePage (capital P) -->
+        <div id="hub-bg-layers" class="absolute inset-0 rounded-full overflow-hidden opacity-0 pointer-events-none transition-opacity duration-700">
+            <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-1.png" class="absolute inset-0 w-full h-full object-cover animate-spin-slow-cw" style="mix-blend-mode: multiply;">
+            <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-2.png" class="absolute inset-0 w-full h-full object-cover">
+            <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-3.png" class="absolute inset-0 w-full h-full object-cover animate-spin-slow-ccw" style="opacity: 0.8;">
+        </div>
+
+        <!-- Default Content (Closed State) -->
         <div id="hub-content-default" class="relative z-10 text-center transition-all duration-500">
             <h2 id="hub-text-1" class="font-bold tracking-[0.25em] text-[10px] uppercase" style="color: var(--theme-hub-text);">Tea Party</h2>
             <div class="w-4 h-[1px] bg-slate-300 mx-auto my-1.5 opacity-40"></div>
             <h2 id="hub-text-2" class="font-light tracking-[0.2em] text-[8px] uppercase" style="color: #94a3b8;">Record</h2>
         </div>
-        <div id="hub-content-open" class="hidden relative z-10 w-full px-8 flex flex-col items-center opacity-0 scale-95 transition-all duration-500">
-            <div class="flex items-center gap-2 mb-6 text-slate-400">
-                <i data-lucide="sparkles" class="w-3 h-3"></i>
-                <span class="text-[9px] uppercase tracking-widest font-mono">Terminal Protocol</span>
+
+        <!-- Open Content (v9.1: Triangle Layout) -->
+        <div id="hub-content-open" class="hidden relative z-20 w-full h-full opacity-0 scale-95 transition-all duration-500">
+            
+            <!-- v9.3: Triangle Vertex 1: Top Center -->
+            <!-- v9.4: Width reduced to w-28 (70% of w-40) -->
+            <div class="absolute top-[18%] left-1/2 -translate-x-1/2 w-28">
+                <div class="relative">
+                    <div class="floating-border"></div>
+                    <input type="text" placeholder="Who am I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+                </div>
             </div>
-            <div class="w-full space-y-3">
-                <input type="text" placeholder="Phrase 01" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center text-slate-700">
-                <input type="text" placeholder="Phrase 02" class="input-verify w-full rounded px-3 py-2 text-[10px] outline-none text-center text-slate-700">
+
+            <!-- v9.3: Triangle Vertex 2: Bottom Left -->
+            <!-- v9.4: Width reduced to w-28 -->
+            <div class="absolute bottom-[20%] left-[5%] w-28">
+                <div class="relative">
+                    <div class="floating-border"></div>
+                    <input type="text" placeholder="What I do" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+                </div>
             </div>
-            <button class="mt-6 w-full bg-slate-900 text-white rounded py-2 text-[9px] uppercase tracking-widest font-bold hover:bg-slate-700 transition-colors">Verify</button>
+
+            <!-- v9.3: Triangle Vertex 3: Bottom Right -->
+            <!-- v9.4: Width reduced to w-28 -->
+            <div class="absolute bottom-[20%] right-[5%] w-28">
+                <div class="relative">
+                    <div class="floating-border"></div>
+                    <input type="text" placeholder="How do I" class="input-verify w-full h-10 px-2 text-[11px] outline-none text-center text-slate-700 font-mono tracking-widest shadow-sm">
+                </div>
+            </div>
+
+            <!-- Center: Inverted Triangle Button -->
+            <!-- v9.2: Double size (w-40 h-32), No border (via clip-path it has none, removed any shadow/border utilities) -->
+            <button class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-32 bg-slate-900 text-white text-[12px] font-bold tracking-widest hover:bg-slate-700 transition-colors clip-triangle-inverted flex items-start justify-center pt-4 z-30">
+                <span class="mt-1">VERIFY</span>
+            </button>
+
+            <!-- Decorative Label -->
+             <div class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-20">
+                <i data-lucide="triangle" class="w-32 h-32 text-slate-900 rotate-180"></i>
+            </div>
         </div>
     </div>
 
@@ -334,7 +404,7 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.0 [TARGET_FOUND]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.4 [PHILOSOPHY_TRINITY]</p>
     </div>
 
     <script>
@@ -355,7 +425,7 @@
         const elCenterHub = document.getElementById('center-hub'), elTitleMain = document.getElementById('para-title-main');
         const elTitleLine = document.getElementById('para-title-line'), elTitleSub = document.getElementById('para-title-sub');
 
-        // --- 粒子系统核心 (v8.6 新增 -> v8.7 修正 -> v8.9 颜色优化) ---
+        // --- 粒子系统核心 (v8.6 新增 -> v8.7 修正 -> v8.9 颜色优化 -> v9.2 颜色修正) ---
         class ParticleSystem {
             constructor(canvasId, options) {
                 this.canvas = document.getElementById(canvasId);
@@ -371,14 +441,24 @@
                 this.canvas.height = window.innerHeight;
             }
 
-            // v8.9: 随机颜色生成器
+            // v8.9 & v9.2: 随机颜色生成器 (Update for Day Mode)
             getRandomColor() {
-                // R: 255 (固定)
-                // G: 141 (FF8D7C) -> 160 (FFA091)
-                // B: 124 (FF8D7C) -> 145 (FFA091)
-                const g = 141 + Math.floor(Math.random() * (160 - 141));
-                const b = 124 + Math.floor(Math.random() * (145 - 124));
-                return `rgb(255, ${g}, ${b})`;
+                if (currentTheme === 'day') {
+                    // v9.2: Day Mode -> FFED72 (255, 237, 114) to FFC16E (255, 193, 110)
+                    // R: 255
+                    // G: 193 - 237
+                    // B: 110 - 114
+                    const g = 193 + Math.floor(Math.random() * (237 - 193));
+                    const b = 110 + Math.floor(Math.random() * (114 - 110));
+                    return `rgb(255, ${g}, ${b})`;
+                } else {
+                    // Night Mode (Previous Ember)
+                    // G: 141 (FF8D7C) -> 160 (FFA091)
+                    // B: 124 (FF8D7C) -> 145 (FFA091)
+                    const g = 141 + Math.floor(Math.random() * (160 - 141));
+                    const b = 124 + Math.floor(Math.random() * (145 - 124));
+                    return `rgb(255, ${g}, ${b})`;
+                }
             }
 
             spawn() {
@@ -545,9 +625,41 @@
             requestAnimationFrame(animate);
         }
 
-        const hub = document.getElementById('center-hub'), defaultContent = document.getElementById('hub-content-default'), openContent = document.getElementById('hub-content-open');
-        hub.addEventListener('mouseenter', () => { isPaused = true; hub.style.width = '360px'; hub.style.height = '360px'; defaultContent.style.opacity = '0'; setTimeout(() => { defaultContent.classList.add('hidden'); openContent.classList.remove('hidden'); setTimeout(() => { openContent.style.opacity = '1'; openContent.style.transform = 'scale(1)'; }, 50); }, 300); });
-        hub.addEventListener('mouseleave', () => { isPaused = false; hub.style.width = '130px'; hub.style.height = '130px'; openContent.style.opacity = '0'; openContent.style.transform = 'scale(0.95)'; setTimeout(() => { openContent.classList.add('hidden'); defaultContent.classList.remove('hidden'); setTimeout(() => { defaultContent.style.opacity = '1'; }, 50); }, 300); });
+        const hub = document.getElementById('center-hub'), defaultContent = document.getElementById('hub-content-default'), openContent = document.getElementById('hub-content-open'), bgLayers = document.getElementById('hub-bg-layers');
+        hub.addEventListener('mouseenter', () => { 
+            isPaused = true; 
+            hub.style.width = '360px'; 
+            hub.style.height = '360px'; 
+            defaultContent.style.opacity = '0';
+            bgLayers.style.opacity = '1'; /* v9.1: Fade in backgrounds */
+            setTimeout(() => { 
+                defaultContent.classList.add('hidden'); 
+                openContent.classList.remove('hidden'); 
+                // v9.3: Activate border animation
+                document.querySelectorAll('.floating-border').forEach(el => el.style.opacity = '1');
+                setTimeout(() => { 
+                    openContent.style.opacity = '1'; 
+                    openContent.style.transform = 'scale(1)'; 
+                }, 50); 
+            }, 300); 
+        });
+        hub.addEventListener('mouseleave', () => { 
+            isPaused = false; 
+            hub.style.width = '130px'; 
+            hub.style.height = '130px'; 
+            openContent.style.opacity = '0'; 
+            openContent.style.transform = 'scale(0.95)'; 
+            bgLayers.style.opacity = '0'; /* v9.1: Fade out backgrounds */
+            // v9.3: Deactivate border animation
+            document.querySelectorAll('.floating-border').forEach(el => el.style.opacity = '0');
+            setTimeout(() => { 
+                openContent.classList.add('hidden'); 
+                defaultContent.classList.remove('hidden'); 
+                setTimeout(() => { 
+                    defaultContent.style.opacity = '1'; 
+                }, 50); 
+            }, 300); 
+        });
 
         // v9.0: Loading Screen Logic
         window.addEventListener('load', () => {
@@ -558,7 +670,7 @@
                 setTimeout(() => {
                     loader.remove(); // Remove from DOM after transition
                 }, 1000); 
-            }, 500); // 稍微延迟一点点 Target:FOUND
+            }, 500); // 稍微延迟一点点，确保用户能看到 Target:FOUND
         });
 
         checkTheme(); initRabbitSprites(); SLICES_DATA.forEach((data, i) => wheel.appendChild(createSliceDOM(data, i))); lucide.createIcons(); animate();
