@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.23 Text Manifest Fix</title>
+    <title>Alice's Reg - v9.26 Animation Fusion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -195,32 +195,58 @@
         .input-verify::placeholder { color: rgba(51, 65, 85, 0.5); font-size: 20px; font-weight: 400; }
         .input-verify:focus { background: transparent; outline: none; }
 
-        /* v9.23: 激活态真名显现 - 强制可见 & 修复渲染 */
+        /* v9.24: 激活态真名显现 - 强制全尺寸 + 绝对居中 + 动画 */
         .input-verify.input-activated {
             background-color: transparent !important;
-            /* 黑色底色 + 标题流光 */
             color: #1e293b !important;
             background-image: var(--theme-active-text-gradient) !important;
             background-size: 200% 100% !important;
             -webkit-background-clip: text !important;
             background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
-            animation: textShimmer 12s linear infinite !important;
-            /* 阴影效果 */
-            text-shadow: 0 0 5px rgba(0,0,0,0.3) !important;
+            /* v9.26 FIX: Animation Fusion! 显式包含两个动画，防止互相覆盖 */
+            animation: textShimmer 12s linear infinite, float-out-none 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards !important;
+            
+            filter: drop-shadow(0 0 3px rgba(0,0,0,0.15)) !important;
             font-weight: 900 !important;
             font-size: 33px !important; 
             font-family: 'Book Antiqua', serif !important;
-            /* 必须强制可见 */
             opacity: 1 !important; visibility: visible !important;
             pointer-events: none;
-            /* 层级一定要高 */
-            z-index: 9999 !important;
+            z-index: 100 !important;
+            /* v9.24: Full Release Size */
             position: absolute !important;
-            inset: 0 !important;
-            width: 100% !important; height: 100% !important;
-            /* 移除 Flex 以避免 input 内部排版问题，使用标准 vertical-align */
-            padding-top: 10px !important; /* 微调垂直居中 */
+            width: 300px !important; 
+            height: 100px !important;
+            top: 50% !important; left: 50% !important;
+            margin-left: -150px !important; margin-top: -50px !important; 
+            padding: 0 !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+        }
+
+        /* v9.25: Strengthened Outward Float Animations */
+        @keyframes float-out-up {
+            0% { transform: translateY(0px) scale(0.8); opacity: 0; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 1; }
+        }
+        @keyframes float-out-left {
+            0% { transform: translate(0px, 0px) scale(0.8); opacity: 0; }
+            100% { transform: translate(-80px, 80px) scale(1.2); opacity: 1; }
+        }
+        @keyframes float-out-right {
+            0% { transform: translate(0px, 0px) scale(0.8); opacity: 0; }
+            100% { transform: translate(80px, 80px) scale(1.2); opacity: 1; }
+        }
+
+        /* v9.26 FIX: Use specific combined animations in classes */
+        .anim-float-up { 
+            animation: float-out-up 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, textShimmer 12s linear infinite !important; 
+        }
+        .anim-float-left { 
+            animation: float-out-left 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, textShimmer 12s linear infinite !important; 
+        }
+        .anim-float-right { 
+            animation: float-out-right 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, textShimmer 12s linear infinite !important; 
         }
 
         /* 隐藏输入框底部的图片容器 (只隐藏图片，不隐藏父容器) */
@@ -315,9 +341,8 @@
         </div>
 
         <div id="hub-content-open" class="hidden relative z-20 w-full h-full opacity-0 scale-95 transition-all duration-500">
-            <!-- v9.22: Reverted to Tailwind sizing classes to fix layout collapse -->
-            <!-- Top Input Slot -->
-            <div class="absolute top-[10%] left-1/2 -translate-x-1/2 -translate-y-[50px] w-48">
+            <!-- v9.26: Top Input Slot - Adjusted to -80px as requested -->
+            <div class="absolute top-[10%] left-1/2 -translate-x-1/2 -translate-y-[80px] w-48">
                 <div id="container-top" class="relative w-full flex items-center justify-center transition-opacity duration-700">
                     <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-inputbox-up.png" class="w-full object-contain pointer-events-none select-none drop-shadow-md">
                     <input id="input-top" type="text" placeholder="Who am I" class="input-verify absolute inset-0 w-full h-full px-4 text-[13px] outline-none text-center font-mono tracking-widest">
@@ -350,7 +375,7 @@
 
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.23 [TEXT_MANIFEST_FIX]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.26 [ANIMATION_FUSION]</p>
     </div>
 
     <script>
@@ -498,9 +523,11 @@
 
         window.addEventListener('load', () => { const loader = document.getElementById('loading-overlay'); setTimeout(() => { loader.classList.add('fade-out'); setTimeout(() => { loader.remove(); }, 1000); }, 500); });
 
+        // --- v9.24: Added Animation Logic for True Names ---
         const TRUENAMES = { 'input-top': 'AClergies', 'input-left': 'Sacrilege', 'input-right': 'GraceLies' };
         const PARTS = { 'input-top': 'part-up', 'input-left': 'part-left', 'input-right': 'part-right' };
         const CONTAINERS = { 'input-top': 'container-top', 'input-left': 'container-left', 'input-right': 'container-right' };
+        const ANIM_CLASSES = { 'input-top': 'anim-float-up', 'input-left': 'anim-float-left', 'input-right': 'anim-float-right' };
 
         function setupInputLogic(id) {
             const input = document.getElementById(id); if(!input) return;
@@ -511,10 +538,10 @@
             const input = document.getElementById(id), part = document.getElementById(PARTS[id]), container = document.getElementById(CONTAINERS[id]);
             if (input.classList.contains('input-activated')) return;
             input.classList.add('input-activated'); input.setAttribute('readonly', true);
-            // v9.22: Restore opacity=0 method instead of removing/hiding parent
-            if (container) {
-                container.classList.add('container-hidden');
-            }
+            // v9.26 FIX: Add animation class
+            input.classList.add(ANIM_CLASSES[id]);
+            
+            if (container) container.classList.add('container-hidden');
             if (part) part.classList.add('part-activated');
         }
 
