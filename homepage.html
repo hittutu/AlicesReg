@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.19.3 True Alignment</title>
+    <title>Alice's Reg - v9.19 Coord Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -126,7 +126,7 @@
             will-change: background-position; 
         }
 
-        /* --- 背景系统 v9.15 Fix --- */
+        /* --- 背景系统 --- */
         #background-root { 
             position: fixed; inset: 0; z-index: 0; 
             background-color: var(--theme-void-bg); transition: background-color 1s ease; 
@@ -150,12 +150,6 @@
             mix-blend-mode: var(--theme-center-blob-mode);
             animation: blob-move-3 30s infinite alternate ease-in-out; transition: all 1s ease;
         }
-
-        @keyframes holo-shift-1 { 0% { background-color: #ffdde1; } 50% { background-color: #f6d365; } 100% { background-color: #fda085; } }
-        @keyframes holo-shift-2 { 0% { background-color: #84fab0; } 50% { background-color: #8fd3f4; } 100% { background-color: #a18cd1; } }
-        @keyframes blob-move-1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-1vw, 1vh) scale(1.05); } }
-        @keyframes blob-move-2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(1vw, -1vh) scale(1.1); } }
-        @keyframes blob-move-3 { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-49%, -51%) scale(1.02); } }
 
         @keyframes texture-drift { 0% { background-position: 0 0; } 100% { background-position: 1000px -1000px; } }
         
@@ -332,6 +326,7 @@
         <div class="aurora-container">
             <div class="aurora-blob colored-blob blob-1"></div>
             <div class="aurora-blob colored-blob blob-2"></div>
+            <!-- v9.13: Updated Blob-3 -->
             <div class="aurora-blob blob-3"></div>
         </div>
         <div class="star-sand-texture"></div>
@@ -361,7 +356,7 @@
             <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-3.png" class="absolute inset-0 w-full h-full object-cover animate-spin-slow-ccw" style="opacity: 0.8;">
         </div>
 
-        <!-- v9.18: Activation Images Container with OFFSET CORRECTION (translate-x-[30px]) -->
+        <!-- v9.19 Sync: Final Offset Correction from Majesty (X:29px, Y:15px) -->
         <div id="hub-activation-layers" class="absolute inset-0 pointer-events-none z-15 transition-opacity duration-700 opacity-0 translate-x-[29px] translate-y-[15px]">
             <!-- Part Up -->
             <div id="part-up" class="absolute inset-0 w-full h-full">
@@ -390,7 +385,7 @@
         <!-- Open Content (Triangle Layout) -->
         <div id="hub-content-open" class="hidden relative z-20 w-full h-full opacity-0 scale-95 transition-all duration-500">
             
-            <!-- v9.15: Top Input -->
+            <!-- Top Input -->
             <div class="absolute top-[10%] left-1/2 -translate-x-1/2 -translate-y-[100px] w-48">
                 <div id="container-top" class="relative w-full flex items-center justify-center transition-opacity duration-700">
                     <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-inputbox-up.png" class="w-full object-contain pointer-events-none select-none drop-shadow-md">
@@ -430,7 +425,7 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.18 [TRUE_ALIGNMENT]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.19 [COORD_SYNC]</p>
     </div>
 
     <script>
@@ -597,14 +592,13 @@
 
         const hub = document.getElementById('center-hub'), defaultContent = document.getElementById('hub-content-default'), openContent = document.getElementById('hub-content-open'), bgLayers = document.getElementById('hub-bg-layers'), hubOrb = document.getElementById('hub-orb');
         const kaleidoWrapper = document.getElementById('kaleidoscope-wrapper'); 
-        const activationLayers = document.getElementById('hub-activation-layers'); // v9.17
+        const activationLayers = document.getElementById('hub-activation-layers'); 
 
         hub.addEventListener('mouseenter', () => { 
             isPaused = true; 
             hub.style.width = '360px'; hub.style.height = '360px'; 
             defaultContent.style.opacity = '0';
             bgLayers.style.opacity = '1'; 
-            // v9.17: Show activation layers (sync with bg layers)
             activationLayers.style.opacity = '1';
             
             hubOrb.style.borderColor = 'transparent';
@@ -619,7 +613,6 @@
             hub.style.width = '130px'; hub.style.height = '130px'; 
             openContent.style.opacity = '0'; openContent.style.transform = 'scale(0.95)'; 
             bgLayers.style.opacity = '0'; 
-            // v9.17: Hide activation layers
             activationLayers.style.opacity = '0';
 
             hubOrb.style.borderColor = 'var(--theme-border)';
@@ -656,11 +649,9 @@
 
             input.classList.add('input-activated');
             input.setAttribute('readonly', true);
-            // v9.15: Hide container graphics (img)
             if (container) {
                 container.classList.add('container-hidden');
             }
-            // v9.15: Activate Center Part
             if (part) part.classList.add('part-activated');
         }
 
