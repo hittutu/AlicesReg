@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.15 Reality Anchor</title>
+    <title>Alice's Reg - v9.18 True Alignment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -25,6 +25,8 @@
             --theme-center-blob-opacity: 0.48;
             --theme-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
             --theme-title-gradient: linear-gradient(90deg, rgba(30, 41, 59, 0.98) 0%, rgba(100, 116, 139, 0.7) 25%, rgba(30, 41, 59, 0.98) 50%, rgba(100, 116, 139, 0.7) 75%, rgba(30, 41, 59, 0.98) 100%);
+            /* v9.5: 激活态流光 */
+            --theme-active-text-gradient: linear-gradient(90deg, #ffffff 0%, #a5b4fc 25%, #ffffff 50%, #a5b4fc 75%, #ffffff 100%);
         }
 
         /* 黑夜模式变量 */
@@ -43,6 +45,7 @@
             --theme-center-blob-mode: screen;
             --theme-center-blob-opacity: 0.7; 
             --theme-shadow: none; 
+            /* v8.3: 加深黑夜流光对比度 */
             --theme-title-gradient: linear-gradient(90deg, #ffffff 0%, #94a3b8 25%, #ffffff 50%, #94a3b8 75%, #ffffff 100%);
         }
 
@@ -126,8 +129,6 @@
         /* --- 背景系统 v9.15 Fix --- */
         #background-root { 
             position: fixed; inset: 0; z-index: 0; 
-            /* v9.15: Removed translateZ to fix z-index stacking issues with particles/body */
-            /* transform: translateZ(0); */
             background-color: var(--theme-void-bg); transition: background-color 1s ease; 
             will-change: transform; 
         }
@@ -144,6 +145,7 @@
         .blob-3 { 
             width: 88vw; height: 88vw; top: 50%; left: 68%; transform: translate(-50%, -50%); 
             z-index: 2; filter: blur(80px); opacity: var(--theme-center-blob-opacity); 
+            /* v9.13 Sync: 30% Decay */
             background: radial-gradient(circle, var(--theme-center-blob-color) 0%, var(--theme-center-blob-color) 30%, transparent 100%);
             mix-blend-mode: var(--theme-center-blob-mode);
             animation: blob-move-3 30s infinite alternate ease-in-out; transition: all 1s ease;
@@ -183,7 +185,6 @@
         /* --- 粒子系统 CSS --- */
         .particle-canvas {
             position: fixed; inset: 0; pointer-events: none;
-            /* v9.15: Restore simple positioning to fix layering */
             z-index: auto;
         }
         #particles-bg { z-index: 20; }
@@ -251,7 +252,7 @@
         }
         .input-verify:focus { background: transparent; outline: none; }
 
-        /* v9.15: 激活态 - 输入框文字显现，但容器图片消失 (via JS adding class to parent) */
+        /* v9.15: 激活态 */
         .input-verify.input-activated {
             background: transparent !important;
             border: none !important;
@@ -264,11 +265,10 @@
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
             font-weight: 700;
             font-size: 33px !important; 
-            opacity: 1 !important; /* v9.15 FIX: Ensure visible */
+            opacity: 1 !important; 
             pointer-events: none;
         }
 
-        /* v9.15: Class to hide the input background image container */
         .container-hidden img { opacity: 0; transition: opacity 0.5s ease; }
 
         /* v9.1: 枢纽背景纹理动画 */
@@ -285,7 +285,6 @@
         }
         .tri-inactive { opacity: 1; }
         .tri-active { opacity: 0; }
-        /* When activated class added to parent */
         .part-activated .tri-inactive { opacity: 0; }
         .part-activated .tri-active { opacity: 1; }
 
@@ -293,7 +292,7 @@
 </head>
 <body>
 
-    <!-- Loading Screen (v9.0) -->
+    <!-- Loading Screen -->
     <div id="loading-overlay">
         <div class="loading-text">Target:FOUND</div>
     </div>
@@ -362,6 +361,25 @@
             <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-teapartyrecord-bg-3.png" class="absolute inset-0 w-full h-full object-cover animate-spin-slow-ccw" style="opacity: 0.8;">
         </div>
 
+        <!-- v9.18: Activation Images Container with OFFSET CORRECTION (translate-x-[25px]) -->
+        <div id="hub-activation-layers" class="absolute inset-0 pointer-events-none z-15 transition-opacity duration-700 opacity-0 translate-x-[25px]">
+            <!-- Part Up -->
+            <div id="part-up" class="absolute inset-0 w-full h-full">
+                <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-up-Inactive.png" class="triangle-part tri-inactive object-cover w-full h-full">
+                <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-up-Activated.png" class="triangle-part tri-active object-cover w-full h-full">
+            </div>
+            <!-- Part Left -->
+            <div id="part-left" class="absolute inset-0 w-full h-full">
+                <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-left-Inactive.png" class="triangle-part tri-inactive object-cover w-full h-full">
+                <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-left-Activated.png" class="triangle-part tri-active object-cover w-full h-full">
+            </div>
+            <!-- Part Right -->
+            <div id="part-right" class="absolute inset-0 w-full h-full">
+                <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-right-Inactive.png" class="triangle-part tri-inactive object-cover w-full h-full">
+                <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-right-Activated.png" class="triangle-part tri-active object-cover w-full h-full">
+            </div>
+        </div>
+
         <!-- Default Content (Closed State) -->
         <div id="hub-content-default" class="relative z-10 text-center transition-all duration-500">
             <h2 id="hub-text-1" class="font-bold tracking-[0.25em] text-[10px] uppercase" style="color: var(--theme-hub-text);">Tea Party</h2>
@@ -372,7 +390,7 @@
         <!-- Open Content (Triangle Layout) -->
         <div id="hub-content-open" class="hidden relative z-20 w-full h-full opacity-0 scale-95 transition-all duration-500">
             
-            <!-- v9.15: Top Input moved up (translate-y-[-100px] was 150) -->
+            <!-- v9.15: Top Input -->
             <div class="absolute top-[10%] left-1/2 -translate-x-1/2 -translate-y-[100px] w-48">
                 <div id="container-top" class="relative w-full flex items-center justify-center transition-opacity duration-700">
                     <img src="https://www.alicesreg.icu/Texture/UI/HomePage/homepage-inputbox-up.png" class="w-full object-contain pointer-events-none select-none drop-shadow-md">
@@ -396,29 +414,6 @@
                 </div>
             </div>
 
-            <!-- v9.15: Center Core (Images) -->
-            <div class="absolute top-[52%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none z-30 flex items-center justify-center">
-                
-                <!-- Part Up -->
-                <div id="part-up" class="absolute inset-0">
-                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-up-Inactive.png" class="triangle-part tri-inactive object-contain">
-                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-up-Activated.png" class="triangle-part tri-active object-contain">
-                </div>
-
-                <!-- Part Left -->
-                <div id="part-left" class="absolute inset-0">
-                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-left-Inactive.png" class="triangle-part tri-inactive object-contain">
-                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-left-Activated.png" class="triangle-part tri-active object-contain">
-                </div>
-
-                <!-- Part Right -->
-                <div id="part-right" class="absolute inset-0">
-                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-right-Inactive.png" class="triangle-part tri-inactive object-contain">
-                    <img src="https://www.alicesreg.icu/Texture/UI/HomePage/TeaPartyRecord/realname-right-Activated.png" class="triangle-part tri-active object-contain">
-                </div>
-
-            </div>
-
         </div>
     </div>
 
@@ -435,7 +430,7 @@
     <!-- 状态信息 -->
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.15 [REALITY_ANCHOR]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.18 [TRUE_ALIGNMENT]</p>
     </div>
 
     <script>
@@ -601,15 +596,18 @@
         }
 
         const hub = document.getElementById('center-hub'), defaultContent = document.getElementById('hub-content-default'), openContent = document.getElementById('hub-content-open'), bgLayers = document.getElementById('hub-bg-layers'), hubOrb = document.getElementById('hub-orb');
-        const kaleidoWrapper = document.getElementById('kaleidoscope-wrapper'); // v9.15
+        const kaleidoWrapper = document.getElementById('kaleidoscope-wrapper'); 
+        const activationLayers = document.getElementById('hub-activation-layers'); // v9.17
 
         hub.addEventListener('mouseenter', () => { 
             isPaused = true; 
             hub.style.width = '360px'; hub.style.height = '360px'; 
             defaultContent.style.opacity = '0';
             bgLayers.style.opacity = '1'; 
+            // v9.17: Show activation layers (sync with bg layers)
+            activationLayers.style.opacity = '1';
+            
             hubOrb.style.borderColor = 'transparent';
-            // v9.15: Fade slice text
             kaleidoWrapper.classList.add('hub-open');
             setTimeout(() => { 
                 defaultContent.classList.add('hidden'); openContent.classList.remove('hidden'); 
@@ -621,8 +619,10 @@
             hub.style.width = '130px'; hub.style.height = '130px'; 
             openContent.style.opacity = '0'; openContent.style.transform = 'scale(0.95)'; 
             bgLayers.style.opacity = '0'; 
+            // v9.17: Hide activation layers
+            activationLayers.style.opacity = '0';
+
             hubOrb.style.borderColor = 'var(--theme-border)';
-            // v9.15: Restore slice text
             kaleidoWrapper.classList.remove('hub-open');
             setTimeout(() => { 
                 openContent.classList.add('hidden'); defaultContent.classList.remove('hidden'); 
