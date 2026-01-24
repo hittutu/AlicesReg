@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.26 Animation Fusion</title>
+    <title>Alice's Reg - v9.29 Visibility Rescue</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -195,26 +195,24 @@
         .input-verify::placeholder { color: rgba(51, 65, 85, 0.5); font-size: 20px; font-weight: 400; }
         .input-verify:focus { background: transparent; outline: none; }
 
-        /* v9.24: 激活态真名显现 - 强制全尺寸 + 绝对居中 + 动画 */
+        /* v9.29: 激活态真名显现 - 修复不可见问题 */
         .input-verify.input-activated {
             background-color: transparent !important;
+            /* v9.29 FIX: Explicitly set text color and remove opacity: 0 */
             color: #1e293b !important;
-            background-image: var(--theme-active-text-gradient) !important;
-            background-size: 200% 100% !important;
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            /* v9.26 FIX: Animation Fusion! 显式包含两个动画，防止互相覆盖 */
-            animation: textShimmer 12s linear infinite, float-out-none 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards !important;
+            -webkit-text-fill-color: #1e293b !important;
+            background-image: none !important;
+            animation: none !important; 
             
             filter: drop-shadow(0 0 3px rgba(0,0,0,0.15)) !important;
             font-weight: 900 !important;
             font-size: 33px !important; 
             font-family: 'Book Antiqua', serif !important;
+            /* v9.29 FIX: Visible */
             opacity: 1 !important; visibility: visible !important;
             pointer-events: none;
             z-index: 100 !important;
-            /* v9.24: Full Release Size */
+            
             position: absolute !important;
             width: 300px !important; 
             height: 100px !important;
@@ -224,33 +222,44 @@
             display: flex !important; align-items: center !important; justify-content: center !important;
         }
 
-        /* v9.25: Strengthened Outward Float Animations */
+        /* v9.28: Outward Float Animations */
         @keyframes float-out-up {
-            0% { transform: translateY(0px) scale(0.8); opacity: 0; }
-            100% { transform: translateY(-100px) scale(1.2); opacity: 1; }
+            0% { transform: translateY(0px) scale(0.5); opacity: 0; }
+            100% { transform: translateY(-250px) scale(1.3); opacity: 1; }
         }
         @keyframes float-out-left {
-            0% { transform: translate(0px, 0px) scale(0.8); opacity: 0; }
-            100% { transform: translate(-80px, 80px) scale(1.2); opacity: 1; }
+            0% { transform: translate(0px, 0px) scale(0.5); opacity: 0; }
+            100% { transform: translate(-200px, 200px) scale(1.3); opacity: 1; }
         }
         @keyframes float-out-right {
-            0% { transform: translate(0px, 0px) scale(0.8); opacity: 0; }
-            100% { transform: translate(80px, 80px) scale(1.2); opacity: 1; }
+            0% { transform: translate(0px, 0px) scale(0.5); opacity: 0; }
+            100% { transform: translate(200px, 200px) scale(1.3); opacity: 1; }
         }
 
-        /* v9.26 FIX: Use specific combined animations in classes */
+        /* v9.28: Divine Flash - White Burst */
+        @keyframes flash-white {
+            0% { color: #1e293b; text-shadow: 0 0 5px rgba(0,0,0,0.15); }
+            50% { color: #ffffff; text-shadow: 0 0 25px rgba(255, 255, 255, 1); }
+            100% { color: #1e293b; text-shadow: 0 0 5px rgba(0,0,0,0.15); }
+        }
+
         .anim-float-up { 
-            animation: float-out-up 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, textShimmer 12s linear infinite !important; 
+            animation: float-out-up 2.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, 
+                       flash-white 1s 2.5s ease-in-out forwards !important; 
         }
         .anim-float-left { 
-            animation: float-out-left 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, textShimmer 12s linear infinite !important; 
+            animation: float-out-left 2.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, 
+                       flash-white 1s 2.5s ease-in-out forwards !important; 
         }
         .anim-float-right { 
-            animation: float-out-right 1.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, textShimmer 12s linear infinite !important; 
+            animation: float-out-right 2.5s cubic-bezier(0.19, 1, 0.22, 1) forwards, 
+                       flash-white 1s 2.5s ease-in-out forwards !important; 
         }
 
         /* 隐藏输入框底部的图片容器 (只隐藏图片，不隐藏父容器) */
         .container-hidden img { opacity: 0; transition: opacity 0.5s ease; }
+        /* v9.29 FIX: Ensure container is visible for overflow */
+        .container-hidden { overflow: visible !important; }
 
         /* 枢纽背景纹理动画 */
         @keyframes spin-slow-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -375,7 +384,7 @@
 
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.26 [ANIMATION_FUSION]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.29 [VISIBILITY_RESCUE]</p>
     </div>
 
     <script>
