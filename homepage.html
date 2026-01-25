@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.39 Ascension Protocol</title>
+    <title>Alice's Reg - v9.40 Connection Repair</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -124,7 +124,6 @@
         .aurora-blob { position: absolute; border-radius: 50%; mix-blend-mode: var(--theme-blob-mode); transition: all 1s ease; }
         .colored-blob { filter: blur(100px); opacity: var(--theme-blob-opacity); }
         
-        /* v9.29 FIX: Added background colors for blobs */
         .blob-1 { 
             width: 70vw; height: 70vw; bottom: -35%; left: -35%; 
             background: radial-gradient(circle, rgba(160, 190, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
@@ -386,7 +385,7 @@
 
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.39 [ASCENSION_PROTOCOL]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.40 [CONNECTION_REPAIR]</p>
     </div>
 
     <script>
@@ -541,6 +540,7 @@
         
         // 记录已激活的真名数量
         const activatedSet = new Set();
+        let connectionErrorShown = false; // 只弹窗报错一次
 
         // 简单的防抖函数，避免频繁请求
         function debounce(func, wait) {
@@ -557,7 +557,13 @@
 
             input.addEventListener('input', debounce(async (e) => {
                 const val = e.target.value.trim();
-                if (val.length < 3) return; // 太短不查
+                // 如果长度不够，复原红色警告
+                if (val.length < 3) {
+                    input.style.color = '#334155';
+                    return; 
+                }
+
+                console.log(`[Client] Verifying ${id}: ${val}`);
 
                 try {
                     const response = await fetch('http://localhost:3000/api/verify', {
@@ -567,11 +573,20 @@
                     });
                     const result = await response.json();
                     
+                    console.log(`[Client] Server says:`, result);
+
                     if (result.success) {
                         activateInput(id);
+                    } else {
+                        // 验证失败，不做处理，让用户继续输
                     }
                 } catch (err) {
                     console.error("Backend connection failed:", err);
+                    input.style.color = 'red'; // 视觉反馈：变红表示连不上
+                    if (!connectionErrorShown) {
+                        alert("🔴 无法连接到服务器！\n\n请检查：\n1. 是否运行了 node server.js？\n2. 终端里有没有报错？\n3. 是否在本地浏览器打开的？");
+                        connectionErrorShown = true;
+                    }
                 }
             }, 500)); 
         }
@@ -604,6 +619,7 @@
                     const data = await response.json();
                     
                     if (data.granted && data.url) {
+                        console.log("Ascension Granted. Teleporting...");
                         setTimeout(() => {
                             window.location.href = data.url;
                         }, 2500); // 给动画一点播放时间
