@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice's Reg - v9.38 Client-Server</title>
+    <title>Alice's Reg - v9.39 Ascension Protocol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Sans+SC:wght@300;500;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -247,8 +247,6 @@
             100% { transform: translate(50px, 50px) scale(1.3); opacity: 1; }
         }
 
-        /* v9.37: Removed flash-alice animation */
-
         /* v9.37 FIX: Removed flash-alice reference */
         .anim-float-up { 
             animation: float-out-up 1.75s cubic-bezier(0.19, 1, 0.22, 1) forwards !important; 
@@ -388,7 +386,7 @@
 
     <div class="fixed z-[130] pointer-events-none flex flex-col items-end gap-1" style="bottom: 12px; right: 20px;">
         <p class="text-[9px] font-mono text-slate-400 animate-pulse uppercase tracking-widest text-right">System_Awaiting_User_Sync</p>
-        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.38 [CLIENT-SERVER]</p>
+        <p id="version-tag" class="text-[8px] font-mono text-slate-400 tracking-tighter opacity-80 text-right">VER: 9.39 [ASCENSION_PROTOCOL]</p>
     </div>
 
     <script>
@@ -536,26 +534,84 @@
 
         window.addEventListener('load', () => { const loader = document.getElementById('loading-overlay'); setTimeout(() => { loader.classList.add('fade-out'); setTimeout(() => { loader.remove(); }, 1000); }, 500); });
 
-        // --- v9.24: Added Animation Logic for True Names ---
-        const TRUENAMES = { 'input-top': 'AClergies', 'input-left': 'Sacrilege', 'input-right': 'GraceLies' };
+        // --- v9.39: Client-Server Logic Update ---
         const PARTS = { 'input-top': 'part-up', 'input-left': 'part-left', 'input-right': 'part-right' };
         const CONTAINERS = { 'input-top': 'container-top', 'input-left': 'container-left', 'input-right': 'container-right' };
         const ANIM_CLASSES = { 'input-top': 'anim-float-up', 'input-left': 'anim-float-left', 'input-right': 'anim-float-right' };
+        
+        // 记录已激活的真名数量
+        const activatedSet = new Set();
+
+        // 简单的防抖函数，避免频繁请求
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
 
         function setupInputLogic(id) {
-            const input = document.getElementById(id); if(!input) return;
-            input.addEventListener('input', (e) => { const val = e.target.value.trim(); if (val.toLowerCase() === TRUENAMES[id].toLowerCase()) { activateInput(id); } });
+            const input = document.getElementById(id);
+            if (!input) return;
+
+            input.addEventListener('input', debounce(async (e) => {
+                const val = e.target.value.trim();
+                if (val.length < 3) return; // 太短不查
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ positionId: id, text: val })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        activateInput(id);
+                    }
+                } catch (err) {
+                    console.error("Backend connection failed:", err);
+                }
+            }, 500)); 
         }
 
         function activateInput(id) {
             const input = document.getElementById(id), part = document.getElementById(PARTS[id]), container = document.getElementById(CONTAINERS[id]);
             if (input.classList.contains('input-activated')) return;
-            input.classList.add('input-activated'); input.setAttribute('readonly', true);
-            // v9.26 FIX: Add animation class
+            
+            input.classList.add('input-activated'); 
+            input.setAttribute('readonly', true);
             input.classList.add(ANIM_CLASSES[id]);
             
             if (container) container.classList.add('container-hidden');
             if (part) part.classList.add('part-activated');
+
+            // 记录激活
+            activatedSet.add(id);
+            checkAscension();
+        }
+
+        async function checkAscension() {
+            if (activatedSet.size === 3) {
+                // 三重真名集齐，请求飞升地址
+                try {
+                    console.log("Trinity Completed. Requesting Ascension...");
+                    const response = await fetch('http://localhost:3000/api/ascension', {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await response.json();
+                    
+                    if (data.granted && data.url) {
+                        setTimeout(() => {
+                            window.location.href = data.url;
+                        }, 2500); // 给动画一点播放时间
+                    }
+                } catch (e) {
+                    console.error("Ascension Denied:", e);
+                }
+            }
         }
 
         setupInputLogic('input-top'); setupInputLogic('input-left'); setupInputLogic('input-right');
